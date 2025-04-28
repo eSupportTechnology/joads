@@ -1,0 +1,91 @@
+
+.bannercontainer {
+    border: 1px solid #409cf1;
+    border-radius: 5px;
+    background-color: #ffffff;
+    padding: 15px;
+    max-width: 1400px;
+    margin: 0 auto;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.bannerheader {
+    background-color: #e0f0ff; /* Light blue background */
+    color: #000;
+    font-weight: bold;
+    padding: 10px 15px;
+    font-size: 1.1em;
+    border-radius: 5px 5px 0 0;
+}
+
+.bannercontent {
+    padding: 15px;
+}
+
+.content p {
+    margin-bottom: 15px;
+    font-size: 1em;
+    color: #333;
+}
+
+a {
+    text-decoration: none;
+    color: #007bff; /* Link color */
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #0056b3; /* Darker link color on hover */
+}
+
+strong {
+    color: #000; /* Strong tags for emphasis */
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    body {
+        margin: 10px;
+    }
+
+    .bannercontainer {
+        margin: 10px;
+        padding: 10px;
+        max-width: 100%; /* Take full width of the screen */
+    }
+
+    .bannerheader {
+        font-size: 1em; /* Smaller font size for headers */
+        padding: 8px 10px;
+    }
+
+    .bannercontent {
+        padding: 10px;
+    }
+
+    .content p {
+        font-size: 0.9em; /* Slightly smaller text */
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .bannercontainer {
+        padding: 8px;
+        margin: 5px;
+    }
+
+    .bannerheader {
+        font-size: 0.9em; /* Smaller headers for very small screens */
+        padding: 5px 8px;
+    }
+
+    .bannercontent {
+        padding: 8px;
+    }
+
+    .content p {
+        font-size: 0.8em; /* Smaller text */
+    }
+}

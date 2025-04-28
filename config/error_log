@@ -1,0 +1,4 @@
+[28-Jan-2025 16:39:14 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/jsgcuuta/jobads.lk/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jsgcuuta/jobads.lk/config/database.php on line 18
