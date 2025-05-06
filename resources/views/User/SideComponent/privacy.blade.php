@@ -11,8 +11,8 @@
         /* Logo positioning */
         .logo-container {
             position: absolute;
-            top: 140px; /* Adjust for spacing */
-            right: 50px;
+            top: 130px; /* Adjust for spacing */
+            right: 600px;
             z-index: 1000;
         }
         .logo {
@@ -27,7 +27,7 @@
 
         /* Footer styling */
         .footer-container {
-            background-color: #007bff; /* Blue background */
+            background-color: #18799c; /* Blue background */
             color: white; /* White text */
             padding: 20px; /* Padding around the content */
             text-align: center; /* Center align the content */
@@ -97,7 +97,7 @@
     </header>
 
     <main class="privacy-policy-main">
-        <section class="privacy-policy-section">
+        <section class="privacy-policy-section" style="padding-top: 50px">
             <h2>Introduction</h2>
             <p>This site is committed to protecting your privacy. This Statement of Privacy applies to the jobads.lk website and governs data collection and usage at this site. Please read the Statement of Privacy below.</p>
         </section>
@@ -134,8 +134,8 @@
         <h2 class="footer-title">Contact Us</h2>
         <ul class="footer-list">
             @php
-                use App\Models\Contact;
-                $contacts = Contact::all();
+                use App\Models\ContactUs;
+                $contacts = contactus::all();
             @endphp
             <li class="footer-email">Email: {{ $contacts->first()->email ?? 'Not Available' }}</li>
             @foreach ($contacts as $contact)

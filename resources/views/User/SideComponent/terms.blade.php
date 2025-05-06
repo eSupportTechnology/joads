@@ -16,7 +16,6 @@
             position: absolute;
             top: 100px; /* Increase this value to add more space between the logo and the header */
             right: 50px;
-            z-index: 1000; /* Ensure it's above other elements */
         }
 
         .logo {
@@ -29,10 +28,15 @@
             margin-top: 50px; /* Adjust as needed */
         }
 
+        .terms-and-conditions{
+            padding-left: 200px;
+            padding-right: 100px;
+        }
+
         /* Footer styling */
         /* Footer Container */
 .footer-container {
-    background-color: #007bff; /* Blue background */
+    background-color: #18799c; /* Blue background */
     color: white; /* White text */
     padding: 20px; /* Padding around the content */
     text-align: center; /* Center align the content */
@@ -100,41 +104,43 @@
     <div class="logo-container">
         <img src="{{ asset('Jobads.png') }}" alt="Logo" class="logo">
     </div>
-
-    <div class="terms-and-conditions">
-        <header class="terms-and-conditions-header">
-            <h1>Terms & Conditions</h1>
-        </header>
-        <p><strong>Updated: 14th December 2024, Revision 5</strong></p>
-
-        <!-- Dynamic Navigation Menu -->
-        <nav>
-            <h2> Terms and Conditions</h2>
-            <p>Welcome to JOBADS.LK. 
-                These Terms and Conditions govern your use of our website and the payment process for services provided through our platform. By accessing and using our website, you agree to comply with these terms. Please read them carefully before proceeding with any transactions.</p>
-            <ul>
-                @foreach ($terms as $term)
-                    <li><a href="#term-{{ $term['number'] }}">Condition {{ $term['number'] }}</a></li>
-                @endforeach
-            </ul>
-        </nav>
-
-        <!-- Dynamic Content Sections -->
-        @foreach ($terms as $term)
-            <div id="term-{{ $term['number'] }}" class="section">
-                <h2>{{ $term['number'] }}.</h2>
-                <p>{{ $term['text'] }}</p>
-            </div>
-        @endforeach
+    <div class="container">
+        <div class="terms-and-conditions">
+            <header class="terms-and-conditions-header">
+                <h1>Terms & Conditions</h1>
+            </header>
+            <p><strong>Updated: 14th December 2024, Revision 5</strong></p>
+    
+            <!-- Dynamic Navigation Menu -->
+            <nav>
+                <h2> Terms and Conditions</h2>
+                <p>Welcome to JOBADS.LK. 
+                    These Terms and Conditions govern your use of our website and the payment process for services provided through our platform. By accessing and using our website, you agree to comply with these terms. Please read them carefully before proceeding with any transactions.</p>
+                <ul>
+                    @foreach ($terms as $term)
+                        <li><a href="#term-{{ $term['number'] }}">Condition {{ $term['number'] }}</a></li>
+                    @endforeach
+                </ul>
+            </nav>
+    
+            <!-- Dynamic Content Sections -->
+            @foreach ($terms as $term)
+                <div id="term-{{ $term['number'] }}" class="section">
+                    <h2>{{ $term['number'] }}.</h2>
+                    <p>{{ $term['text'] }}</p>
+                </div>
+            @endforeach
+        </div>
+    
+    
     </div>
-
     <!-- Footer with contact information -->
 <footer class="footer-container">
     <h2 class="footer-title">Contact Us</h2>
     <ul class="footer-list">
         @php
-            use App\Models\Contact;
-            $contacts = Contact::all();
+                use App\Models\ContactUs;
+                $contacts = contactus::all();
         @endphp
         <li class="footer-email">Email: {{ $contacts->first()->email ?? 'Not Available' }}</li>
         @foreach ($contacts as $contact)

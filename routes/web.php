@@ -41,6 +41,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\PressReleaseController;
 use App\Http\Controllers\DurationController;
+use App\Http\Controllers\VissionMissionController;
+
+
 
 //Breeze routes
 Route::get('/', [JobPostingController::class, 'home'])->name('home');
@@ -247,6 +250,13 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     // Delete an existing terms and condition
     Route::delete('terms-and-conditions/{termsAndCondition}', [TermsAndConditionController::class, 'destroy'])->name('terms.destroy');
 });
+
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware('admin')
+    ->group(function () {
+        Route::resource('vissionmission', VissionMissionController::class);
+    });
 
 Route::get('/about-us', [AboutUsController::class, 'indexhome'])->name('about-us.index');
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {

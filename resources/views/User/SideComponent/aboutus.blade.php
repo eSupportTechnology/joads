@@ -77,16 +77,23 @@
             </div>
         </div>
 
-        <!-- Vision and Mission Sections -->
-        <div class="vision-mission-section">
-            <h2>Our Vision</h2>
-            <p></p> <!-- Dynamically display Vision content -->
-
-            <h2>Our Mission</h2>
-            <p></p> <!-- Dynamically display Mission content -->
-        </div>
-
     </div>
+
+    @php
+    // Fetch the first record of the Vision and Mission
+    $vissionMission = \App\Models\VissionMission::first();
+@endphp
+
+<div class="container">
+    <div class="about-section" style="padding-top:10px ;display:flex;flex-direction:column">
+        <h2>Our Vision</h2>
+        <p>{{ $vissionMission->vission ?? 'Vision not available' }}</p> <!-- Dynamically display Vision content -->
+
+        <h2>Our Mission</h2>
+        <p>{{ $vissionMission->mission ?? 'Mission not available' }}</p> <!-- Dynamically display Mission content -->
+    </div>
+</div>
+
     @include('home.footer')
 
     <script>

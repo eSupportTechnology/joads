@@ -168,7 +168,7 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
         <button class="menu-toggle" aria-label="Toggle Navigation">
             ☰
         </button>
-        <nav class="nav-links unique-nav-links" style="margin-left:45px;margin-top:11px">
+        <nav class="nav-links unique-nav-links" style="margin-left:100px;margin-top:11px">
             <!-- "Post Your Vacancy" as a button -->
             <a href="{{ route('user.postvacancy') }}"
                 style="background: linear-gradient(to bottom, #28adce, #18799c); color: white;transition: color 0.3s ease,
