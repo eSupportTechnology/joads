@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
     <link rel="stylesheet" href="{{ asset('css/aboutus.css') }}">
     <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
-   
+
     <style>
         .more-content {
             max-height: 0;
@@ -36,6 +36,21 @@
         .learn-more:hover {
             background-color: #4c51bf;
         }
+
+        /* Vision and Mission Section Styling */
+        .vision-mission-section {
+            margin-top: 50px;
+        }
+
+        .vision-mission-section h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .vision-mission-section p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
     </style>
 </head>
 
@@ -51,7 +66,7 @@
 
                 <!-- Full description hidden initially -->
                 <div id="more-content" class="more-content">
-                    <p>{{ $aboutUs->description }}</p> <!-- Full description -->
+                    <p id="full-description">{{ $aboutUs->description }}</p> <!-- Full description -->
                 </div>
 
                 <!-- Toggle button for showing/hiding full content -->
@@ -61,17 +76,47 @@
                 <img src="{{ asset('Jobads.png') }}" style="width: 100px;" alt="Illustration">
             </div>
         </div>
+
+        <!-- Vision and Mission Sections -->
+        <div class="vision-mission-section">
+            <h2>Our Vision</h2>
+            <p></p> <!-- Dynamically display Vision content -->
+
+            <h2>Our Mission</h2>
+            <p></p> <!-- Dynamically display Mission content -->
+        </div>
+
     </div>
     @include('home.footer')
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const learnMoreBtn = document.getElementById('learn-more-btn');
             const moreContent = document.getElementById('more-content');
             const description = document.getElementById('description');
+            const fullDescription = document.getElementById('full-description');
+
+            // Function to add line breaks only at periods and apostrophes (but not in domains like Jobads.lk)
+            function addLineBreaks(text) {
+                // Prevent line breaks for "jobads.lk"
+                text = text.replace(/(jobads\.lk)([^a-zA-Z0-9])/gi, function (match, p1, p2) {
+                    return p1 + "###" + p2; // Add a temporary marker to ignore line breaks
+                });
+
+                // Add line breaks only after periods (.) and apostrophes (') - but not after "Jobads.lk"
+                text = text.replace(/([.'!?])\s+/g, '$1<br>');  // Only break after period or apostrophe, without breaking "Jobads.lk"
+
+                // Revert the temporary marker back to normal "jobads.lk"
+                text = text.replace(/###/g, ".");
+
+                return text;
+            }
+
+            // Apply line breaks to the full description
+            fullDescription.innerHTML = addLineBreaks(fullDescription.innerHTML);
 
             // Event listener for the Learn More button
-            learnMoreBtn.addEventListener('click', function(e) {
+            learnMoreBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 if (moreContent.classList.contains('expanded')) {
                     moreContent.classList.remove('expanded');

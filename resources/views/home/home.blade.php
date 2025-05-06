@@ -214,6 +214,69 @@
                 width: 300px !important;
             }
         }
+
+
+
+        /* Custom Styles for Pagination */
+.pagination-container {
+    text-align: center; /* Center pagination */
+}
+
+.pagination {
+    display: inline-flex;
+    list-style: none;
+    padding-left: 0;
+    border-radius: 0.25rem;
+    margin: 0;
+}
+
+.pagination li {
+    margin: 0 5px;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 0;
+    line-height: 1.5;
+    text-decoration: none;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.pagination a:hover,
+.pagination span:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination .active a,
+.pagination .active span {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.pagination .disabled a,
+.pagination .disabled span {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #6c757d;
+}
+
+.pagination .page-item:first-child a,
+.pagination .page-item:first-child span {
+    border-radius: 0.25rem 0 0 0.25rem; /* Rounded left side */
+}
+
+.pagination .page-item:last-child a,
+.pagination .page-item:last-child span {
+    border-radius: 0 0.25rem 0.25rem 0; /* Rounded right side */
+}
+
     </style>
 </head>
 
@@ -361,13 +424,13 @@
     <!-- Job Listings Section -->
     <section id="job-listings" class="job-listings-container">
         <h3 class="job-listings-title">Available Jobs</h3>
-
+    
         @if ($jobs->isEmpty())
             <p>No jobs found matching your criteria.</p>
         @else
             @if (request()->has('category_id') && request()->category_id != null)
                 <!-- Display as Table if Category is Selected -->
-                <div class="table-container">
+                <div>
                     <table class="job-table">
                         <thead>
                             <tr>
@@ -383,7 +446,7 @@
                         <tbody>
                             @foreach ($jobs as $index => $job)
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ ($jobs->currentPage() - 1) * $jobs->perPage() + $index + 1 }}</td>
                                     <td>{{ $job->job_id ?? 'N/A' }}</td>
                                     <td>
                                         <a href="{{ route('job.details', $job->id) }}" class="job-title">
@@ -434,9 +497,14 @@
                     @endforeach
                 </div>
             @endif
+    
+            <!-- Pagination -->
+            <div class="pagination-container" style="margin-top: 20px;">
+                {{ $jobs->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
+            </div>
         @endif
     </section>
-
+        
 
 
 
