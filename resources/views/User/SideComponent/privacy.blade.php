@@ -11,22 +11,42 @@
         /* Logo positioning */
         .logo-container {
             position: absolute;
-            top: 140px; /* Increase this value to add more space between the logo and the header */
+            top: 140px; /* Adjust for spacing */
             right: 50px;
-            z-index: 1000; /* Ensure it's above other elements */
+            z-index: 1000;
         }
-    
         .logo {
-            width: 100px; /* Adjust size as needed */
+            width: 100px;
             height: auto;
         }
-    
-        /* Optional: Add margin to the header to create consistent spacing */
+
+        /* Header margin adjustment */
         .terms-and-conditions-header {
-            margin-top: 100px; /* Adjust as needed */
+            margin-top: 100px;
+        }
+
+        /* Footer styling */
+        footer {
+            background-color: #f8f9fa; /* Light grey background */
+            padding: 20px;
+            text-align: center;
+            margin-top: 40px; /* Spacing from main content */
+            border-top: 1px solid #ddd; /* Light border for separation */
+        }
+
+        footer h2 {
+            margin-bottom: 10px;
+        }
+
+        footer ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        footer li {
+            margin: 5px 0;
         }
     </style>
-
 </head>
 <body class="privacy-policy-body">
     <!-- Logo in the top right corner -->
@@ -34,10 +54,10 @@
         <img src="{{ asset('Jobads.png') }}" alt="Logo" class="logo">
     </div>
 
-
     <header class="privacy-policy-header">
         <h1>Privacy Policy</h1>
     </header>
+
     <main class="privacy-policy-main">
         <section class="privacy-policy-section">
             <h2>Introduction</h2>
@@ -70,6 +90,20 @@
             <p>We prioritize transparency and user safety, and we will keep you informed throughout the resolution process.</p>
         </section>
     </main>
-    
+
+    <!-- Footer with contact information -->
+    <footer>
+        <h2>Contact Us</h2>
+        <ul>
+            @php
+                use App\Models\Contact;
+                $contacts = Contact::all();
+            @endphp
+            <li>Email: {{ $contacts->first()->email ?? 'Not Available' }}</li>
+            @foreach ($contacts as $contact)
+                <li>Phone: {{ $contact->phone }}</li>
+            @endforeach
+        </ul>
+    </footer>
 </body>
 </html>

@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
     <link rel="stylesheet" href="{{ asset('css/terms.css') }}">
 
-
     <style>
         /* Logo positioning */
         .logo-container {
@@ -19,18 +18,40 @@
             right: 50px;
             z-index: 1000; /* Ensure it's above other elements */
         }
-    
+
         .logo {
             width: 100px; /* Adjust size as needed */
             height: auto;
         }
-    
+
         /* Optional: Add margin to the header to create consistent spacing */
         .terms-and-conditions-header {
             margin-top: 50px; /* Adjust as needed */
         }
+
+        /* Footer styling */
+        footer {
+            background-color: #f8f9fa; /* Light grey background */
+            padding: 20px;
+            text-align: center;
+            margin-top: 40px; /* Space from main content */
+            border-top: 1px solid #ddd; /* Light border for separation */
+        }
+
+        footer h2 {
+            margin-bottom: 10px;
+        }
+
+        footer ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        footer li {
+            margin: 5px 0;
+        }
     </style>
-    </head>
+</head>
 
 <body>
     @include('home.header')
@@ -65,18 +86,23 @@
                 <p>{{ $term['text'] }}</p>
             </div>
         @endforeach
-
-        <div id="contacts">
-            <h2>Contact Us</h2>
-            <ul>
-                @foreach ($contacts as $contact)
-                    <li>{{ $contact->email }}</li>
-                    <li>{{ $contact->phone }}</li>
-                @endforeach
-            </ul>
-        </div>
-
     </div>
+
+    <!-- Footer with contact information -->
+    <footer>
+        <h2>Contact Us</h2>
+        <ul>
+            @php
+                use App\Models\Contact;
+                $contacts = Contact::all();
+            @endphp
+            <li>Email: {{ $contacts->first()->email ?? 'Not Available' }}</li>
+            @foreach ($contacts as $contact)
+                <li>Phone: {{ $contact->phone }}</li>
+            @endforeach
+        </ul>
+    </footer>
+
 </body>
 
 </html>
