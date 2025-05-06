@@ -26,27 +26,65 @@
         }
 
         /* Footer styling */
-        footer {
-            background-color: #f8f9fa; /* Light grey background */
-            padding: 20px;
-            text-align: center;
-            margin-top: 40px; /* Spacing from main content */
-            border-top: 1px solid #ddd; /* Light border for separation */
+        .footer-container {
+            background-color: #007bff; /* Blue background */
+            color: white; /* White text */
+            padding: 20px; /* Padding around the content */
+            text-align: center; /* Center align the content */
         }
-
-        footer h2 {
-            margin-bottom: 10px;
+        
+        /* Footer Title */
+        .footer-title {
+            font-size: 24px; /* Larger font size for the title */
+            margin-bottom: 15px; /* Space below the title */
+            font-weight: bold; /* Bold text */
         }
-
-        footer ul {
-            list-style-type: none;
-            padding: 0;
+        
+        /* Footer List */
+        .footer-list {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0; /* Remove padding */
+            margin: 0; /* Remove margin */
         }
-
-        footer li {
-            margin: 5px 0;
+        
+        /* Footer List Items */
+        .footer-list li {
+            font-size: 16px; /* Font size for list items */
+            margin: 5px 0; /* Add margin between list items */
         }
-    </style>
+        
+        /* Footer Email */
+        .footer-email {
+            font-style: italic; /* Italicize the email */
+            margin-bottom: 10px; /* Add space below email */
+        }
+        
+        /* Footer Phone */
+        .footer-phone {
+            font-weight: 600; /* Make phone numbers bold */
+            margin-bottom: 5px; /* Add space between phone items */
+        }
+        
+        /* Hover effect for footer items */
+        .footer-list li:hover {
+            background-color: #18799c; /* Darker blue on hover */
+            cursor: pointer; /* Pointer cursor on hover */
+            padding: 5px 0; /* Add padding on hover for effect */
+        }
+        
+        /* Footer for small screens */
+        @media (max-width: 600px) {
+            .footer-container {
+                padding: 15px; /* Reduce padding for smaller screens */
+            }
+            .footer-title {
+                font-size: 20px; /* Adjust title font size */
+            }
+            .footer-list li {
+                font-size: 14px; /* Adjust list item font size */
+            }
+        }
+            </style>
 </head>
 <body class="privacy-policy-body">
     <!-- Logo in the top right corner -->
@@ -92,18 +130,18 @@
     </main>
 
     <!-- Footer with contact information -->
-    <footer>
-        <h2>Contact Us</h2>
-        <ul>
+    <footer class="footer-container">
+        <h2 class="footer-title">Contact Us</h2>
+        <ul class="footer-list">
             @php
                 use App\Models\Contact;
                 $contacts = Contact::all();
             @endphp
-            <li>Email: {{ $contacts->first()->email ?? 'Not Available' }}</li>
+            <li class="footer-email">Email: {{ $contacts->first()->email ?? 'Not Available' }}</li>
             @foreach ($contacts as $contact)
-                <li>Phone: {{ $contact->phone }}</li>
+                <li class="footer-phone">Phone: {{ $contact->phone }}</li>
             @endforeach
         </ul>
     </footer>
-</body>
+    </body>
 </html>

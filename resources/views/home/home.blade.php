@@ -318,33 +318,70 @@
 
 
     <div class="scroll-wrapper">
-
+        <!-- Scroll buttons -->
         <button class="scroll-btn left-scroll" id="scrollLeft">
             <i class="fa fa-chevron-left"></i>
         </button>
-
-
+    
+        <!-- Categories list -->
         <div class="categories-list" id="categoriesList"
-            style="border-radius: 15px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">
+             style="border-radius: 15px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">
+             
+            <!-- Render "All" category first -->
             @foreach ($categories as $category)
-                <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
-                    class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
-                    style="text-decoration: none; background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
-                          color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};
-                          padding: 4px 15px; border-radius: 5px; min-width:230px; width: auto;
-                          font-size: 14px; transition: all 0.3s ease; white-space: nowrap; display: inline-block;">
-                    {{ $category->name }}
-                </a>
+                @if ($category->name == 'All')
+                    <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
+                       class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
+                       style="
+                            text-decoration: none; 
+                            background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
+                            color: red;                            
+                            padding: 4px 15px; 
+                            border-radius: 5px; 
+                            min-width: 230px; 
+                            width: auto;
+                            font-size: 14px; 
+                            transition: all 0.3s ease; 
+                            white-space: nowrap; 
+                            display: inline-block;
+                            position: sticky; top: 0; z-index: 10;
+                       ">
+                        {{ $category->name }}
+                    </a>
+                @endif
             @endforeach
+    
+            <!-- Render the rest of the categories -->
+            @foreach ($categories as $category)
+                @if ($category->name != 'All')
+                    <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
+                       class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
+                       style="
+                            text-decoration: none; 
+                            background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
+                            color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};
+                            padding: 4px 15px; 
+                            border-radius: 5px; 
+                            min-width: 230px; 
+                            width: auto;
+                            font-size: 14px; 
+                            transition: all 0.3s ease; 
+                            white-space: nowrap; 
+                            display: inline-block;
+                       ">
+                        {{ $category->name }}
+                    </a>
+                @endif
+            @endforeach
+    
         </div>
-
+    
+        <!-- Scroll buttons -->
         <button class="scroll-btn right-scroll" id="scrollRight">
             <i class="fa fa-chevron-right"></i>
         </button>
-
     </div>
-
-
+    
     </section>
     <!-- <div class="ads-banner">
         <img src="{{ asset('assets/images/ads.jpg') }}" alt="">
