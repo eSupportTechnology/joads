@@ -15,13 +15,35 @@ class TermsAndConditionController extends Controller
 
         return view('Admin.terms.index', compact('terms'));
     }
+
     public function indexhome()
     {
-        $terms = TermsAndCondition::all(); // Assuming only one record exists for terms and conditions
-        $contacts = ContactUs::all();
-        return view('User.SideComponent.terms', compact('terms', 'contacts'));
-    }
+        $termsRecord = TermsAndCondition::first();
 
+        $terms = [];
+
+        if ($termsRecord && $termsRecord->content) {
+            $content = $termsRecord->content;
+
+            preg_match_all('/\d+\.\s(.*?)(?=\d+\.\s|$)/s', $content, $matches);
+
+            if (!empty($matches[0])) {
+                foreach ($matches[0] as $match) {
+                    preg_match('/^(\d+)\.\s(.*)/s', $match, $conditionParts);
+                    if (count($conditionParts) === 3) {
+                        $terms[] = [
+                            'number' => $conditionParts[1], 
+                            'text' => trim($conditionParts[2]), 
+                        ];
+                    }
+                }
+            }
+        }
+
+        $contacts = ContactUs::all();
+
+        return view('User.SideComponent.terms', compact('terms', 'contacts'));
+    }    
     // Show the form for creating a new terms and condition
     public function create()
     {

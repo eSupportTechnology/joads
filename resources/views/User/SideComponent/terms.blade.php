@@ -9,11 +9,11 @@
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
     <link rel="stylesheet" href="{{ asset('css/terms.css') }}">
-  
 </head>
 
 <body>
     @include('home.header')
+
     <div class="terms-and-conditions">
         <header class="terms-and-conditions-header">
             <h1>Terms & Conditions</h1>
@@ -22,18 +22,21 @@
 
         <!-- Dynamic Navigation Menu -->
         <nav>
+            <h2> Terms and Conditions</h2>
+            <p>Welcome to JOBADS.LK. 
+                These Terms and Conditions govern your use of our website and the payment process for services provided through our platform. By accessing and using our website, you agree to comply with these terms. Please read them carefully before proceeding with any transactions.</p>
             <ul>
                 @foreach ($terms as $term)
-                    <li><a href="#{{ strtolower(str_replace(' ', '-', $term->title)) }}">{{ $term->title }}</a></li>
+                    <li><a href="#term-{{ $term['number'] }}">Condition {{ $term['number'] }}</a></li>
                 @endforeach
             </ul>
         </nav>
 
         <!-- Dynamic Content Sections -->
         @foreach ($terms as $term)
-            <div id="{{ strtolower(str_replace(' ', '-', $term->title)) }}" class="section">
-                <h2>{{ $term->title }}</h2>
-                <p>{{ $term->content }}</p>
+            <div id="term-{{ $term['number'] }}" class="section">
+                <h2>{{ $term['number'] }}.</h2>
+                <p>{{ $term['text'] }}</p>
             </div>
         @endforeach
 
