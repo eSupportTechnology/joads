@@ -106,16 +106,18 @@ class AdminAuthController extends Controller
         try {
             // Get current date for calculations
             $currentDate = now();
-
+            $todayStart = $currentDate->copy()->startOfDay(); // Start of today (00:00)
+            $todayEnd = $currentDate->copy()->endOfDay(); // End of today (23:59)
+    
             // Check if required tables and columns exist
             if (!Schema::hasTable('job_postings')) {
                 throw new \Exception("Job postings table does not exist");
             }
-
+    
             if (!Schema::hasColumn('job_postings', 'view_count')) {
                 throw new \Exception("view_count column missing in job_postings table");
             }
-
+    
             // Initialize variables with default values
             $totalApplications = 0;
             $totalJobsPosted = 0;
@@ -124,6 +126,7 @@ class AdminAuthController extends Controller
             $totalEarnings = 0;
             $recentApplications = 0;
             $totalViews = 0;
+            $dailyViews = 0;
             $totalAdmins = 0;
             $totalSuperAdmins = 0;
             $totalJobs = 0;
@@ -134,11 +137,12 @@ class AdminAuthController extends Controller
             $totalApprovedBanners = 0;
             $totalCurrentBanners = 0;
             $totalBannerEarnings = 0;
-
+    
             // Get total applications count if table exists
             if (Schema::hasTable('applications')) {
                 $totalApplications = Application::count();
             }
+    
             $today = Carbon::today();
             // Get total active job postings
             if (Schema::hasTable('job_postings')) {
@@ -148,40 +152,51 @@ class AdminAuthController extends Controller
                         $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
                     })
                     ->count();
-
+    
                 // Calculate total views
                 $totalViews = JobPosting::sum('view_count');
+    
+                // Calculate today's views
+                $dailyViews = JobPosting::whereBetween('updated_at', [$todayStart, $todayEnd])
+                    ->sum('view_count');
             }
-
+    
+            // Get total active job postings
             if (Schema::hasTable('job_postings')) {
                 $totalJobs = JobPosting::count();
             }
-
+    
+            // Get total pending job postings
             if (Schema::hasTable('job_postings')) {
                 $totalPendingJobs = JobPosting::where('status', 'pending')
-
                     ->count();
             }
-
+    
+            // Get total approved job postings
             if (Schema::hasTable('job_postings')) {
                 $totalApprovedJobs = JobPosting::where('status', 'approved')
                     ->count();
             }
-
+    
+            // Get total banners
             if (Schema::hasTable('banners')) {
                 $totalBanners = Banner::count();
             }
-
+    
+            // Get total approved banners
             if (Schema::hasTable('banners')) {
                 $totalApprovedBanners = Banner::where('status', 'published')
                     ->count();
             }
-
+    
+            // Get total pending banners
             if (Schema::hasTable('banners')) {
                 $totalPendingBanners = Banner::where('status', 'pending')
                     ->count();
             }
+    
             $now = Carbon::now();
+            // Get total current banners
             if (Schema::hasTable('banners')) {
                 $totalCurrentBanners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
                     ->join('duration', 'banner_packages.duration_id', '=', 'duration.id') // Join duration table
@@ -189,32 +204,34 @@ class AdminAuthController extends Controller
                     ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now]) // Ensure within duration
                     ->count();
             }
+    
+            // Get total banner earnings
             if (Schema::hasTable('banners')) {
                 $totalBannerEarnings = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
                     ->where('banners.status', 'published')
                     ->sum('banner_packages.price_lkr');
             }
-
+    
             // Get total active jobseekers
             if (Schema::hasTable('users')) {
                 $totalJobseekers = User::count();
             }
-
+    
             // Get total active companies
             if (Schema::hasTable('employers')) {
                 $totalCompanies = Employer::count();
             }
-
-            // Get total active jobseekers
+    
+            // Get total admins
             if (Schema::hasTable('admins')) {
                 $totalAdmins = Admin::count();
             }
-
-            // Get total active jobseekers
+    
+            // Get total super admins
             if (Schema::hasTable('admins')) {
                 $totalSuperAdmins = Admin::where('role', 'super_admin')->count();
             }
-
+    
             // Get total earnings
             try {
                 $totalEarnings = DB::table('job_postings')
@@ -222,27 +239,27 @@ class AdminAuthController extends Controller
                     ->where('job_postings.status', 'approved')
                     ->sum('packages.lkr_price');
             } catch (\Exception $e) {
-                // \Log::error('Error calculating total earnings: ' . $e->getMessage());
                 $totalEarnings = 0;
             }
-
+    
             // Get recent applications (last 7 days)
             if (Schema::hasTable('applications')) {
                 $recentApplications = Application::whereDate('created_at', '>=', $currentDate->copy()->subDays(7))
                     ->count();
-
+    
                 $previousWeekApplications = Application::whereDate('created_at', '>=', $currentDate->copy()->subDays(14))
                     ->whereDate('created_at', '<', $currentDate->copy()->subDays(7))
                     ->count();
-
+    
                 $applicationGrowth = $previousWeekApplications > 0
-                ? (($recentApplications - $previousWeekApplications) / $previousWeekApplications) * 100
-                : 0;
+                    ? (($recentApplications - $previousWeekApplications) / $previousWeekApplications) * 100
+                    : 0;
             } else {
                 $recentApplications = 0;
                 $applicationGrowth = 0;
             }
-
+    
+            // Return the statistics including daily views
             return [
                 'total_applications' => $totalApplications,
                 'total_jobs_posted' => $totalJobsPosted,
@@ -252,6 +269,7 @@ class AdminAuthController extends Controller
                 'recent_applications' => $recentApplications,
                 'application_growth' => round($applicationGrowth, 2),
                 'total_views' => $totalViews, // Include total views
+                'daily_views' => $dailyViews, // Return daily views
                 'total_admins' => $totalAdmins,
                 'total_super_admins' => $totalSuperAdmins,
                 'total_jobs' => $totalJobs,
@@ -263,11 +281,11 @@ class AdminAuthController extends Controller
                 'total_current_banners' => $totalCurrentBanners,
                 'total_banner_earnings' => $totalBannerEarnings,
             ];
-
+    
         } catch (\Exception $e) {
+            // Log error and return default values to avoid issues in blade templates
             // \Log::error('Error in getDashboardStatistics: ' . $e->getMessage());
-
-            // Return default values to avoid blade template issues
+    
             return [
                 'total_applications' => 0,
                 'total_jobs_posted' => 0,
@@ -277,6 +295,7 @@ class AdminAuthController extends Controller
                 'recent_applications' => 0,
                 'application_growth' => 0,
                 'total_views' => 0,
+                'daily_views' => 0, // Default daily views to 0 in case of error
                 'total_admins' => 0,
                 'total_super_admins' => 0,
                 'total_jobs' => 0,
@@ -290,7 +309,7 @@ class AdminAuthController extends Controller
             ];
         }
     }
-    /**
+            /**
      * Display admin dashboard
      *
      * @return \Illuminate\View\View
