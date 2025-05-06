@@ -59,7 +59,7 @@
         </div>
 
         @foreach ($contacts as $contact)
-            <div class="jobads-footer-section" style="flex: 1; min-width: 250px; text-align: left;">
+            <div class="jobads-footer-section" style="flex: 1; min-width: 50px; text-align: left;">
                 <h3 style="font-size: 22px; font-weight: bold; margin-bottom: 15px; color: #fff;">Contact Us</h3>
                 <ul style="padding: 0; list-style: none;">
                     <li style="margin-bottom: 12px; display: flex; align-items: center;">
@@ -78,7 +78,7 @@
                             {{ $contact->email }}
                         </a>
                     </li>
-                    <li style="margin-bottom: 12px; display: flex; align-items: center;">
+                    <li style="margin-bottom: 12px; display: flex; align-items: center;padding-right:50px;">
                         <i class="fa fa-map-marker"
                             style="margin-right: 12px; color: goldenrod; width: 20px; text-align: center;"></i>
                         <a href="https://www.google.com/maps/place/{{ $contact->address }}" target="_blank"
