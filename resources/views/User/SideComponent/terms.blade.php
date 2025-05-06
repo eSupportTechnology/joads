@@ -9,10 +9,36 @@
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
     <link rel="stylesheet" href="{{ asset('css/terms.css') }}">
-</head>
+
+
+    <style>
+        /* Logo positioning */
+        .logo-container {
+            position: absolute;
+            top: 100px; /* Increase this value to add more space between the logo and the header */
+            right: 50px;
+            z-index: 1000; /* Ensure it's above other elements */
+        }
+    
+        .logo {
+            width: 100px; /* Adjust size as needed */
+            height: auto;
+        }
+    
+        /* Optional: Add margin to the header to create consistent spacing */
+        .terms-and-conditions-header {
+            margin-top: 50px; /* Adjust as needed */
+        }
+    </style>
+    </head>
 
 <body>
     @include('home.header')
+
+    <!-- Logo in the top right corner -->
+    <div class="logo-container">
+        <img src="{{ asset('Jobads.png') }}" alt="Logo" class="logo">
+    </div>
 
     <div class="terms-and-conditions">
         <header class="terms-and-conditions-header">

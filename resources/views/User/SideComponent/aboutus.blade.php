@@ -58,7 +58,7 @@
                 <a href="#" id="learn-more-btn" class="learn-more">Learn More</a>
             </div>
             <div class="illustration">
-                <img src="{{ asset('images/aboutus.png') }}" alt="Illustration">
+                <img src="{{ asset('Jobads.png') }}" style="width: 100px;" alt="Illustration">
             </div>
         </div>
     </div>

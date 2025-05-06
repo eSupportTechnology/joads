@@ -7,9 +7,34 @@
     <title>Privacy Policy</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="{{ asset('css/privacy.css') }}">
-   
+    <style>
+        /* Logo positioning */
+        .logo-container {
+            position: absolute;
+            top: 140px; /* Increase this value to add more space between the logo and the header */
+            right: 50px;
+            z-index: 1000; /* Ensure it's above other elements */
+        }
+    
+        .logo {
+            width: 100px; /* Adjust size as needed */
+            height: auto;
+        }
+    
+        /* Optional: Add margin to the header to create consistent spacing */
+        .terms-and-conditions-header {
+            margin-top: 100px; /* Adjust as needed */
+        }
+    </style>
+
 </head>
 <body class="privacy-policy-body">
+    <!-- Logo in the top right corner -->
+    <div class="logo-container">
+        <img src="{{ asset('Jobads.png') }}" alt="Logo" class="logo">
+    </div>
+
+
     <header class="privacy-policy-header">
         <h1>Privacy Policy</h1>
     </header>
