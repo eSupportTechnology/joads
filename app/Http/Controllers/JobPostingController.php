@@ -63,7 +63,7 @@ class JobPostingController extends Controller
         $topEmployers = Employer::withCount('jobPostings') // Assuming 'jobPostings' is the relationship
            
             ->orderBy('job_postings_count', 'desc') // Sort by the number of job postings
-            ->take(28) // Limit to top 28
+            ->take(8) // Limit to top 28
             ->get();
 
         // Pass data to the view
@@ -238,7 +238,6 @@ class JobPostingController extends Controller
 
     public function home(Request $request)
     {
-        // Check if none of the filters are set in the URL.
         if (
             !$request->has('search') &&
             !$request->has('location') &&
@@ -247,26 +246,23 @@ class JobPostingController extends Controller
         ) {
             session()->forget('selected_category_id');
         }
-
+    
         $search = $request->input('search');
         $location = $request->input('location');
         $countryId = $request->input('country');
         $categoryId = $request->input('category_id');
-
+    
         if ($categoryId) {
             session(['selected_category_id' => $categoryId]);
         } else {
             $categoryId = session('selected_category_id');
         }
-
-        \Log::debug('Selected Category ID:', ['category_id' => $categoryId]);
-
+    
         $today = Carbon::today();
-
+    
         $jobs = JobPosting::with(['category', 'subcategory', 'country', 'package.duration'])
             ->where('status', 'approved')
             ->where('is_active', true)
-
             ->whereHas('package.duration', function ($query) use ($today) {
                 $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
             })
@@ -288,13 +284,13 @@ class JobPostingController extends Controller
             ->when($categoryId, function ($query, $categoryId) {
                 $query->where('category_id', $categoryId);
             })
-            ->get();
-
+            ->paginate(50); // Pagination added here
+    
         $categories = Category::with('subcategories')->get();
         $contacts = ContactUs::all();
         $countries = Country::all();
         $now = Carbon::today();
-
+    
         $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
             ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
             ->where('banners.status', 'published')
@@ -302,10 +298,12 @@ class JobPostingController extends Controller
             ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now])
             ->select('banners.*', 'duration.duration')
             ->get();
-
+    
         return view('home.home', compact('categories', 'jobs', 'contacts', 'countries', 'banners'))
             ->with('selected_category_id', session('selected_category_id'));
     }
+                
+    
     
     public function toggleActiveStatus($id)
     {
