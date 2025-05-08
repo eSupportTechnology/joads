@@ -335,7 +335,7 @@
                        style="
                             text-decoration: none; 
                             background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
-                            color: red;                            
+                            color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};                            
                             padding: 4px 15px; 
                             border-radius: 5px; 
                             min-width: 230px; 
@@ -416,7 +416,7 @@
     <!-- Filters Section -->
     <section class="filters" style="background-color: rgba(0, 0, 0, 0.1); padding:2px 25px 0px 25px">
         <p class="jobtitle">
-            Available Jobs: {{ $jobs->count() }} new hot jobs
+            Available New Jobs : {{ $totalCount }}
             @if (session('selected_category_id'))
                 @php
                     $selectedCategory = \App\Models\Category::find(session('selected_category_id'));
