@@ -277,6 +277,12 @@
     border-radius: 0 0.25rem 0.25rem 0; /* Rounded right side */
 }
 
+.job-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+
+}
+
     </style>
 </head>
 

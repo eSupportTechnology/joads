@@ -16,7 +16,7 @@
             z-index: 1000;
         }
         .logo {
-            width: 100px;
+            width: 150px;
             height: auto;
         }
 

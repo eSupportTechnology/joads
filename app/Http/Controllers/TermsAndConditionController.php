@@ -18,27 +18,9 @@ class TermsAndConditionController extends Controller
 
     public function indexhome()
     {
-        $termsRecord = TermsAndCondition::first();
+        $terms = TermsAndCondition::all();
 
-        $terms = [];
-
-        if ($termsRecord && $termsRecord->content) {
-            $content = $termsRecord->content;
-
-            preg_match_all('/\d+\.\s(.*?)(?=\d+\.\s|$)/s', $content, $matches);
-
-            if (!empty($matches[0])) {
-                foreach ($matches[0] as $match) {
-                    preg_match('/^(\d+)\.\s(.*)/s', $match, $conditionParts);
-                    if (count($conditionParts) === 3) {
-                        $terms[] = [
-                            'number' => $conditionParts[1], 
-                            'text' => trim($conditionParts[2]), 
-                        ];
-                    }
-                }
-            }
-        }
+   
 
         $contacts = ContactUs::all();
 

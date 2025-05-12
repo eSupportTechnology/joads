@@ -327,7 +327,7 @@ Route::middleware('admin')->group(function () {
 
 });
 
-//Route::get('/ourservices', [ContactUsController::class, 'index'])->name('ourservices');
+// Route::get('/ourservices', [ContactUsController::class, 'index'])->name('ourservices');
 Route::get('/contactus', [ContactListController::class, 'contactus'])->name('contacts');
 
 

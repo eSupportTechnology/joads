@@ -15,10 +15,12 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
+            text-align: justify;
         }
 
         .more-content.expanded {
             max-height: 300px;
+            text-align: justify;
             /* Adjust this value according to your content */
         }
 
@@ -31,6 +33,7 @@
             text-decoration: none;
             border-radius: 4px;
             font-size: 14px;
+            text-align: justify;
         }
 
         .learn-more:hover {
@@ -51,6 +54,20 @@
             font-size: 16px;
             line-height: 1.6;
         }
+        .text-center {
+            text-align: left;
+        }
+        .box {
+            padding: 20px;
+            text-align: left;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        
+        }
+        
+        
     </style>
 </head>
 
@@ -62,18 +79,20 @@
                 <h1>{{ $aboutUs->title }}</h1> <!-- Dynamically display the title -->
 
                 <!-- Show part of the description initially -->
-                <p id="description" class="description">{{ Str::limit($aboutUs->description, 150) }}</p>
-
+                <p id="description" class="description" style="text-align: justify;">
+                    {{ Str::limit($aboutUs->description, 1000) }}
+                </p>
+                
                 <!-- Full description hidden initially -->
-                <div id="more-content" class="more-content">
-                    <p id="full-description">{{ $aboutUs->description }}</p> <!-- Full description -->
+                <div id="more-content" class="more-content" style="text-align: justify;">
+                    <p id="full-description"  >{{ $aboutUs->description }}</p> <!-- Full description -->
                 </div>
 
                 <!-- Toggle button for showing/hiding full content -->
                 <a href="#" id="learn-more-btn" class="learn-more">Learn More</a>
             </div>
             <div class="illustration">
-                <img src="{{ asset('Jobads.png') }}" style="width: 100px;" alt="Illustration">
+                <img src="{{ asset('Jobads.png') }}" style="width: 150px;padding-right: 200px;" alt="Illustration">
             </div>
         </div>
 
@@ -85,14 +104,19 @@
 @endphp
 
 <div class="container">
-    <div class="about-section" style="padding-top:10px ;display:flex;flex-direction:column">
+    <div class="box">
         <h2>Our Vision</h2>
-        <p>{{ $vissionMission->vission ?? 'Vision not available' }}</p> <!-- Dynamically display Vision content -->
+        <p style="font-size: 16px; color: #666;">
+            {{ $vissionMission->vission ?? 'Vision not available' }}
+        </p> <!-- Dynamically display Vision content -->
 
         <h2>Our Mission</h2>
-        <p>{{ $vissionMission->mission ?? 'Mission not available' }}</p> <!-- Dynamically display Mission content -->
+        <p style="font-size: 16px; color: #666;">
+            {{ $vissionMission->mission ?? 'Mission not available' }}
+        </p> <!-- Dynamically display Mission content -->
     </div>
 </div>
+
 
     @include('home.footer')
 
@@ -101,27 +125,7 @@
             const learnMoreBtn = document.getElementById('learn-more-btn');
             const moreContent = document.getElementById('more-content');
             const description = document.getElementById('description');
-            const fullDescription = document.getElementById('full-description');
-
-            // Function to add line breaks only at periods and apostrophes (but not in domains like Jobads.lk)
-            function addLineBreaks(text) {
-                // Prevent line breaks for "jobads.lk"
-                text = text.replace(/(jobads\.lk)([^a-zA-Z0-9])/gi, function (match, p1, p2) {
-                    return p1 + "###" + p2; // Add a temporary marker to ignore line breaks
-                });
-
-                // Add line breaks only after periods (.) and apostrophes (') - but not after "Jobads.lk"
-                text = text.replace(/([.'!?])\s+/g, '$1<br>');  // Only break after period or apostrophe, without breaking "Jobads.lk"
-
-                // Revert the temporary marker back to normal "jobads.lk"
-                text = text.replace(/###/g, ".");
-
-                return text;
-            }
-
-            // Apply line breaks to the full description
-            fullDescription.innerHTML = addLineBreaks(fullDescription.innerHTML);
-
+    
             // Event listener for the Learn More button
             learnMoreBtn.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -137,6 +141,6 @@
             });
         });
     </script>
-</body>
+    </body>
 
 </html>

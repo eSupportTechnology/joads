@@ -183,7 +183,7 @@
                     </tr>
                     <tr style="background-color: #fad157;">
                         <th style="padding-left: 20px;background-color: #fad157;">Email</th>
-                        <td class="email" colspan="2" style="color: red;">jobads@jobads.lk</td>
+                        <td class="email" colspan="2" style="color: red;">jobs@jobads.lk</td>
                     </tr>
                     <tr style="background-color: #fad157;">
                         <td></td>

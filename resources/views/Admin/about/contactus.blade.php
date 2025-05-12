@@ -63,7 +63,7 @@
                     <table class="contact-table">
                         <tr>
                             <th class="emailth" style="background-color: #fad157;">Email</th>
-                            <td class="email" colspan="2">jobads@jobads.lk</td>
+                            <td class="email" colspan="2">jobs@jobads.lk</td>
                         </tr>
                         <tr>
                             <th rowspan="{{ count($contacts) + 1 }}" style="background-color: #fad157;">Call or WhatsApp
