@@ -14,8 +14,8 @@
         /* Logo positioning */
         .logo-container {
             position: absolute;
-            top: 130px; /* Increase this value to add more space between the logo and the header */
-            right: 570px;
+            top: 40px; /* Increase this value to add more space between the logo and the header */
+            right: 40%;
         }
 
         .logo {
@@ -91,6 +91,15 @@
     .footer-list li {
         font-size: 14px; /* Adjust list item font size */
     }
+}
+.privacy-policy-main {
+         position: relative;
+    padding: 20px;
+    max-width: 800px;
+    margin: 20px auto;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
     </style>

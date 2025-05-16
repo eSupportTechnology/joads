@@ -309,13 +309,74 @@ class AdminAuthController extends Controller
             ];
         }
     }
+
+public function companyStat()
+{
+    try {
+        // Get current date and time boundaries for today
+        $todayStart = now()->startOfDay(); // Start of today (00:00)
+        $todayEnd = now()->endOfDay(); // End of today (23:59)
+
+        // Check if required tables and columns exist
+        if (!Schema::hasTable('employers') || !Schema::hasTable('job_postings')) {
+            throw new \Exception("Required tables do not exist");
+        }
+
+        if (!Schema::hasColumns('job_postings', ['view_count', 'employer_id', 'updated_at'])) {
+            throw new \Exception("Required columns missing in job_postings table");
+        }
+
+        // Fetch employers with job postings and their statistics
+        $companyStats = Employer::with(['jobPostings' => function ($query) use ($todayStart, $todayEnd) {
+            $query->select('id', 'employer_id', 'title', 'view_count', 'updated_at')
+                ->addSelect([
+                    'today_views' => JobPosting::selectRaw('SUM(view_count)')
+                        ->whereColumn('id', 'job_postings.id')
+                        ->whereBetween('updated_at', [$todayStart, $todayEnd])
+                        ->limit(1)
+                ]);
+        }])->get();
+
+        return $companyStats;
+
+    } catch (\Exception $e) {
+        // Log the error and return default values
+        // \Log::error('Error in companyStat: ' . $e->getMessage());
+        return [];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             /**
      * Display admin dashboard
      *
      * @return \Illuminate\View\View
      */
-    public function dashboard()
+   
+   
+   
+     public function dashboard()
     {
+        $companyStats=$this->companyStat();
         $currentDate = now();
         $statistics = $this->getDashboardStatistics();
 
@@ -345,7 +406,7 @@ class AdminAuthController extends Controller
                 ];
             });
 
-        return view('Admin.dashboard', compact('statistics', 'recentApplications'));
+        return view('Admin.dashboard', compact('statistics', 'recentApplications','companyStats'));
     }
 
     public function showProfileForm()

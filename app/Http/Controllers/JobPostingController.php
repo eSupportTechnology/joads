@@ -236,35 +236,39 @@ class JobPostingController extends Controller
         ));
     }
 
-    public function home(Request $request)
-    {
-        if (
-            !$request->has('search') &&
-            !$request->has('location') &&
-            !$request->has('country') &&
-            (!$request->has('category_id') || $request->input('category_id') === '')
-        ) {
-            session()->forget('selected_category_id');
-        }
-    
-        $search = $request->input('search');
-        $location = $request->input('location');
-        $countryId = $request->input('country');
-        // $categoryName=$request->input('name');
-        $categoryId = $request->input('category_id');
-        if ($categoryId && $categoryId !== 'all') {
-            session(['selected_category_id' => $categoryId]);
-        } elseif ($categoryId === 'all') {
-            session()->forget('selected_category_id');
-            $categoryId = null; // Reset category ID to null for "All"
-        } else {
-            $categoryId = session('selected_category_id');
-        }
-    
-        $today = Carbon::today();
-    
 
-        $totalCount = JobPosting::where('status', 'approved')
+public function home(Request $request)
+{
+    $today = Carbon::today();
+
+    // Handle category selection and session management
+    $categoryId = $request->input('category_id');
+    if ($categoryId && $categoryId !== 'all') {
+        session(['selected_category_id' => $categoryId]);
+    } elseif ($categoryId === 'all') {
+        session()->forget('selected_category_id');
+        $categoryId = null; // Reset category ID to null for "All"
+    } else {
+        $categoryId = session('selected_category_id');
+    }
+
+    // Check if no filters are applied, and reset the session
+    if (
+        !$request->has('search') &&
+        !$request->has('location') &&
+        !$request->has('country') &&
+        (!$request->has('category_id') || $request->input('category_id') === '')
+    ) {
+        session()->forget('selected_category_id');
+    }
+
+    // Input filters
+    $search = $request->input('search');
+    $location = $request->input('location');
+    $countryId = $request->input('country');
+
+    // Total count of jobs matching filters
+    $totalCount = JobPosting::where('status', 'approved')
         ->where('is_active', true)
         ->whereHas('package.duration', function ($query) use ($today) {
             $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
@@ -278,17 +282,12 @@ class JobPostingController extends Controller
                     });
             });
         })
-        ->when($location, function ($query, $location) {
-            $query->where('location', 'like', "%{$location}%");
-        })
-        ->when($countryId, function ($query, $countryId) {
-            $query->where('country_id', $countryId);
-        })
-        ->when($categoryId && $categoryId != 45, function ($query) use ($categoryId) {
-            $query->where('category_id', $categoryId);
-        })
-        ->count(); // Count all matching jobs
-    
+        ->when($location, fn($query, $location) => $query->where('location', 'like', "%{$location}%"))
+        ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
+        ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
+        ->count();
+
+    // Paginated job listings with filters
     $jobs = JobPosting::with(['category', 'subcategory', 'country', 'package.duration'])
         ->where('status', 'approved')
         ->where('is_active', true)
@@ -304,34 +303,27 @@ class JobPostingController extends Controller
                     });
             });
         })
-        ->when($location, function ($query, $location) {
-            $query->where('location', 'like', "%{$location}%");
-        })
-        ->when($countryId, function ($query, $countryId) {
-            $query->where('country_id', $countryId);
-        })
-        ->when($categoryId && $categoryId != 45, function ($query) use ($categoryId) {
-            $query->where('category_id', $categoryId);
-        })
-        ->paginate(50); // Fetch paginated jobs
-                
-    
-        $categories = Category::with('subcategories')->get();
-        $contacts = ContactUs::all();
-        $countries = Country::all();
-        $now = Carbon::today();
-    
-        $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
-            ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
-            ->where('banners.status', 'published')
-            ->where('banners.placement', 'banner')
-            ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now])
-            ->select('banners.*', 'duration.duration')
-            ->get();
-    
-        return view('home.home', compact('categories', 'totalCount','jobs', 'contacts', 'countries', 'banners'))
-            ->with('selected_category_id', session('selected_category_id'));
-    }
+        ->when($location, fn($query, $location) => $query->where('location', 'like', "%{$location}%"))
+        ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
+        ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
+        ->paginate($categoryId && $categoryId != 45 ? 50 : 250);
+
+    // Additional data for the view
+    $categories = Category::with('subcategories')->orderBy('name', 'asc')->get();
+    $contacts = ContactUs::all();
+    $countries = Country::all();
+
+    $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
+        ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
+        ->where('banners.status', 'published')
+        ->where('banners.placement', 'banner')
+        ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$today])
+        ->select('banners.*', 'duration.duration')
+        ->get();
+
+    return view('home.home', compact('categories', 'totalCount', 'jobs', 'contacts', 'countries', 'banners'))
+        ->with('selected_category_id', session('selected_category_id'));
+}
                         
     
     

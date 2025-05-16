@@ -67,6 +67,25 @@
         
         }
         
+            #description {
+        text-align: justify;
+        width: 650px;
+        margin: 0 auto; /* Center the paragraph on larger screens */
+    }
+
+    /* Responsive Design for Smaller Screens */
+    @media (max-width: 768px) {
+        #description {
+            width: 90%; /* Adjust width to fit most of the screen */
+        }
+    }
+
+    @media (max-width: 480px) {
+        #description {
+            width: 100%; /* Full width for very small screens */
+            padding: 10px; /* Add padding for better readability */
+        }
+    }
         
     </style>
 </head>
@@ -79,12 +98,12 @@
                 <h1>{{ $aboutUs->title }}</h1> <!-- Dynamically display the title -->
 
                 <!-- Show part of the description initially -->
-                <p id="description" class="description" style="text-align: justify;">
+                <p id="description" class="description">
                     {{ Str::limit($aboutUs->description, 1000) }}
                 </p>
                 
                 <!-- Full description hidden initially -->
-                <div id="more-content" class="more-content" style="text-align: justify;">
+                <div id="more-content" class="more-content" style="text-align: justify;width:650px">
                     <p id="full-description"  >{{ $aboutUs->description }}</p> <!-- Full description -->
                 </div>
 
@@ -92,7 +111,7 @@
                 <a href="#" id="learn-more-btn" class="learn-more">Learn More</a>
             </div>
             <div class="illustration">
-                <img src="{{ asset('Jobads.png') }}" style="width: 150px;padding-right: 200px;" alt="Illustration">
+                <img src="{{ asset('Jobads.png') }}" style="width: 150px;padding-right: 250px;padding-left:300px" alt="Illustration">
             </div>
         </div>
 

@@ -41,6 +41,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\PressReleaseController;
 use App\Http\Controllers\DurationController;
+use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\VissionMissionController;
 
 
@@ -249,6 +250,26 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
     // Delete an existing terms and condition
     Route::delete('terms-and-conditions/{termsAndCondition}', [TermsAndConditionController::class, 'destroy'])->name('terms.destroy');
+});
+Route::get('policy', [PolicyController::class, 'indexhome'])->name('policy.indexhome');
+Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
+    // Show the list of terms and conditions
+    Route::get('policy', [PolicyController::class, 'index'])->name('policy.index');
+
+    // Show the form for creating a new terms and condition
+    Route::get('policy/create', [PolicyController::class, 'create'])->name('policy.create');
+
+    // Store a new terms and condition
+    Route::post('policy', [PolicyController::class, 'store'])->name('policy.store');
+
+    // Show the form for editing an existing terms and condition
+    Route::get('policy/{policy}/edit', [PolicyController::class, 'edit'])->name('policy.edit');
+
+    // Update an existing terms and condition
+    Route::put('policy/{policy}', [PolicyController::class, 'update'])->name('policy.update');
+
+    // Delete an existing terms and condition
+    Route::delete('policy/{policy}', [PolicyController::class, 'destroy'])->name('policy.destroy');
 });
 
 Route::prefix('admin')
@@ -727,10 +748,7 @@ Route::get('/faq', function () {
     return view('User/SideComponent/faq');
 
 });
-Route::get('/privacy', function () {
-    return view('User/SideComponent/privacy');
 
-});
 
 //job post
 

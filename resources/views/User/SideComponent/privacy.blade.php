@@ -1,147 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Privacy Policy of topjobs.lk">
-    <title>Privacy Policy</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>privacy policy</title>
     <link rel="stylesheet" href="{{ asset('css/privacy.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/header.css') }}">
+    <link rel="stylesheet" href="styles.css">
+
     <style>
         /* Logo positioning */
         .logo-container {
             position: absolute;
-            top: 130px; /* Adjust for spacing */
-            right: 600px;
-            z-index: 1000;
+            top: 40px; /* Increase this value to add more space between the logo and the header */
+            right: 40%;
         }
+
         .logo {
-            width: 150px;
+            width: 150px; /* Adjust size as needed */
             height: auto;
         }
 
-        /* Header margin adjustment */
-        .terms-and-conditions-header {
-            margin-top: 100px;
+        /* Optional: Add margin to the header to create consistent spacing */
+        .privacy-policy-header {
         }
+
+        .justify-text {
+            text-align: justify;
+        }
+        
 
         /* Footer styling */
-        .footer-container {
-            background-color: #18799c; /* Blue background */
-            color: white; /* White text */
-            padding: 20px; /* Padding around the content */
-            text-align: center; /* Center align the content */
-        }
-        
-        /* Footer Title */
-        .footer-title {
-            font-size: 24px; /* Larger font size for the title */
-            margin-bottom: 15px; /* Space below the title */
-            font-weight: bold; /* Bold text */
-        }
-        
-        /* Footer List */
-        .footer-list {
-            list-style-type: none; /* Remove bullet points */
-            padding: 0; /* Remove padding */
-            margin: 0; /* Remove margin */
-        }
-        
-        /* Footer List Items */
-        .footer-list li {
-            font-size: 16px; /* Font size for list items */
-            margin: 5px 0; /* Add margin between list items */
-        }
-        
-        /* Footer Email */
-        .footer-email {
-            font-style: italic; /* Italicize the email */
-            margin-bottom: 10px; /* Add space below email */
-        }
-        
-        /* Footer Phone */
-        .footer-phone {
-            font-weight: 600; /* Make phone numbers bold */
-            margin-bottom: 5px; /* Add space between phone items */
-        }
-        
-        /* Hover effect for footer items */
-        .footer-list li:hover {
-            background-color: #18799c; /* Darker blue on hover */
-            cursor: pointer; /* Pointer cursor on hover */
-            padding: 5px 0; /* Add padding on hover for effect */
-        }
-        
-        /* Footer for small screens */
-        @media (max-width: 600px) {
-            .footer-container {
-                padding: 15px; /* Reduce padding for smaller screens */
-            }
-            .footer-title {
-                font-size: 20px; /* Adjust title font size */
-            }
-            .footer-list li {
-                font-size: 14px; /* Adjust list item font size */
-            }
-        }
-            </style>
+        /* Footer Container */
+.footer-container {
+    background-color: #18799c; /* Blue background */
+    color: white; /* White text */
+    padding: 20px; /* Padding around the content */
+    text-align: center; /* Center align the content */
+}
+
+/* Footer Title */
+.footer-title {
+    font-size: 24px; /* Larger font size for the title */
+    margin-bottom: 15px; /* Space below the title */
+    font-weight: bold; /* Bold text */
+}
+
+/* Footer List */
+.footer-list {
+    list-style-type: none; /* Remove bullet points */
+    padding: 0; /* Remove padding */
+    margin: 0; /* Remove margin */
+}
+
+/* Footer List Items */
+.footer-list li {
+    font-size: 16px; /* Font size for list items */
+    margin: 5px 0; /* Add margin between list items */
+}
+
+/* Footer Email */
+.footer-email {
+    font-style: italic; /* Italicize the email */
+    margin-bottom: 10px; /* Add space below email */
+}
+
+/* Footer Phone */
+.footer-phone {
+    font-weight: 600; /* Make phone numbers bold */
+    margin-bottom: 5px; /* Add space between phone items */
+}
+
+/* Hover effect for footer items */
+.footer-list li:hover {
+    background-color: #18799c; /* Darker blue on hover */
+    cursor: pointer; /* Pointer cursor on hover */
+    padding: 5px 0; /* Add padding on hover for effect */
+}
+
+/* Footer for small screens */
+@media (max-width: 600px) {
+    .footer-container {
+        padding: 15px; /* Reduce padding for smaller screens */
+    }
+    .footer-title {
+        font-size: 20px; /* Adjust title font size */
+    }
+    .footer-list li {
+        font-size: 14px; /* Adjust list item font size */
+    }
+}
+.privacy-policy-main {
+         position: relative;
+    padding: 20px;
+    max-width: 800px;
+    margin: 20px auto;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+    </style>
 </head>
+<header class="privacy-policy-header" >
+    <h1>Privacy and Policy</h1>
+</header>
+
 <body class="privacy-policy-body">
-    <!-- Logo in the top right corner -->
-    <div class="logo-container">
-        <img src="{{ asset('Jobads.png') }}" alt="Logo" class="logo">
-    </div>
+    <main class="privacy-policy-main" style="padding-top:100px">
 
-    <header class="privacy-policy-header">
-        <h1>Privacy Policy</h1>
-    </header>
 
-    <main class="privacy-policy-main">
-        <section class="privacy-policy-section" style="padding-top: 50px">
-            <h2>Introduction</h2>
-            <p>This site is committed to protecting your privacy. This Statement of Privacy applies to the jobads.lk website and governs data collection and usage at this site. Please read the Statement of Privacy below.</p>
-        </section>
-        <section class="privacy-policy-section">
-            <h2>Scope of Coverage</h2>
-            <p>This Statement of Privacy covers how topjobs.lk treats personal information collected and received, including information relating to the past use of our products and services. "Personal Information" refers to information that personally identifies you by your name, email address, phone number, and other information that is not otherwise publicly available.</p>
-            <p>This Statement of Privacy applies only to the practices of topjobs.lk and the people we employ or manage. Other websites or services linked to/from this website will have their own privacy statements, which can be viewed by clicking on their respective privacy links.</p>
-        </section>
-        <section class="privacy-policy-section">
-            <h2>Use of Your Personal Information</h2>
-            <p>This site does not sell, rent, or share your personal information with other people or non-affiliated third parties except to provide you with the products or services you have requested, or when you give us permission, or under the following circumstances:</p>
-            <ul class="privacy-policy-list">
-                <li>When you apply to jobs through our services, your resume data in your account and any other information disclosed during your job applications will be made available to the companies you are applying to.</li>
-                <li>You may opt to make your resume searchable by any companies using this site to recruit. These companies may retain a copy of your resume in their own files or databases.</li>
-                <li>Personal information collected on this site may be stored and processed in any country where this site or its business partners, subsidiaries, or agents maintain facilities. By using this site, you consent to such transfer of information outside your country.</li>
-            </ul>
-            <p>While we endeavor to ensure that companies comply with relevant privacy laws, topjobs.lk is not responsible for the retention, use, or privacy practices of resumes by these companies or any third parties associated with them.</p>
-        </section>
-        <section class="privacy-policy-section">
-            <h2>Control of Your Personal Information</h2>
-            <p>This site offers you various choices for the use and sharing of your personal information. You may go to your account page to edit your personal information and preferences at any time. You will be asked to make your requests while logged into your account, so that we can associate your preferences with your specific profile. This security safeguard prevents unauthorized changes to the usage and control of your personal information.</p>
-            <p>There are certain site services that send periodic emails to inform you of technical service issues, new vacancies, and updates about our products and services. You will be unable to unsubscribe from these emails as they are considered an integral part of the service you have chosen.</p>
-        </section>
-        <section class="privacy-policy-section">
-            <h2>Data Breach Notification Policy</h2>
-            <p>We are committed to safeguarding your personal information. In the unlikely event of a data breach that may compromise your personal information, we will take prompt action to assess the impact and notify affected users without undue delay.</p>
-            <p>This notification will include details of the incident, the data affected, potential risks, and the steps we are taking to mitigate the impact. We will also provide guidance on the actions you may take to protect your information. Our incident response process ensures compliance with applicable data protection regulations.</p>
-            <p>We prioritize transparency and user safety, and we will keep you informed throughout the resolution process.</p>
-        </section>
+        <!-- Logo in the top right corner -->
+        <div class="logo-container">
+            <img src="{{ asset('Jobads.png') }}" alt="Logo" class="logo">
+        </div>
+        <div class="container">
+            <div class="privacy-policy-">
+        
+                <!-- Dynamic Navigation Menu -->
+                <nav>
+                    <h2 style="color: #0056b3"> Introduction</h2>
+                    <p >Welcome to JOBADS.LK. 
+This site is committed to protecting your privacy. This Statement of Privacy applies to the jobads.lk website and governs data collection and usage at this site. Please read the Statement of Privacy below.    
+                </nav>
+        
+                            <!-- Dynamic Content Sections -->
+            @foreach ($policy as $policy)
+                <div id="term-{{ $policy['number'] }}" class="section">
+                    <h2 style="color: #0056b3">{{ $policy->title }}.</h2>
+                    <p style="text-align: justify;">{!! nl2br(e($policy->content)) !!}</p>
+                </div>
+            @endforeach
+            </div>
+        
+        
+        </div>
+    
     </main>
-
     <!-- Footer with contact information -->
-    <footer class="footer-container">
-        <h2 class="footer-title">Contact Us</h2>
-        <ul class="footer-list">
-            @php
+<footer class="footer-container">
+    <h2 class="footer-title">Contact Us</h2>
+    <ul class="footer-list">
+        @php
                 use App\Models\ContactUs;
                 $contacts = contactus::all();
-            @endphp
-            <li class="footer-email">Email: {{ $contacts->first()->email ?? 'Not Available' }}</li>
-            @foreach ($contacts as $contact)
-                <li class="footer-phone">Phone: {{ $contact->phone }}</li>
-            @endforeach
-        </ul>
-    </footer>
-    </body>
+        @endphp
+        <li class="footer-email">Email: {{ $contacts->first()->email ?? 'Not Available' }}</li>
+        @foreach ($contacts as $contact)
+            <li class="footer-phone">Phone: {{ $contact->phone }}</li>
+        @endforeach
+    </ul>
+</footer>
+
+</body>
+
 </html>

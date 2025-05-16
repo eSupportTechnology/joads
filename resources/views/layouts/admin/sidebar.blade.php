@@ -218,6 +218,7 @@
                             <li><a href="{{ route('contactus.create') }}">ContactUs Page Details </a></li>
                             <li><a href="{{ route('admin.about-us.index') }}">About Details</a></li>
                             <li><a href="{{ route('admin.terms.index') }}">Terms Details </a></li>
+                            <li><a href="{{ route('admin.policy.index') }}">Policy Details </a></li>
                             <li><a href="{{ route('faqs.index') }}">FAQ</a></li>
                             <li><a href="{{ route('admin.vissionmission.index') }}">Vision & Mission</a></li>
 
