@@ -1,19 +1,21 @@
 name: Publish Website to Cpanel
-On:
+
+on:
   push:
-     branches:
-       - main
-  jobs: 
-    FTP-Deploy-Action:
-      name: FTP-Deploy-Action
-      runs-on: ubuntu-latest
-      steps:
-       - uses : action/checkout@2.1.0
-         with: 
-            fetch-depth: 2
-       - name :  FTP-Deploy-Action
-         user : lakindumalaka/FTP-Deploy-Action@3.1.1
-         with:
-          ftp-server: S{{secrets.FTP_SERVER}}
-          ftp-username: ${{secrets.FTP_USERNAME}}
-          ftp-password: ${{secrets.FTP_PASSWORD}}
+    branches:
+      - main
+
+jobs:
+  FTP-Deploy-Action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./  # Adjust this if your build is in a subfolder
