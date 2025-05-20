@@ -30,13 +30,17 @@ class VissionMissionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'vission' => 'required|string',
-            'mission' => 'required|string',
+            'vission' => 'required|string|max:65535', // Max for TEXT or LONGTEXT
+            'mission' => 'required|string|max:65535',
         ]);
 
-        VissionMission::create($request->all());
+        VissionMission::create([
+            'vission' => $request->input('vission'),
+            'mission' => $request->input('mission'),
+        ]);
 
-        return redirect()->route('admin.vissionmission.index')->with('success', ' created successfully.');
+        return redirect()->route('admin.vissionmission.index')
+            ->with('success', 'Vission and Mission created successfully.');
     }
 
     /**
@@ -45,7 +49,7 @@ class VissionMissionController extends Controller
     public function edit($id)
     {
         $vissionMission = VissionMission::findOrFail($id);
-        return view('Admin.vissionmission.edit', compact('vissionMission'));
+        return view('admin.vissionmission.edit', compact('vissionMission'));
     }
 
     /**
@@ -54,14 +58,18 @@ class VissionMissionController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'vission' => 'required|string',
-            'mission' => 'required|string',
+            'vission' => 'required|string|max:65535',
+            'mission' => 'required|string|max:65535',
         ]);
 
         $vissionMission = VissionMission::findOrFail($id);
-        $vissionMission->update($request->all());
+        $vissionMission->update([
+            'vission' => $request->input('vission'),
+            'mission' => $request->input('mission'),
+        ]);
 
-        return redirect()->route('admin.vissionmission.index')->with('success', ' updated successfully.');
+        return redirect()->route('admin.vissionmission.index')
+            ->with('success', 'Vission and Mission updated successfully.');
     }
 
     /**
@@ -72,6 +80,7 @@ class VissionMissionController extends Controller
         $vissionMission = VissionMission::findOrFail($id);
         $vissionMission->delete();
 
-        return redirect()->route('admin.vissionmission.index')->with('success', 'deleted successfully.');
+        return redirect()->route('admin.vissionmission.index')
+            ->with('success', 'Vission and Mission deleted successfully.');
     }
 }

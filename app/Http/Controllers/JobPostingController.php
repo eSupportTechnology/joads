@@ -250,41 +250,71 @@ class JobPostingController extends Controller
         $search = $request->input('search');
         $location = $request->input('location');
         $countryId = $request->input('country');
+        // $categoryName=$request->input('name');
         $categoryId = $request->input('category_id');
-    
-        if ($categoryId) {
+        if ($categoryId && $categoryId !== 'all') {
             session(['selected_category_id' => $categoryId]);
+        } elseif ($categoryId === 'all') {
+            session()->forget('selected_category_id');
+            $categoryId = null; // Reset category ID to null for "All"
         } else {
             $categoryId = session('selected_category_id');
         }
     
         $today = Carbon::today();
     
-        $jobs = JobPosting::with(['category', 'subcategory', 'country', 'package.duration'])
-            ->where('status', 'approved')
-            ->where('is_active', true)
-            ->whereHas('package.duration', function ($query) use ($today) {
-                $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
-            })
-            ->when($search, function ($query, $search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('title', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%")
-                        ->orWhereHas('employer', function ($q) use ($search) {
-                            $q->where('company_name', 'like', "%{$search}%");
-                        });
-                });
-            })
-            ->when($location, function ($query, $location) {
-                $query->where('location', 'like', "%{$location}%");
-            })
-            ->when($countryId, function ($query, $countryId) {
-                $query->where('country_id', $countryId);
-            })
-            ->when($categoryId, function ($query, $categoryId) {
-                $query->where('category_id', $categoryId);
-            })
-            ->paginate(50); // Pagination added here
+
+        $totalCount = JobPosting::where('status', 'approved')
+        ->where('is_active', true)
+        ->whereHas('package.duration', function ($query) use ($today) {
+            $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
+        })
+        ->when($search, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('employer', function ($q) use ($search) {
+                        $q->where('company_name', 'like', "%{$search}%");
+                    });
+            });
+        })
+        ->when($location, function ($query, $location) {
+            $query->where('location', 'like', "%{$location}%");
+        })
+        ->when($countryId, function ($query, $countryId) {
+            $query->where('country_id', $countryId);
+        })
+        ->when($categoryId && $categoryId != 45, function ($query) use ($categoryId) {
+            $query->where('category_id', $categoryId);
+        })
+        ->count(); // Count all matching jobs
+    
+    $jobs = JobPosting::with(['category', 'subcategory', 'country', 'package.duration'])
+        ->where('status', 'approved')
+        ->where('is_active', true)
+        ->whereHas('package.duration', function ($query) use ($today) {
+            $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
+        })
+        ->when($search, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('employer', function ($q) use ($search) {
+                        $q->where('company_name', 'like', "%{$search}%");
+                    });
+            });
+        })
+        ->when($location, function ($query, $location) {
+            $query->where('location', 'like', "%{$location}%");
+        })
+        ->when($countryId, function ($query, $countryId) {
+            $query->where('country_id', $countryId);
+        })
+        ->when($categoryId && $categoryId != 45, function ($query) use ($categoryId) {
+            $query->where('category_id', $categoryId);
+        })
+        ->paginate(50); // Fetch paginated jobs
+                
     
         $categories = Category::with('subcategories')->get();
         $contacts = ContactUs::all();
@@ -299,10 +329,10 @@ class JobPostingController extends Controller
             ->select('banners.*', 'duration.duration')
             ->get();
     
-        return view('home.home', compact('categories', 'jobs', 'contacts', 'countries', 'banners'))
+        return view('home.home', compact('categories', 'totalCount','jobs', 'contacts', 'countries', 'banners'))
             ->with('selected_category_id', session('selected_category_id'));
     }
-                
+                        
     
     
     public function toggleActiveStatus($id)

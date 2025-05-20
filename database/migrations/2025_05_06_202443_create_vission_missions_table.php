@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vission_missions', function (Blueprint $table) {
-            $table->id();
-            $table->String('vission');
-            $table->String('mission');
+            $table->id(); // This will automatically set 'id' as auto-incrementing
+            $table->longText('vission');
+            $table->longText('mission');
             $table->timestamps();
         });
     }
