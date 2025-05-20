@@ -8,6 +8,7 @@
     <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}" type="image/x-icon">
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
@@ -17,7 +18,7 @@
 
 
 
-    <style>
+ <style>
         .dropdown {
             padding: 8px;
             margin: 10px 0;
@@ -75,29 +76,29 @@
             font-size: 12px;
         }
         
-        .contact-table th, .contact-table td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    word-wrap: break-word;
-    width: auto;
-    text-align: left;
-}
-        
-        .text-input::placeholder {
-    font-size: 12px; /* Adjust the size as needed */
-}
+            .contact-table th, .contact-table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        word-wrap: break-word;
+        width: auto;
+        text-align: left;
+    }
+            
+            .text-input::placeholder {
+        font-size: 12px; /* Adjust the size as needed */
+    }
 
-.table-container {
-            max-height: auto;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            margin-top: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+    .table-container {
+                max-height: auto;
+                overflow-y: auto;
+                border: 1px solid #ddd;
+                margin-top: 10px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
 
-        @media (max-width: 1200px) {
-            .filters-form {
-                flex-direction: column;
+            @media (max-width: 1200px) {
+                .filters-form {
+                    flex-direction: column;
                 align-items: stretch;
             }
 
@@ -111,7 +112,6 @@
 
         .scroll-wrapper {
             background-color: #d9d9d9;
-            ;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             margin: 0 10px;
         }
@@ -217,71 +217,116 @@
 
 
 
-        /* Custom Styles for Pagination */
-.pagination-container {
-    text-align: center; /* Center pagination */
+            /* Custom Styles for Pagination */
+    .pagination-container {
+        text-align: center; /* Center pagination */
+    }
+
+    .pagination {
+        display: inline-flex;
+        list-style: none;
+        padding-left: 0;
+        border-radius: 0.25rem;
+        margin: 0;
+    }
+
+    .pagination li {
+        margin: 0 5px;
+    }
+
+    .pagination a,
+    .pagination span {
+        display: inline-block;
+        padding: 8px 16px;
+        margin: 0;
+        line-height: 1.5;
+        text-decoration: none;
+        color: #007bff;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+    }
+
+    .pagination a:hover,
+    .pagination span:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .pagination .active a,
+    .pagination .active span {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+
+    .pagination .disabled a,
+    .pagination .disabled span {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #6c757d;
+    }
+
+    .pagination .page-item:first-child a,
+    .pagination .page-item:first-child span {
+        border-radius: 0.25rem 0 0 0.25rem; /* Rounded left side */
+    }
+
+    .pagination .page-item:last-child a,
+    .pagination .page-item:last-child span {
+        border-radius: 0 0.25rem 0.25rem 0; /* Rounded right side */
+    }
+
+
+    .job-grid {
+    display: grid;
+    gap: 4.3px;
 }
 
-.pagination {
-    display: inline-flex;
-    list-style: none;
-    padding-left: 0;
-    border-radius: 0.25rem;
-    margin: 0;
+/* For Medium (md) and up: Limit to 5 columns */
+@media (min-width: 768px) {
+    .job-grid {
+        grid-template-columns: repeat(5, 1fr); /* 5 cards per row */
+    }
 }
 
-.pagination li {
-    margin: 0 5px;
+/* For Large (lg) and up */
+@media (min-width: 992px) {
+    .job-grid {
+        grid-template-columns: repeat(5, 1fr); /* 5 cards per row */
+    }
 }
 
-.pagination a,
-.pagination span {
-    display: inline-block;
-    padding: 8px 16px;
-    margin: 0;
-    line-height: 1.5;
-    text-decoration: none;
-    color: #007bff;
-    background-color: #fff;
-    border: 1px solid #dee2e6;
-    border-radius: 0.25rem;
+/* For Extra-Large (xl) and up */
+@media (min-width: 1200px) {
+    .job-grid {
+        grid-template-columns: repeat(5, 1fr); /* 5 cards per row */
+    }
 }
 
-.pagination a:hover,
-.pagination span:hover {
-    background-color: #007bff;
-    color: white;
+/* For Small (sm) screens and below */
+@media (max-width: 767px) {
+    .job-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
+    }
 }
 
-.pagination .active a,
-.pagination .active span {
-    background-color: #007bff;
-    border-color: #007bff;
-    color: white;
+/* For Extra-Small (xs) screens */
+@media (max-width: 575px) {
+    .job-grid {
+        grid-template-columns: 1fr; /* 1 card per row */
+    }
 }
 
-.pagination .disabled a,
-.pagination .disabled span {
-    background-color: #f8f9fa;
-    border-color: #dee2e6;
-    color: #6c757d;
-}
 
-.pagination .page-item:first-child a,
-.pagination .page-item:first-child span {
-    border-radius: 0.25rem 0 0 0.25rem; /* Rounded left side */
-}
+</style>
 
-.pagination .page-item:last-child a,
-.pagination .page-item:last-child span {
-    border-radius: 0 0.25rem 0.25rem 0; /* Rounded right side */
-}
-
-    </style>
 </head>
 
 <body>
     @include('home.header')
+    @include('home.socialbutton')
+
 
     <!-- Categories Section -->
     <section class="categories-container">
@@ -317,70 +362,70 @@
 
 
 
-    <div class="scroll-wrapper">
-        <!-- Scroll buttons -->
-        <button class="scroll-btn left-scroll" id="scrollLeft">
-            <i class="fa fa-chevron-left"></i>
-        </button>
-    
-        <!-- Categories list -->
-        <div class="categories-list" id="categoriesList"
-             style="border-radius: 15px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">
-             
-            <!-- Render "All" category first -->
-            @foreach ($categories as $category)
-                @if ($category->name == 'All')
-                    <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
-                       class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
-                       style="
-                            text-decoration: none; 
-                            background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
-                            color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};                            
-                            padding: 4px 15px; 
-                            border-radius: 5px; 
-                            min-width: 230px; 
-                            width: auto;
-                            font-size: 14px; 
-                            transition: all 0.3s ease; 
-                            white-space: nowrap; 
-                            display: inline-block;
-                            position: sticky; top: 0; z-index: 10;
-                       ">
-                        {{ $category->name }}
-                    </a>
-                @endif
-            @endforeach
-    
-            <!-- Render the rest of the categories -->
-            @foreach ($categories as $category)
-                @if ($category->name != 'All')
-                    <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
-                       class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
-                       style="
-                            text-decoration: none; 
-                            background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
-                            color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};
-                            padding: 4px 15px; 
-                            border-radius: 5px; 
-                            min-width: 230px; 
-                            width: auto;
-                            font-size: 14px; 
-                            transition: all 0.3s ease; 
-                            white-space: nowrap; 
-                            display: inline-block;
-                       ">
-                        {{ $category->name }}
-                    </a>
-                @endif
-            @endforeach
-    
-        </div>
-    
-        <!-- Scroll buttons -->
-        <button class="scroll-btn right-scroll" id="scrollRight">
-            <i class="fa fa-chevron-right"></i>
-        </button>
+<div class="scroll-wrapper">
+    <!-- Scroll buttons -->
+    <button class="scroll-btn left-scroll" id="scrollLeft">
+        <i class="fa fa-chevron-left"></i>
+    </button>
+
+    <!-- Categories list -->
+    <div class="categories-list" id="categoriesList"
+         style="border-radius: 15px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">
+
+        <!-- Render "All" category first -->
+        @foreach ($categories as $category)
+            @if ($category->name == 'All')
+                <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
+                   class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
+                   style="
+                        text-decoration: none; 
+                        background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
+                        color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};                            
+                        padding: 4px 15px; 
+                        border-radius: 5px; 
+                        min-width: 230px; 
+                        width: auto;
+                        font-size: 14px; 
+                        transition: all 0.3s ease; 
+                        white-space: nowrap; 
+                        display: inline-block;
+                        position: sticky; top: 0; z-index: 10;
+                   ">
+                    {{ $category->name }}
+                </a>
+            @endif
+        @endforeach
+
+        <!-- Render the rest of the categories -->
+        @foreach ($categories as $category)
+            @if ($category->name != 'All')
+                <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
+                   class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
+                   style="
+                        text-decoration: none; 
+                        background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
+                        color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};
+                        padding: 4px 15px; 
+                        border-radius: 5px; 
+                        min-width: 230px; 
+                        width: auto;
+                        font-size: 14px; 
+                        transition: all 0.3s ease; 
+                        white-space: nowrap; 
+                        display: inline-block;
+                   ">
+                    {{ $category->name }}
+                </a>
+            @endif
+        @endforeach
+
     </div>
+
+    <!-- Scroll buttons -->
+    <button class="scroll-btn right-scroll" id="scrollRight">
+        <i class="fa fa-chevron-right"></i>
+    </button>
+</div>
     
     </section>
     <!-- <div class="ads-banner">
@@ -413,45 +458,42 @@
     </div>
 
 
-    <!-- Filters Section -->
-    <section class="filters" style="background-color: rgba(0, 0, 0, 0.1); padding:2px 25px 0px 25px">
-        <p class="jobtitle">
-            Available New Jobs : {{ $totalCount }}
-            @if (session('selected_category_id'))
-                @php
-                    $selectedCategory = \App\Models\Category::find(session('selected_category_id'));
-                @endphp
-                in {{ $selectedCategory->name }}
-            @endif
-        </p>
-        <form method="GET" action="{{ route('home') }}" class="filters-form" id="searchForm">
-            <!-- Category Filter -->
-            <input type="hidden" name="category_id" id="categoryInput"
-                value="{{ request('category_id') ?? session('selected_category_id') }}">
+<!-- Filters Section -->
+<section class="filters" style="background-color: rgba(0, 0, 0, 0.1); padding: 2px 25px 0px 25px; display: flex; justify-content: space-between; align-items: center;">
+    <p class="jobtitle" style="margin: 0;">
+        Available New Jobs : {{ $totalCount }}
+        @if (session('selected_category_id'))
+            @php
+                $selectedCategory = \App\Models\Category::find(session('selected_category_id'));
+            @endphp
+            in {{ $selectedCategory->name }}
+        @endif
+    </p>
+    <form method="GET" action="{{ route('home') }}" class="filters-form" id="searchForm" style="width: 70%; margin: 0;">
+        <!-- Category Filter -->
+        <input type="hidden" name="category_id" id="categoryInput"
+            value="{{ request('category_id') ?? session('selected_category_id') }}">
 
-            <input class="text-input" style="height:17px" type="text" name="search"
-                placeholder="Enter Vacancy Name/Company/Job Reference" value="{{ request('search') }}">
+        <input class="text-input" style="height:17px" type="text" name="search"
+            placeholder="Enter Vacancy Name/Company/Job Reference" value="{{ request('search') }}">
 
-            <input class="text-input" style="height:17px;" type="text" name="location"
-                placeholder="Enter your Location" value="{{ request('location') }}">
+        <input class="text-input" style="height:17px;" type="text" name="location"
+            placeholder="Enter your Location" value="{{ request('location') }}">
 
-            <select name="country" class="dropdown" style="height: 43px; color: #777777">
-                <option value="">Select Country</option>
-                @foreach ($countries as $country)
-                    <option value="{{ $country->id }}" {{ request('country') == $country->id ? 'selected' : '' }}>
-                        {{ $country->name }}
-                    </option>
-                @endforeach
-            </select>
+        <select name="country" class="dropdown" style="height: 43px; color: #777777">
+            <option value="">Select Country</option>
+            @foreach ($countries as $country)
+                <option value="{{ $country->id }}" {{ request('country') == $country->id ? 'selected' : '' }}>
+                    {{ $country->name }}
+                </option>
+            @endforeach
+        </select>
 
-            <button class="view-btn" type="submit">
-                <i class="fa fa-search"></i>
-            </button>
-        </form>
-
-
-        <hr>
-    </section>
+        <button class="view-btn" type="submit">
+            <i class="fa fa-search"></i>
+        </button>
+    </form>
+</section>
 
 
 
@@ -459,88 +501,94 @@
 
     <!-- Job Listings Section -->
     <!-- Job Listings Section -->
-    <section id="job-listings" class="job-listings-container">
-        <h3 class="job-listings-title">Available Jobs</h3>
-    
-        @if ($jobs->isEmpty())
-            <p>No jobs found matching your criteria.</p>
-        @else
-            @if (request()->has('category_id') && request()->category_id != null)
-                <!-- Display as Table if Category is Selected -->
-                <div>
-                    <table class="job-table">
-                        <thead>
+<section id="job-listings" class="job-listings-container">
+    <h3 class="job-listings-title">Available Jobs</h3>
+
+    @if ($jobs->isEmpty())
+        <p>No jobs found matching your criteria.</p>
+    @else
+        @php
+            // Check if category_id is set and not null, and whether it is "All"
+            $isCategorySelected = request()->has('category_id') && request()->category_id != null;
+            $isAllCategory = request()->category_id === '45';
+        @endphp
+
+        @if ($isCategorySelected && !$isAllCategory)
+            <!-- Display as Table if Specific Category (not "45") is Selected -->
+            <div>
+                <table class="job-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Reference ID</th>
+                            <th>Job Title</th>
+                            <th>Description</th>
+                            <th>Location</th>
+                            <th>Posted Date</th>
+                            <th>Closing Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($jobs as $index => $job)
                             <tr>
-                                <th>#</th>
-                                <th>Reference ID</th>
-                                <th>Job Title</th>
-                                <th>Description</th>
-                                <th>Location</th>
-                                <th>Posted Date</th>
-                                <th>Closing Date</th>
+                                <td>{{ ($jobs->currentPage() - 1) * $jobs->perPage() + $index + 1 }}</td>
+                                <td>{{ $job->job_id ?? 'N/A' }}</td>
+                                <td>
+                                    <a href="{{ route('job.details', $job->id) }}" class="job-title">
+                                        {{ $job->title }}
+                                    </a>
+                                    <br>
+                                    <a href="{{ route('job.details', $job->id) }}" class="company-name">
+                                        {{ $job->employer->company_name }}
+                                    </a>
+                                </td>
+                                <td>{{ $job->description ?? 'No description provided' }}</td>
+                                <td>{{ $job->location ?? 'Not specified' }}</td>
+                                <td>{{ $job->created_at ? $job->created_at->format('Y-m-d') : 'N/A' }}</td>
+                                <td>{{ $job->closing_date ?? 'N/A' }}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($jobs as $index => $job)
-                                <tr>
-                                    <td>{{ ($jobs->currentPage() - 1) * $jobs->perPage() + $index + 1 }}</td>
-                                    <td>{{ $job->job_id ?? 'N/A' }}</td>
-                                    <td>
-                                        <a href="{{ route('job.details', $job->id) }}" class="job-title">
-                                            {{ $job->title }}
-                                        </a>
-                                        <br>
-                                        <a href="{{ route('job.details', $job->id) }}" class="company-name">
-                                            {{ $job->employer->company_name }}
-                                        </a>
-                                    </td>
-                                    <td>{{ $job->description ?? 'No description provided' }}</td>
-                                    <td>{{ $job->location ?? 'Not specified' }}</td>
-                                    <td>{{ $job->created_at ? $job->created_at->format('Y-m-d') : 'N/A' }}</td>
-                                    <td>{{ $job->closing_date ?? 'N/A' }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <!-- Display as Cards if No Category is Selected -->
-                <div class="job-grid">
-                    @foreach ($jobs as $job)
-                        <div class="job-card" style="min-height:50px;height:auto; cursor: pointer;"
-                            onclick="window.location='{{ route('job.details', $job->id) }}'">
-                            <a href="{{ route('job.details', $job->id) }}" class="job-title"
-                                style="font-size:15px; margin-bottom: 0px;">
-                                {{ $job->title }}
-                            </a>
-                            <p class="company-name"
-                                style="font-size: 14px; margin-top: 2px; margin-bottom: 0px; font-weight:600; line-height:1;">
-                                {{ $job->employer->company_name }}
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <!-- Display as Cards if No Category or "All" is Selected -->
+            <div class="job-grid">
+                @foreach ($jobs as $job)
+                    <div class="job-card" style="min-height:50px;height:auto; cursor: pointer;"
+                        onclick="window.location='{{ route('job.details', $job->id) }}'">
+                        <a href="{{ route('job.details', $job->id) }}" class="job-title"
+                            style="font-size:15px; margin-bottom: 0px;">
+                            {{ $job->title }}
+                        </a>
+                        <p class="company-name"
+                            style="font-size: 14px; margin-top: 2px; margin-bottom: 0px; font-weight:600; line-height:1;">
+                            {{ $job->employer->company_name }}
+                        </p>
+                        <p class="location"
+                            style="font-size: 12px; margin-top: 1px; margin-bottom: 0px; line-height:1;">
+                            {{ $job->location }}
+                        </p>
+                        <div style="display: flex; justify-content: space-between;">
+                            <p
+                                style="font-size: 14px; color:red; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
+                                {{ $job->closing_date }}
                             </p>
-                            <p class="location"
-                                style="font-size: 12px; margin-top: 1px; margin-bottom: 0px; line-height:1;">
-                                {{ $job->location }}
-                            </p>
-                            <div style="display: flex; justify-content: space-between;">
-                                <p
-                                    style="font-size: 14px; color:red; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
-                                    {{ $job->closing_date }}
-                                </p>
-                                <p
-                                    style="font-size: 14px; color:#888888; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
-                                    {{ $job->job_id }}</p>
-                            </div>
+                            <p
+                                style="font-size: 14px; color:#888888; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
+                                {{ $job->job_id }}</p>
                         </div>
-                    @endforeach
-                </div>
-            @endif
-    
-            <!-- Pagination -->
-            <div class="pagination-container" style="margin-top: 20px;">
-                {{ $jobs->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
+                    </div>
+                @endforeach
             </div>
         @endif
-    </section>
+
+        <!-- Pagination -->
+        <div class="pagination-container" style="margin-top: 20px;">
+            {{ $jobs->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
+        </div>
+    @endif
+</section>
         
 
 

@@ -151,7 +151,31 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
                 margin-top: -50px;
             }
         }
-    </style>
+.social-icons {
+    display: flex;
+    gap: 20px;
+    position: absolute;
+    top: 35px;
+    right: 25px;
+}
+
+/* Hide social icons on small screens */
+@media (max-width: 1177px) {
+    .social-icons {
+        display: none;
+        position: relative; /* reset absolute to avoid layout issues */
+        top: auto;
+        right: auto;
+        margin-top: 20px;
+        justify-content: center;
+    }
+    
+    /* Show social icons inside nav when menu is toggled */
+    .unique-nav-links.show .social-icons {
+        display: flex;
+    }
+}
+php </style>
 
 </head>
 
@@ -168,7 +192,7 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
         <button class="menu-toggle" aria-label="Toggle Navigation">
             ☰
         </button>
-        <nav class="nav-links unique-nav-links" style="margin-left:100px;margin-top:11px">
+        <nav class="nav-links unique-nav-links" style="margin-left:100px;margin-top:11px;height:300px">
             <!-- "Post Your Vacancy" as a button -->
             <a href="{{ route('user.postvacancy') }}"
                 style="background: linear-gradient(to bottom, #28adce, #18799c); color: white;transition: color 0.3s ease,
@@ -187,7 +211,7 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
                             this.style.boxShadow='0 6px 10px rgba(0, 0, 0, 0.15)';"
                 onmouseout="this.style.transform='translateY(0)';
                            this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)';">
-                CV Create
+                Create Free CV
             </a>
 
 
@@ -210,14 +234,26 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
                 onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
                 Contact Us
             </a>
-
-
+            <!-- Move social-icons here -->
+            <div class="social-icons" style="display: flex; gap: 20px;">
+                <a href="https://www.facebook.com/jobads.lkJSG" target="_blank" style="color: #18799c;">
+                <img src="{{ asset('facebook.jpeg') }}" style="width:25px ;height:auto">
+                </a>
+                <a href="https://www.linkedin.com/company/jobads-lk/?viewAsMember=true" target="_blank" style="color:#18799c;">
+                <img src="{{ asset('linkedin.jpeg') }}" style="width:25px ;height:auto">
+                </a>
+                <a href="https://www.tiktok.com/@jobads.lk" target="_blank" style="color:#18799c;">
+                <img src="{{ asset('tiktok.jpeg') }}" style="width:25px ;height:auto">
+                </a>
+                <a href="https://www.instagram.com/jobadslk/" target="_blank" style="color: #18799c;">
+                <img src="{{ asset('Instagram.jpeg') }}" style="width:25px ;height:auto">
+                </a>
+            </div>        
         </nav>
-
-
-
-
         </div>
+    
+
+
         <div class="menu">
             @auth
                 <!-- For authenticated users -->

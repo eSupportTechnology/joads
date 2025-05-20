@@ -1,0 +1,22 @@
+[0;1;32m●[0m bluetooth.service - Bluetooth service
+     Loaded: loaded (]8;;file://hp/usr/lib/systemd/system/bluetooth.service/usr/lib/systemd/system/bluetooth.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;32mactive (running)[0m since Tue 2025-05-13 16:34:42 +0530; 18min ago
+       Docs: ]8;;man:bluetoothd(8)man:bluetoothd(8)]8;;
+   Main PID: 1172 (bluetoothd)
+     Status: "[0;1;36mRunning[0m"
+      Tasks: 1 (limit: 8871)
+     Memory: 2.9M (peak: 3.2M)
+        CPU: 84ms
+     CGroup: /system.slice/bluetooth.service
+             └─[0;38;5;245m1172 /usr/libexec/bluetooth/bluetoothd[0m
+
+May 13 16:34:42 hp systemd[1]: Started bluetooth.service - Bluetooth service.
+May 13 16:34:42 hp bluetoothd[1172]: Starting SDP server
+May 13 16:34:42 hp bluetoothd[1172]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185msrc/plugin.c:plugin_init() System does not support csip plugin[0m
+May 13 16:34:42 hp bluetoothd[1172]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mprofiles/audio/micp.c:micp_init() D-Bus experimental not enabled[0m
+May 13 16:34:42 hp bluetoothd[1172]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185msrc/plugin.c:plugin_init() System does not support micp plugin[0m
+May 13 16:34:42 hp bluetoothd[1172]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185msrc/plugin.c:plugin_init() System does not support vcp plugin[0m
+May 13 16:34:42 hp bluetoothd[1172]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185msrc/plugin.c:plugin_init() System does not support mcp plugin[0m
+May 13 16:34:42 hp bluetoothd[1172]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185msrc/plugin.c:plugin_init() System does not support bass plugin[0m
+May 13 16:34:42 hp bluetoothd[1172]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185msrc/plugin.c:plugin_init() System does not support bap plugin[0m
+May 13 16:34:42 hp bluetoothd[1172]: Bluetooth management interface 1.23 initialized

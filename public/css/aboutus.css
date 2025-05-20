@@ -12,7 +12,6 @@ body {
 
 .about-section {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     background-color: #fff;
     padding: 40px;
@@ -51,6 +50,7 @@ body {
 }
 
 .illustration img {
+    padding-left: 350px;
     width: 500px;
     height: auto;
     border-radius: 8px;

@@ -3,9 +3,9 @@
 </head>
 
 <footer class="jobads-main-footer"
-    style="background-color: #18799c; color: #fff; padding: 20px; text-align: center; border-radius: 50px 0 0 0;">
+    style="background-color: #18799c; color: #fff; padding: 30px; text-align: center; border-radius: 50px 0 0 0;">
     <div class="jobads-footer-content"
-        style="display: flex; justify-content: space-between; gap: 30px; max-width: 1200px; margin: 0 auto; flex-wrap: wrap;">
+        style="display: flex; justify-content: space-between; gap: 40px; max-width: 1200px; margin: 0 auto; flex-wrap: wrap;">
         <div class="jobads-footer-section" style="flex: 1; min-width: 250px; text-align: left;">
             <h3 style="font-size: 22px; font-weight: bold; margin-bottom: 15px; color: #fff;">About Us</h3>
             <p style="font-size: 16px; line-height: 1.6; color: #f0f0f0;">
@@ -30,7 +30,7 @@
                         </a>
                     </li>
                     <li style="margin-bottom: 10px;">
-                        <a href="privacy" style="color: #f4f4f4; text-decoration: none; transition: color 0.3s;">
+                        <a href="{{ route('policy.indexhome') }}" style="color: #f4f4f4; text-decoration: none; transition: color 0.3s;">
                             <i class="fa fa-chevron-right" style="margin-right: 10px; color: goldenrod;"></i>Privacy
                             Policy
                         </a>
@@ -95,7 +95,9 @@
     <div class="jobads-footer-bottom"
         style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
         <p style="font-size: 14px; color: #f4f4f4; margin: 0;">
-            All Rights Reserved. &copy; 2024 JobAds.lk.
+            <footer>
+                All Rights Reserved. &copy; {{ date('Y') }} jobads.lk.
+            </footer>
         </p>
     </div>
 </footer>
