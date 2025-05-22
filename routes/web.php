@@ -199,7 +199,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/cv2', [CVController::class, 'index2'])->name('generate.index2');
     Route::post('/profile/cv3', [CVController::class, 'generateCV3'])->name('generate.cv3');
     Route::get('/profile/cv3', [CVController::class, 'index3'])->name('generate.index3');
-    
+
     Route::get('/cv/download/{template}', [CVController::class, 'downloadCV'])->name('cv.download');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
@@ -329,12 +329,16 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/profile', [AdminAuthController::class, 'showProfileForm'])
         ->name('admin.profile');
     Route::get('/job_postings/{id}', [JobPostingController::class, 'show'])->name('job_postings.show');
+    Route::put('/job_postings/{id}', [JobPostingController::class, 'updatepost'])->name('job_postings.update');
 
     Route::put('/admin/profile', [AdminAuthController::class, 'updateProfile'])
         ->name('admin.profile.update');
     Route::get('/admin/list', [AdminAuthController::class, 'adminList'])->name('admin.list');
 
     Route::get('/admin/employer-list', [EmployerAuthController::class, 'list'])->name('employer.list');
+    Route::get('/admin/employer-list/edit/{id}', [EmployerAuthController::class, 'listedit'])->name('employer.listedit');
+    Route::put('/admin/employer-list/edit/{id}', [EmployerAuthController::class, 'listupdate'])->name('employer.listupdate');
+    Route::delete('/admin/employer-list/delete/{id}', [EmployerAuthController::class, 'listdelete'])->name('employer.listdelete');
 
     Route::delete('/employer/delete/{id}', function ($id) {
         $employer = \App\Models\Employer::findOrFail($id);

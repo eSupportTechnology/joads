@@ -69,7 +69,7 @@
                                             <td>{{ $job->job_id }}</td>
                                             <td>{{ $job->title }}</td>
                                             <td>{{ $job->category->name }}</td>
-                                            <td>{{ $job->employer->company_name }}</td>
+                                            <td>{{ $job->employer->company_name ?? 'N/A' }}</td>
                                             <td>{{ $job->status }}</td>
                                             <td>
                                                 <a href="{{ route('job_postings.show', $job->id) }}"
@@ -141,7 +141,7 @@
                                             <td>{{ $job->job_id }}</td>
                                             <td>{{ $job->title }}</td>
                                             <td>{{ $job->category->name }}</td>
-                                            <td>{{ $job->employer->company_name }}</td>
+                                            <td>{{ $job->employer->company_name ?? 'N/A' }}</td>
                                             <td>{{ $job->status }}</td>
                                             <td>
                                                 <a href="{{ route('job_postings.show', $job->id) }}"
@@ -175,7 +175,7 @@
                                             <td>{{ $job->job_id }}</td>
                                             <td>{{ $job->title }}</td>
                                             <td>{{ $job->category->name }}</td>
-                                            <td>{{ $job->employer->company_name }}</td>
+                                            <td>{{ $job->employer->company_name ?? 'N/A' }}</td>
                                             <td>{{ $job->status }}</td>
                                             <td>
                                                 <a href="{{ route('job_postings.show', $job->id) }}"
