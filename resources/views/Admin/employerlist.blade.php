@@ -66,12 +66,18 @@
                                                         {{ $employer->is_active ? 'Inactive' : 'Active' }}
                                                     </button>
                                                 </form>
-                                                {{-- <form action="{{ route('employer.delete', $employer->id) }}" method="POST"
-                                style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form> --}}
+                                                <a href="{{ route('employer.listedit', $employer->id) }}"
+                                                    class="btn btn-sm btn-warning">Edit</a>
+                                                {{-- <form action="{{ route('employer.show', $employer->id) }}" method="GET"
+                                                    style="display:inline;">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-info">View</button> --}}
+                                                <form action="{{ route('employer.listdelete', $employer->id) }}" method="POST"
+                                                    style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                </form>
                                             </td>
                                         </tr>
                                     @endforeach

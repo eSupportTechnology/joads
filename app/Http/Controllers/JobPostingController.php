@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\JobApprovedMail;
 use App\Models\Application;
 use App\Models\Banner;
 use App\Models\Category;
@@ -16,6 +17,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class JobPostingController extends Controller
 {
@@ -54,14 +56,14 @@ class JobPostingController extends Controller
             ->get();
         return view('Admin.jobview', compact('jobPostings', 'pendingJobs', 'rejectedJobs', 'expireddJobs'));
     }
-    
-    
+
+
     public function topEmployers()
     {
         $contacts = ContactUs::all();
         // Fetch top 28 employers based on job postings count and filter those with a logo
         $topEmployers = Employer::withCount('jobPostings') // Assuming 'jobPostings' is the relationship
-           
+
             ->orderBy('job_postings_count', 'desc') // Sort by the number of job postings
             ->take(8) // Limit to top 28
             ->get();
@@ -324,9 +326,9 @@ public function home(Request $request)
     return view('home.home', compact('categories', 'totalCount', 'jobs', 'contacts', 'countries', 'banners'))
         ->with('selected_category_id', session('selected_category_id'));
 }
-                        
-    
-    
+
+
+
     public function toggleActiveStatus($id)
     {
         // Find the job posting by ID and ensure it belongs to the authenticated employer
@@ -344,11 +346,43 @@ public function home(Request $request)
     }
 
     public function show($id)
-    {
-        $job = JobPosting::with(['category', 'employer'])->findOrFail($id);
-        return view('Admin.showonejob', compact('job'
-        ));
-    }
+{
+    $job = JobPosting::with(['category', 'employer', 'package.duration'])->findOrFail($id);
+    $categories = Category::all();
+    $sub_categories = Subcategory::all();
+    $packages = Package::with('duration')->get();
+
+    return view('Admin.showonejob', compact('job', 'categories', 'packages', 'sub_categories'));
+}
+
+    public function updatepost(Request $request, $id)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'category_id' => 'required|exists:categories,id',
+        'description' => 'required|string',
+        'location' => 'required|string|max:255',
+        'salary_range' => 'nullable|numeric',
+        'requirements' => 'nullable|string',
+        'closing_date' => 'required|date',
+        'package_id' => 'required|exists:packages,id',
+    ]);
+
+    $job = JobPosting::findOrFail($id);
+
+    $job->title = $request->title;
+    $job->category_id = $request->category_id;
+    $job->description = $request->description;
+    $job->location = $request->location;
+    $job->salary_range = $request->salary_range;
+    $job->requirements = $request->requirements;
+    $job->closing_date = $request->closing_date;
+    $job->package_id = $request->package_id;
+
+    $job->save();
+
+    return redirect()->route('job_postings.show', $job->id)->with('success', 'Job updated successfully.');
+}
     public function showjob($id)
     {
         $contacts = ContactUs::all();
@@ -371,40 +405,49 @@ public function home(Request $request)
     }
 
     public function updateStatus(Request $request, $id)
-    {
-        // Validate the incoming request
-        $request->validate([
-            'status' => 'required|in:pending,approved,reject',
-            'rejection_reason' => 'nullable|string|max:255', // Validate rejection reason
-        ]);
+{
+    // Validate the incoming request
+    $request->validate([
+        'status' => 'required|in:pending,approved,reject',
+        'rejection_reason' => 'nullable|string|max:255', // Validate rejection reason
+    ]);
 
-        // Retrieve the job posting by ID
-        $job = JobPosting::findOrFail($id);
+    // Retrieve the job posting by ID
+    $job = JobPosting::findOrFail($id);
+    $previousStatus = $job->status;
 
-        // Update the status
-        $job->status = $request->input('status');
+    // Update the status
+    $job->status = $request->input('status');
 
-        // Save approved date if status is approved
-        if ($job->status === 'approved') {
-            $job->approved_date = now(); // Save the current timestamp
-            $job->rejection_reason = null; // Clear rejection reason if previously set
-        }
-
-        // Save rejected date and reason if status is reject
-        if ($job->status === 'reject') {
-            $job->rejected_date = now(); // Save the current timestamp
-            $job->rejection_reason = $request->input('rejection_reason'); // Save rejection reason
-        }
-
-        // Save the admin ID who updated the status
-        $job->admin_id = auth('admin')->id(); // Assuming admin is logged in
-
-        // Save the changes to the database
-        $job->save();
-
-        // Redirect back with a success message
-        return redirect()->route('job_postings.index')->with('success', 'Job status updated successfully.');
+    // Save approved date if status is approved
+    if ($job->status === 'approved') {
+        $job->approved_date = now(); // Save the current timestamp
+        $job->rejection_reason = null; // Clear rejection reason if previously set
     }
+
+    // Save rejected date and reason if status is reject
+    if ($job->status === 'reject') {
+        $job->rejected_date = now(); // Save the current timestamp
+        $job->rejection_reason = $request->input('rejection_reason'); // Save rejection reason
+    }
+
+    // Save the admin ID who updated the status
+    $job->admin_id = auth('admin')->id(); // Assuming admin is logged in
+
+    // Save the changes to the database
+    $job->save();
+
+    // Send email if newly approved
+    if ($previousStatus !== 'approved' && $job->status === 'approved') {
+        $employer = Employer::find($job->employer_id);
+        if ($employer && $employer->email) {
+            Mail::to($employer->email)->send(new JobApprovedMail($job));
+        }
+    }
+
+    // Redirect back with a success message
+    return redirect()->route('job_postings.index')->with('success', 'Job status updated successfully.');
+}
     public function getJobsByCategory($categoryId)
     {
         $today = Carbon::today();
@@ -485,7 +528,7 @@ public function home(Request $request)
                         // Check if user and job exist before accessing properties
                         $userName = optional($app->user)->name ?? 'Unknown User';
                         $jobTitle = optional($app->job)->title ?? 'Unknown Job';
-        
+
                         return "$userName applied for $jobTitle";
                     });
 
@@ -516,7 +559,7 @@ public function home(Request $request)
                         // Check if user and job exist before accessing properties
                         $userName = optional($app->user)->name ?? 'Unknown User';
                         $jobTitle = optional($app->job)->title ?? 'Unknown Job';
-        
+
                         return "$userName - $jobTitle";
                     });
 
@@ -866,8 +909,8 @@ public function home(Request $request)
         $subcategories = Subcategory::where('category_id', $jobPosting->category_id)->get(); // Assuming you have a Subcategory model
         return view('employer.jobupdate', compact('countries','jobPosting', 'categories', 'subcategories'));
     }
-    
-    
+
+
     public function createForAdmin()
     {
         $categories = Category::all(); // Fetch all categories
