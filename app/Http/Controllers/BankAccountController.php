@@ -45,7 +45,7 @@ class BankAccountController extends Controller
             $path = $request->file('logo')->store('bank-logos');
             $validated['logo'] = str_replace('public/', '', $path);
         }
-        
+
          $imagePath = $request->file('logo')->store('bank-logos', 'public');
 
         BankAccount::create($validated);

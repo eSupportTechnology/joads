@@ -34,7 +34,7 @@
                             enctype="multipart/form-data">
                             @csrf
                             <div class="row g-3">
-                                
+
                                 <!-- Existing Fields -->
                                 <div class="col-md-6">
                                     <label for="bank_name" class="form-label">Bank Name</label>

@@ -33,5 +33,10 @@ class Admin extends Authenticatable
     {
         return $this->hasMany(Feedback::class);
     }
+    public function permissions()
+{
+    return $this->belongsToMany(Permission::class);
+}
+
 
 }
