@@ -73,7 +73,6 @@ Route::middleware('auth')->group(function () {
         ->name('user.jobseekerprofile.myjobs.view');
     Route::post('/jobs/{jobId}/flag', [FlaggedJobController::class, 'toggleFlag'])->name('jobs.flag');
     Route::get('/user/flagged-jobs', [FlaggedJobController::class, 'showFlaggedJobs'])->name('user.flagged_jobs');
-
 });
 
 // Route::get('/', function () {
@@ -133,24 +132,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('education.delete');
 });
 
-
-
 // List all press releases
-Route::get('/press-releases', [PressReleaseController::class, 'index'])->name('press-releases.index');
-Route::get('/press-releases/create', [PressReleaseController::class, 'create'])->name('press-releases.create');
-Route::post('/press-releases/store', [PressReleaseController::class, 'store'])->name('press-releases.store');
-Route::get('/press-releases/{pressRelease}', [PressReleaseController::class, 'show'])->name('press-releases.show');
-Route::get('/press-releases/{pressRelease}/edit', [PressReleaseController::class, 'edit'])->name('press-releases.edit');
-Route::put('/press-releases/{pressRelease}/update', [PressReleaseController::class, 'update'])->name('press-releases.update');
-Route::delete('/press-releases/{pressRelease}/destroy', [PressReleaseController::class, 'destroy'])->name('press-releases.destroy');
+
 Route::post('/press-releases/store-multiple', [PressReleaseController::class, 'storeMultiple'])->name('press-releases.store-multiple');
 Route::get('/press-releases-page', [PressReleaseController::class, 'frontendIndex'])->name('press-releases.frontend');
-
-
-Route::get('/admin/durations', [DurationController::class, 'index'])->name('durations.index');
-Route::get('/admin/durations/edit/{duration}', [DurationController::class, 'edit'])->name('durations.edit')->middleware(['superadmin']);
-Route::put('/admin/durations/update/{duration}', [DurationController::class, 'update'])->name('durations.update')->middleware(['superadmin']);
-
 
 Route::get('/ourservices', [ContactListController::class, 'ourservices'])->name('ourservices');
 
@@ -171,7 +156,6 @@ Route::middleware(['auth'])->group(function () {
     // Delete experience
     Route::get('/experience/delete/{id}', [JobExperienceController::class, 'destroy'])
         ->name('experience.delete');
-
 });
 
 Route::middleware('auth')->group(function () {
@@ -209,7 +193,6 @@ Route::middleware('auth')->group(function () {
 Route::prefix('dashboard')->group(function () {
     Route::view('index', 'dashboard.index')->name('index');
     Route::view('dashboard-02', 'dashboard.dashboard-02')->name('dashboard-02');
-
 });
 
 Route::prefix('widgets')->group(function () {
@@ -229,127 +212,46 @@ Route::prefix('admin')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('admin.dashboard');
     });
-
 });
 Route::get('terms-and-conditions', [TermsAndConditionController::class, 'indexhome'])->name('terms.index');
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     // Show the list of terms and conditions
-    Route::get('terms-and-conditions', [TermsAndConditionController::class, 'index'])->name('terms.index');
 
-    // Show the form for creating a new terms and condition
-    Route::get('terms-and-conditions/create', [TermsAndConditionController::class, 'create'])->name('terms.create');
-
-    // Store a new terms and condition
-    Route::post('terms-and-conditions', [TermsAndConditionController::class, 'store'])->name('terms.store');
-
-    // Show the form for editing an existing terms and condition
-    Route::get('terms-and-conditions/{termsAndCondition}/edit', [TermsAndConditionController::class, 'edit'])->name('terms.edit');
-
-    // Update an existing terms and condition
-    Route::put('terms-and-conditions/{termsAndCondition}', [TermsAndConditionController::class, 'update'])->name('terms.update');
-
-    // Delete an existing terms and condition
-    Route::delete('terms-and-conditions/{termsAndCondition}', [TermsAndConditionController::class, 'destroy'])->name('terms.destroy');
 });
 Route::get('policy', [PolicyController::class, 'indexhome'])->name('policy.indexhome');
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     // Show the list of terms and conditions
-    Route::get('policy', [PolicyController::class, 'index'])->name('policy.index');
 
-    // Show the form for creating a new terms and condition
-    Route::get('policy/create', [PolicyController::class, 'create'])->name('policy.create');
-
-    // Store a new terms and condition
-    Route::post('policy', [PolicyController::class, 'store'])->name('policy.store');
-
-    // Show the form for editing an existing terms and condition
-    Route::get('policy/{policy}/edit', [PolicyController::class, 'edit'])->name('policy.edit');
-
-    // Update an existing terms and condition
-    Route::put('policy/{policy}', [PolicyController::class, 'update'])->name('policy.update');
-
-    // Delete an existing terms and condition
-    Route::delete('policy/{policy}', [PolicyController::class, 'destroy'])->name('policy.destroy');
 });
 
-Route::prefix('admin')
-    ->name('admin.')
-    ->middleware('admin')
-    ->group(function () {
-        Route::resource('vissionmission', VissionMissionController::class);
-    });
+
 
 Route::get('/about-us', [AboutUsController::class, 'indexhome'])->name('about-us.index');
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
-    // Show the About Us section
-    Route::get('/about-us', [AboutUsController::class, 'index'])->name('about-us.index');
 
-    // Show the form to create a new About Us section
-    Route::get('about-us/create', [AboutUsController::class, 'create'])->name('about-us.create');
-
-    // Store the new About Us section
-    Route::post('about-us', [AboutUsController::class, 'store'])->name('about-us.store');
-
-    // Show the form to edit an existing About Us section
-    Route::get('about-us/{aboutUs}/edit', [AboutUsController::class, 'edit'])->name('about-us.edit');
-
-    // Update the existing About Us section
-    Route::put('about-us/{aboutUs}', [AboutUsController::class, 'update'])->name('about-us.update');
-
-    // Delete the About Us section
-    Route::delete('about-us/{aboutUs}', [AboutUsController::class, 'destroy'])->name('about-us.destroy');
 });
 Route::get('faqs', [FaqController::class, 'faqshow'])->name('faqs.home');
 Route::middleware('admin')->group(function () {
-    // Display all FAQs
-    Route::get('admin/faqs', [FaqController::class, 'index'])->name('faqs.index');
 
-    // Show the form to create a new FAQ
-    Route::get('/faqs/create', [FaqController::class, 'create'])->name('faqs.create');
-
-    // Store a new FAQ
-    Route::post('/faqs', [FaqController::class, 'store'])->name('faqs.store');
-
-    // Display a specific FAQ
-    Route::get('/faqs/{faq}', [FaqController::class, 'show'])->name('faqs.show');
-
-    // Show the form to edit a specific FAQ
-    Route::get('/faqs/{faq}/edit', [FaqController::class, 'edit'])->name('faqs.edit');
-
-    // Update a specific FAQ
-    Route::put('/faqs/{faq}', [FaqController::class, 'update'])->name('faqs.update');
-
-    // Delete a specific FAQ
-    Route::delete('/faqs/{faq}', [FaqController::class, 'destroy'])->name('faqs.destroy');
 });
 
 Route::get('/jobs/{id}', [JobPostingController::class, 'showjob'])->name('job.details');
 Route::get('/jobs/category/{categoryId}', [JobPostingController::class, 'getJobsByCategory']);
 Route::middleware('admin')->group(function () {
-    Route::get('/admin/profile', [AdminAuthController::class, 'showProfileForm'])
-        ->name('admin.profile');
-    Route::get('/job_postings/{id}', [JobPostingController::class, 'show'])->name('job_postings.show');
-    Route::put('/job_postings/{id}', [JobPostingController::class, 'updatepost'])->name('job_postings.update');
+    Route::get('/admin/profile', [AdminAuthController::class, 'showProfileForm'])->name('admin.profile');
 
-    Route::put('/admin/profile', [AdminAuthController::class, 'updateProfile'])
-        ->name('admin.profile.update');
+    Route::put('/admin/profile', [AdminAuthController::class, 'updateProfile'])->name('admin.profile.update');
     Route::get('/admin/list', [AdminAuthController::class, 'adminList'])->name('admin.list');
-
-    Route::get('/admin/employer-list', [EmployerAuthController::class, 'list'])->name('employer.list');
-    Route::get('/admin/employer-list/edit/{id}', [EmployerAuthController::class, 'listedit'])->name('employer.listedit');
-    Route::put('/admin/employer-list/edit/{id}', [EmployerAuthController::class, 'listupdate'])->name('employer.listupdate');
-    Route::delete('/admin/employer-list/delete/{id}', [EmployerAuthController::class, 'listdelete'])->name('employer.listdelete');
 
     Route::delete('/employer/delete/{id}', function ($id) {
         $employer = \App\Models\Employer::findOrFail($id);
         $employer->delete();
         return redirect()->route('employer.list')->with('success', 'Employer deleted successfully.');
     })->name('employer.delete');
-    Route::get('/admin/user-list', [RegisteredUserController::class, 'userList'])->name('user.list');
+
     Route::patch('/user/{id}/toggle-status', [RegisteredUserController::class, 'toggleStatus'])->name('user.toggleStatus');
 
     Route::patch('/employer/{id}/toggle-status', [EmployerAuthController::class, 'toggleStatus'])->name('employer.toggleStatus');
-
 });
 
 // Route::get('/ourservices', [ContactUsController::class, 'index'])->name('ourservices');
@@ -358,25 +260,25 @@ Route::get('/contactus', [ContactListController::class, 'contactus'])->name('con
 
 Route::middleware('admin')->prefix('admin')->group(function () {
     // List all categories
-    Route::get('/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
+    // Route::get('/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
 
-    // Show form to create a new category
-    Route::get('/categories/create', [CategoryController::class, 'create'])->name('admin.categories.create');
+    // // Show form to create a new category
+    // Route::get('/categories/create', [CategoryController::class, 'create'])->name('admin.categories.create');
 
-    // Store a new category
-    Route::post('/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
+    // // Store a new category
+    // Route::post('/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
 
-    // Show form to edit an existing category
-    Route::get('/categories/{id}/edit', [CategoryController::class, 'edit'])->name('admin.categories.edit');
+    // // Show form to edit an existing category
+    // Route::get('/categories/{id}/edit', [CategoryController::class, 'edit'])->name('admin.categories.edit');
 
-    // Update an existing category
-    Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('admin.categories.update');
+    // // Update an existing category
+    // Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('admin.categories.update');
 
-    // Delete a category
-    Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+    // // Delete a category
+    // Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
-    // Job Posting admin side route
-    Route::get('job_postings', [JobPostingController::class, 'index'])->name('job_postings.index');
+    // // Job Posting admin side route
+    // Route::get('job_postings', [JobPostingController::class, 'index'])->name('job_postings.index');
 
 
     Route::patch('job_postings/{id}/status', [JobPostingController::class, 'updateStatus'])->name('job_postings.updateStatus');
@@ -388,12 +290,6 @@ Route::middleware('admin')->prefix('admin')->group(function () {
 
     // Store new contact details
     Route::post('/contactus', [ContactUsController::class, 'store'])->name('contactus.store');
-
-    // Show form to edit specific contact details
-    Route::get('/contactus/{contactus}/edit', [ContactUsController::class, 'edit'])->name('contactus.edit');
-
-    // Update specific contact details
-    Route::put('/contactus/{contactus}', [ContactUsController::class, 'update'])->name('contactus.update');
 
     // Delete specific contact details
     Route::delete('/contactus/{contactus}', [ContactUsController::class, 'destroy'])->name('contactus.destroy');
@@ -419,7 +315,6 @@ Route::prefix('employer')->name('employer.')->group(function () {
             Route::patch('/{jobPosting}', [JobPostingController::class, 'update'])->name('post.update');
             Route::delete('/{jobPosting}', [JobPostingController::class, 'destroy'])->name('post.destroy');
         });
-
     });
 });
 
@@ -745,20 +640,18 @@ Route::get('/clear-cache', function () {
 
 Route::get('/terms', function () {
     return view('User/SideComponent/terms');
-
 });
 
 Route::get('/faq', function () {
     return view('User/SideComponent/faq');
-
 });
 
 
 //job post
 
-Route::get('/postjob', function () {
-    return view('user.postvacancy.postvacancy');
-})->name('user.postvacancy');
+// Route::get('/postjob', function () {
+//     return view('user.postvacancy.postvacancy');
+// })->name('user.postvacancy');
 
 Route::get('/postjob/new', [PackageContactController::class, 'index'])->name('user.postvacancy');
 
@@ -812,29 +705,13 @@ Route::middleware(['employer'])->group(function () {
     Route::get('/employer/feedback', [FeedbackController::class, 'employercreate'])->name('employer.feedback.create');
     Route::post('/employer/feedback', [FeedbackController::class, 'employerstore'])->name('employer.feedback.store');
 });
-Route::middleware('admin')->group(function () {
-    Route::get('/admin/feedback', [FeedbackController::class, 'manageFeedback'])->name('admin.feedback.manage');
-    Route::post('/admin/feedback/{feedback}/update', [FeedbackController::class, 'update'])->name('admin.feedback.update');
-    Route::delete('/admin/feedback/{feedback}', [FeedbackController::class, 'destroy'])->name('admin.feedback.destroy');
-});
 
 Route::get('/alerts', function () {
     return view('user/jobseekerprofile/jobalerts/jobalerts');
-
 });
 
-Route::middleware(['admin', 'superadmin'])->group(function () {
-    Route::get('/admin/list', [AdminAuthController::class, 'adminList'])->name('admin.list');
-    Route::post('/admin/toggle-status/{id}', [AdminAuthController::class, 'toggleStatus'])->name('admin.toggleStatus');
-});
 
-Route::patch('/job-postings/{id}/toggle-active', [JobPostingController::class, 'toggleActiveStatus'])
-    ->name('job_postings.toggle_active')
-    ->middleware('employer'); // Ensure only authenticated employers can access this route
 
-Route::get('/employer-register', function () {
-    return view('Admin.employerregister');
-})->middleware('admin')->name('register.adminemployer');
 Route::post('/register-employer', [EmployerAuthController::class, 'extraregister'])->name('register.extraemployer')->middleware('admin');
 
 //admin reset password
@@ -843,92 +720,346 @@ Route::post('/admin/password/email', [AdminForgotPasswordController::class, 'sen
 Route::get('/admin/password/reset/{token}', [AdminResetPasswordController::class, 'showResetForm'])->name('admin.password.reset');
 Route::post('/admin/password/reset', [AdminResetPasswordController::class, 'reset'])->name('admin.password.update');
 // admin
-Route::get('/admin/job-postings/create', [JobPostingController::class, 'createForAdmin'])
-    ->name('admin.job_postings.create')
-    ->middleware('auth:admin'); // Ensure only admins can access
-Route::post('/admin/job-postings/create', [JobPostingController::class, 'storeForAdmin'])
-    ->name('admin.job_postings.store')
-    ->middleware('auth:admin');
+
 Route::get('/employers/search', [EmployerAuthController::class, 'search']);
 
 Route::get('/package-contacts', [PackageContactController::class, 'index'])->name('package-contacts.index'); // Fetch all
-Route::get('/package-contacts/create', [PackageContactController::class, 'create'])->name('package-contacts.create')->middleware('auth:admin');
 Route::post('/package-contacts', [PackageContactController::class, 'store'])->name('package-contacts.store')->middleware('auth:admin'); // Create
 Route::put('/package-contacts/{id}', [PackageContactController::class, 'update'])->name('package-contacts.update')->middleware('auth:admin'); // Update
 Route::delete('/package-contacts/{id}', [PackageContactController::class, 'destroy'])->name('package-contacts.destroy')->middleware('auth:admin'); // Delete
 
-Route::get('admin/packages', [PackageController::class, 'index'])->name('admin.packages.index')->middleware('auth:admin');
-Route::get('admin/packages/create', [PackageController::class, 'create'])->name('admin.packages.create')->middleware('auth:admin');
-Route::post('admin/packages', [PackageController::class, 'store'])->name('admin.packages.store')->middleware('auth:admin');
-Route::get('admin/packages/{package}', [PackageController::class, 'show'])->name('admin.packages.show')->middleware('auth:admin');
-Route::get('admin/packages/{package}/edit', [PackageController::class, 'edit'])->name('admin.packages.edit')->middleware('auth:admin');
-Route::put('admin/packages/{package}', [PackageController::class, 'update'])->name('admin.packages.update')->middleware('auth:admin');
-Route::delete('admin/packages/{package}', [PackageController::class, 'destroy'])->name('admin.packages.destroy')->middleware('auth:admin');
+Route::middleware('superadmin')->group(function () {
+    Route::get('/superadmin/assign-permissions', [AdminAuthController::class, 'showPermissionForm'])->name('superadmin.permissions.form');
+    Route::post('/superadmin/assign-permissions', [AdminAuthController::class, 'assignPermissions'])->name('superadmin.assign.permissions');
+    Route::get('/superadmin/permissions', [AdminAuthController::class, 'showPermissionForm'])->name('superadmin.show.permissions');
+});
 
-Route::get('/contacts/list', [ContactListController::class, 'index'])->name('contacts.index')->middleware('auth:admin');
-Route::get('/contacts/create', [ContactListController::class, 'create'])->name('contacts.create')->middleware('auth:admin');
+
+
+
+
+Route::middleware(['auth:admin'])->group(function () {
+
+    //admin management
+    Route::get('/admin/list', [AdminAuthController::class, 'adminList'])
+        ->name('admin.list')->middleware('check.permission:admin.list');
+    Route::post('/admin/toggle-status/{id}', [AdminAuthController::class, 'toggleStatus'])
+        ->name('admin.toggleStatus');
+
+    //employer management
+    Route::get('/admin/employer-list', [EmployerAuthController::class, 'list'])
+        ->name('employer.list')->middleware('check.permission:employer.list');
+    Route::get('/admin/employer-list/edit/{id}', [EmployerAuthController::class, 'listedit'])
+        ->name('employer.listedit')->middleware('check.permission:employer.listedit');
+    Route::put('/admin/employer-list/edit/{id}', [EmployerAuthController::class, 'listupdate'])
+        ->name('employer.listupdate');
+    Route::delete('/admin/employer-list/delete/{id}', [EmployerAuthController::class, 'listdelete'])
+        ->name('employer.listdelete');
+
+    Route::get('/admin/user-list', [RegisteredUserController::class, 'userList'])
+        ->name('user.list')->middleware('check.permission:user.list');
+
+    Route::get('/employer-register', function () {
+        return view('Admin.employerregister');
+    })->name('register.adminemployer')->middleware('check.permission:register.adminemployer');
+
+    //category management
+
+    Route::get('/categories', [CategoryController::class, 'index'])
+        ->name('admin.categories.index')->middleware('check.permission:admin.categories.index');
+    Route::get('/categories/create', [CategoryController::class, 'create'])
+        ->name('admin.categories.create')->middleware('check.permission:admin.categories.create');
+    Route::post('/categories', [CategoryController::class, 'store'])
+        ->name('admin.categories.store');
+    Route::get('/categories/{id}/edit', [CategoryController::class, 'edit'])
+        ->name('admin.categories.edit')->middleware('check.permission:admin.categories.edit');
+    Route::put('/categories/{id}', [CategoryController::class, 'update'])
+        ->name('admin.categories.update');
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])
+        ->name('admin.categories.destroy');
+
+    //job posting management
+    Route::get('/job_postings', [JobPostingController::class, 'index'])
+        ->name('job_postings.index')->middleware('check.permission:job_postings.index');
+    Route::get('/job_postings/{id}', [JobPostingController::class, 'show'])
+        ->name('job_postings.show')->middleware('check.permission:job_postings.show');
+    Route::put('/job_postings/{id}', [JobPostingController::class, 'updatepost'])
+        ->name('job_postings.update');
+    Route::patch('/job-postings/{id}/toggle-active', [JobPostingController::class, 'toggleActiveStatus'])
+        ->name('job_postings.toggle_active');
+
+
+    Route::get('/admin/job-postings/create', [JobPostingController::class, 'createForAdmin'])
+        ->name('admin.job_postings.create')->middleware('check.permission:admin.job_postings.create');
+    Route::post('/admin/job-postings/create', [JobPostingController::class, 'storeForAdmin'])
+        ->name('admin.job_postings.store');
+
+    //banner management
+
+    Route::get('/banners', [BannerController::class, 'index'])
+        ->name('banners.index')->middleware('check.permission:banners.index');
+    Route::get('/banners/create', [BannerController::class, 'create'])
+        ->name('banners.create')->middleware('check.permission:banners.create');
+    Route::post('/banners', [BannerController::class, 'store'])
+        ->name('banners.store');
+    Route::get('/banners/{banner}/edit', [BannerController::class, 'edit'])
+        ->name('banners.edit')->middleware('check.permission:banners.edit');
+    Route::put('/banners/{banner}', [BannerController::class, 'update'])
+        ->name('banners.update');
+    Route::patch('/banners/{banner}/status', [BannerController::class, 'updateStatus'])
+        ->name('banners.updateStatus');
+    Route::put('/admin/banners/{banner}/update-status', [BannerController::class, 'updateStatus'])
+        ->name('admin.banners.update-status');
+    Route::delete('/banners/{id}', [BannerController::class, 'destroy'])
+        ->name('banners.destroy');
+
+    //feedback management
+
+    Route::get('/admin/feedback', [FeedbackController::class, 'manageFeedback'])
+        ->name('admin.feedback.manage')->middleware('check.permission:admin.feedback.manage');
+    Route::post('/admin/feedback/{feedback}/update', [FeedbackController::class, 'update'])
+        ->name('admin.feedback.update');
+    Route::delete('/admin/feedback/{feedback}', [FeedbackController::class, 'destroy'])
+        ->name('admin.feedback.destroy');
+
+    //country management
+    Route::get('/countries', [CountryController::class, 'index'])
+        ->name('countries.index')->middleware('check.permission:countries.index');
+    Route::get('/countries/create', [CountryController::class, 'create'])
+        ->name('countries.create')->middleware('check.permission:countries.create');
+    Route::post('/countries', [CountryController::class, 'store'])
+        ->name('countries.store');
+    Route::get('/countries/{country}/edit', [CountryController::class, 'edit'])
+        ->name('countries.edit')->middleware('check.permission:countries.edit');
+    Route::put('/countries/{country}', [CountryController::class, 'update'])
+        ->name('countries.update');
+    Route::delete('/countries/{country}', [CountryController::class, 'destroy'])
+        ->name('countries.destroy');
+
+    //package management
+    Route::get('/package-contacts/create', [PackageContactController::class, 'create'])
+        ->name('package-contacts.create')->middleware('check.permission:package-contacts.create');
+
+    Route::get('admin/packages', [PackageController::class, 'index'])
+        ->name('admin.packages.index')->middleware('check.permission:admin.packages.index');
+
+    Route::get('admin/packages/create', [PackageController::class, 'create'])
+        ->name('admin.packages.create')->middleware('check.permission:admin.packages.create');
+
+    Route::post('admin/packages', [PackageController::class, 'store'])
+        ->name('admin.packages.store');
+
+    // Route::get('admin/packages/{package}', [PackageController::class, 'show'])
+    //     ->name('admin.packages.show')
+    //     ->middleware('check.permission:admin.packages.show');
+
+    Route::get('admin/packages/{package}/edit', [PackageController::class, 'edit'])
+        ->name('admin.packages.edit')->middleware('check.permission:admin.packages.edit');
+
+    Route::put('admin/packages/{package}', [PackageController::class, 'update'])
+        ->name('admin.packages.update');
+
+    Route::delete('admin/packages/{package}', [PackageController::class, 'destroy'])
+        ->name('admin.packages.destroy');
+
+    //banner package management
+    Route::get('/banner-details/create', [BannerDetailsController::class, 'create'])
+        ->name('bannerdetails.create')->middleware('check.permission:bannerdetails.create');
+    Route::post('/banner-details/store', [BannerDetailsController::class, 'store'])
+        ->name('bannerdetails.store');
+
+    Route::get('/banner-packages', [BannerPackageController::class, 'index'])
+        ->name('banner_packages.index')->middleware('check.permission:banner_packages.index');
+    Route::get('/banner-packages/create', [BannerPackageController::class, 'create'])
+        ->name('banner_packages.create')->middleware('check.permission:banner_packages.create');
+    Route::post('/banner-packages', [BannerPackageController::class, 'store'])
+        ->name('banner_packages.store');
+    Route::get('/banner-packages/{bannerPackage}/edit', [BannerPackageController::class, 'edit'])
+        ->name('banner_packages.edit')->middleware('check.permission:banner_packages.edit');
+    Route::put('/banner-packages/{bannerPackage}', [BannerPackageController::class, 'update'])
+        ->name('banner_packages.update');
+    Route::delete('/banner-packages/{bannerPackage}', [BannerPackageController::class, 'destroy'])
+        ->name('banner_packages.destroy');
+
+    //package duration management
+    Route::get('/admin/durations', [DurationController::class, 'index'])
+        ->name('durations.index')->middleware('check.permission:durations.index');
+    Route::get('/admin/durations/edit/{duration}', [DurationController::class, 'edit'])
+        ->name('durations.edit')->middleware('check.permission:durations.edit');
+    Route::put('/admin/durations/update/{duration}', [DurationController::class, 'update'])
+        ->name('durations.update');
+
+    //press release management
+    Route::get('/press-releases', [PressReleaseController::class, 'index'])
+        ->name('press-releases.index')->middleware('check.permission:press-releases.index');
+    Route::get('/press-releases/create', [PressReleaseController::class, 'create'])
+        ->name('press-releases.create')->middleware('check.permission:press-releases.create');
+    Route::post('/press-releases/store', [PressReleaseController::class, 'store'])
+        ->name('press-releases.store');
+    // Route::get('/press-releases/{pressRelease}', [PressReleaseController::class, 'show'])
+    // ->name('press-releases.show')->middleware('check.permission:press-releases.show');
+    Route::get('/press-releases/{pressRelease}/edit', [PressReleaseController::class, 'edit'])
+        ->name('press-releases.edit')->middleware('check.permission:press-releases.edit');
+    Route::put('/press-releases/{pressRelease}/update', [PressReleaseController::class, 'update'])
+        ->name('press-releases.update');
+    Route::delete('/press-releases/{pressRelease}/destroy', [PressReleaseController::class, 'destroy'])
+        ->name('press-releases.destroy');
+
+    //bank account management
+
+    Route::get('/admin/bank-accounts', [BankAccountController::class, 'indexadmin'])
+        ->name('admin.bank-accounts.index')->middleware('check.permission:admin.bank-accounts.index');
+    Route::get('/bank-accounts/create', [BankAccountController::class, 'create'])
+        ->name('admin.bank-accounts.create')->middleware('check.permission:admin.bank-accounts.create');
+    Route::post('/bank-accounts', [BankAccountController::class, 'store'])
+        ->name('admin.bank-accounts.store');
+    Route::get('/bank-accounts/{bankAccount}/edit', [BankAccountController::class, 'edit'])
+        ->name('admin.bank-accounts.edit')->middleware('check.permission:admin.bank-accounts.edit');
+    Route::put('/bank-accounts/{bankAccount}', [BankAccountController::class, 'update'])
+        ->name('admin.bank-accounts.update');
+    Route::delete('/bank-accounts/{bankAccount}', [BankAccountController::class, 'destroy'])
+        ->name('admin.bank-accounts.destroy');
+
+    Route::get('/contacts/list', [ContactListController::class, 'index'])
+        ->name('contacts.index')->middleware('check.permission:contacts.index');
+    Route::get('/contacts/create', [ContactListController::class, 'create'])
+        ->name('contacts.create')->middleware('check.permission:contacts.create');
+    Route::post('/contacts', [ContactListController::class, 'store'])
+        ->name('contacts.store');
+    Route::get('/contacts/{contact}/edit', [ContactListController::class, 'edit'])
+        ->name('contactslist.edit')->middleware('check.permission:contactslist.edit');
+    Route::put('/contacts/{id}', [ContactListController::class, 'update'])
+        ->name('contactslist.update');
+    Route::delete('/contacts/{id}', [ContactListController::class, 'destroy'])
+        ->name('contacts.destroy');
+
+    //reports management
+    Route::get('/reports/job-ads', [JobPostingController::class, 'generateJobAdsReport'])
+        ->name('reports.job-ads')->middleware('check.permission:reports.job-ads');
+
+    Route::get('/admin/employer-stats', [EmployerAuthController::class, 'employerStats'])
+        ->name('admin.employer.stats')->middleware('check.permission:admin.employer.stats');
+
+    Route::get('/reports/customers', [JobPostingController::class, 'generateCustomerReport'])
+        ->name('reports.customers')->middleware('check.permission:reports.customers');
+
+    //settings management
+    Route::get('/contactus/{contactus}/edit', [ContactUsController::class, 'edit'])
+        ->name('contactus.edit')->middleware('check.permission:reports.customers');
+    Route::put('/contactus/{contactus}', [ContactUsController::class, 'update'])
+        ->name('contactus.update');
+
+    Route::get('/about-us', [AboutUsController::class, 'index'])
+        ->name('admin.about-us.index')->middleware('check.permission:admin.about-us.index');
+    Route::get('about-us/create', [AboutUsController::class, 'create'])
+        ->name('admin.about-us.create')->middleware('check.permission:admin.about-us.create');
+    Route::post('about-us', [AboutUsController::class, 'store'])
+        ->name('admin.about-us.store');
+    Route::get('about-us/{aboutUs}/edit', [AboutUsController::class, 'edit'])
+        ->name('admin.about-us.edit')->middleware('check.permission:admin.about-us.edit');
+    Route::put('about-us/{aboutUs}', [AboutUsController::class, 'update'])
+        ->name('admin.about-us.update');
+    Route::delete('about-us/{aboutUs}', [AboutUsController::class, 'destroy'])
+        ->name('admin.about-us.destroy');
+
+    Route::get('terms-and-conditions', [TermsAndConditionController::class, 'index'])
+        ->name('admin.terms.index')->middleware('check.permission:admin.terms.index');
+    Route::get('terms-and-conditions/create', [TermsAndConditionController::class, 'create'])
+        ->name('admin.terms.create')->middleware('check.permission:admin.terms.create');
+    Route::post('terms-and-conditions', [TermsAndConditionController::class, 'store'])
+        ->name('admin.terms.store');
+    Route::get('terms-and-conditions/{termsAndCondition}/edit', [TermsAndConditionController::class, 'edit'])
+        ->name('admin.terms.edit')->middleware('check.permission:admin.terms.edit');
+    Route::put('terms-and-conditions/{termsAndCondition}', [TermsAndConditionController::class, 'update'])
+        ->name('admin.terms.update');
+    Route::delete('terms-and-conditions/{termsAndCondition}', [TermsAndConditionController::class, 'destroy'])
+        ->name('admin.terms.destroy');
+
+    Route::get('policy', [PolicyController::class, 'index'])
+        ->name('admin.policy.index')->middleware('check.permission:admin.policy.index');
+    Route::get('policy/create', [PolicyController::class, 'create'])
+        ->name('admin.policy.create')->middleware('check.permission:admin.policy.create');
+    Route::post('policy', [PolicyController::class, 'store'])
+        ->name('admin.policy.store');
+    Route::get('policy/{policy}/edit', [PolicyController::class, 'edit'])
+        ->name('admin.policy.edit')->middleware('check.permission:admin.policy.edit');
+    Route::put('policy/{policy}', [PolicyController::class, 'update'])
+        ->name('admin.policy.update');
+    Route::delete('policy/{policy}', [PolicyController::class, 'destroy'])
+        ->name('admin.policy.destroy');
+
+    Route::get('admin/faqs', [FaqController::class, 'index'])
+        ->name('faqs.index')->middleware('check.permission:faqs.index');
+    Route::get('/faqs/create', [FaqController::class, 'create'])
+        ->name('faqs.create')->middleware('check.permission:faqs.create');
+    Route::post('/faqs', [FaqController::class, 'store'])
+        ->name('faqs.store');
+    Route::get('/faqs/{faq}', [FaqController::class, 'show'])
+        ->name('faqs.show')->middleware('check.permission:faqs.show');
+    Route::get('/faqs/{faq}/edit', [FaqController::class, 'edit'])
+        ->name('faqs.edit')->middleware('check.permission:faqs.edit');
+    Route::put('/faqs/{faq}', [FaqController::class, 'update'])
+        ->name('faqs.update');
+    Route::delete('/faqs/{faq}', [FaqController::class, 'destroy'])
+        ->name('faqs.destroy');
+
+    Route::get('vissionmission', [VissionMissionController::class, 'index'])
+        ->name('admin.vissionmission.index')->middleware('check.permission:vissionmission.index');
+    Route::get('vissionmission/create', [VissionMissionController::class, 'create'])
+        ->name('admin.vissionmission.create')->middleware('check.permission:vissionmission.create');
+    Route::post('vissionmission', [VissionMissionController::class, 'store'])
+        ->name('admin.vissionmission.store');
+    Route::get('vissionmission/{id}', [VissionMissionController::class, 'show'])
+        ->name('admin.vissionmission.show')->middleware('check.permission:vissionmission.show');
+    Route::get('vissionmission/{id}/edit', [VissionMissionController::class, 'edit'])
+        ->name('admin.vissionmission.edit')->middleware('check.permission:vissionmission.edit');
+    Route::put('vissionmission/{id}', [VissionMissionController::class, 'update'])
+        ->name('admin.vissionmission.update');
+    Route::delete('vissionmission/{id}', [VissionMissionController::class, 'destroy'])
+        ->name('admin.vissionmission.destroy');
+});
+
+
 Route::get('/contacts', [ContactListController::class, 'show'])->name('contacts.show');
-Route::post('/contacts', [ContactListController::class, 'store'])->name('contacts.store')->middleware('auth:admin');
-Route::delete('/contacts/{id}', [ContactListController::class, 'destroy'])->name('contacts.destroy')->middleware('auth:admin');
-Route::post('contacts/store-multiple', [ContactListController::class, 'storeMultiple'])->name('contacts.store-multiple')->middleware('auth:admin');
-Route::get('/contacts/{contact}/edit', [ContactListController::class, 'edit'])->name('contactslist.edit')->middleware('auth:admin');
-Route::put('/contacts/{id}', [ContactListController::class, 'update'])->name('contactslist.update')->middleware('auth:admin');
 
-Route::get('/reports/job-ads', [JobPostingController::class, 'generateJobAdsReport'])->name('reports.job-ads')->middleware(['superadmin']);
+
+Route::post('contacts/store-multiple', [ContactListController::class, 'storeMultiple'])->name('contacts.store-multiple')->middleware('auth:admin');
+
+
 
 // Route for generating the customer report
-Route::get('/reports/customers', [JobPostingController::class, 'generateCustomerReport'])->name('reports.customers')->middleware(['superadmin']);
-Route::get('/admin/employer-stats', [EmployerAuthController::class, 'employerStats'])->name('admin.employer.stats')->middleware(['superadmin']);
 
-Route::prefix('admin')->group(function () {
-    Route::get('/bank-accounts', [BankAccountController::class, 'indexadmin'])->name('admin.bank-accounts.index')->middleware('auth:admin');
-    Route::get('/bank-accounts/create', [BankAccountController::class, 'create'])->name('admin.bank-accounts.create')->middleware('auth:admin');
-    Route::post('/bank-accounts', [BankAccountController::class, 'store'])->name('admin.bank-accounts.store')->middleware('auth:admin');
-    Route::get('/bank-accounts/{bankAccount}/edit', [BankAccountController::class, 'edit'])->name('admin.bank-accounts.edit')->middleware('auth:admin');
-    Route::put('/bank-accounts/{bankAccount}', [BankAccountController::class, 'update'])->name('admin.bank-accounts.update')->middleware('auth:admin');
-    Route::delete('/bank-accounts/{bankAccount}', [BankAccountController::class, 'destroy'])->name('admin.bank-accounts.destroy')->middleware('auth:admin');
-});
+Route::prefix('admin')->group(function () {});
 
 // Regular bank account routes
 Route::get('/bank-accounts', [BankAccountController::class, 'index'])->name('bank-accounts.index');
 
-Route::prefix('admin')->middleware(['admin'])->group(function () {
-
-    Route::get('/banner-packages', [BannerPackageController::class, 'index'])->name('banner_packages.index');
-    Route::get('/banner-packages/create', [BannerPackageController::class, 'create'])->name('banner_packages.create');
-    Route::post('/banner-packages', [BannerPackageController::class, 'store'])->name('banner_packages.store');
-    Route::get('/banner-packages/{bannerPackage}/edit', [BannerPackageController::class, 'edit'])->name('banner_packages.edit');
-    Route::put('/banner-packages/{bannerPackage}', [BannerPackageController::class, 'update'])->name('banner_packages.update');
-    Route::delete('/banner-packages/{bannerPackage}', [BannerPackageController::class, 'destroy'])->name('banner_packages.destroy');
-    Route::get('/banner-details/create', [BannerDetailsController::class, 'create'])->name('bannerdetails.create');
-    Route::post('/banner-details/store', [BannerDetailsController::class, 'store'])->name('bannerdetails.store');
-
-});
+Route::prefix('admin')->middleware(['admin'])->group(function () {});
 
 Route::prefix('admin')->middleware(['admin'])->group(function () {
     // Display a listing of the banners
-    Route::get('/banners', [BannerController::class, 'index'])->name('banners.index');
+    // Route::get('/banners', [BannerController::class, 'index'])->name('banners.index');
 
-    // Show the form for creating a new banner
-    Route::get('/banners/create', [BannerController::class, 'create'])->name('banners.create');
+    // // Show the form for creating a new banner
+    // Route::get('/banners/create', [BannerController::class, 'create'])->name('banners.create');
 
-    // Store a newly created banner in storage
-    Route::post('/banners', [BannerController::class, 'store'])->name('banners.store');
+    // // Store a newly created banner in storage
+    // Route::post('/banners', [BannerController::class, 'store'])->name('banners.store');
 
-    // Show the form for editing the specified banner
-    Route::get('/banners/{banner}/edit', [BannerController::class, 'edit'])->name('banners.edit');
+    // // Show the form for editing the specified banner
+    // Route::get('/banners/{banner}/edit', [BannerController::class, 'edit'])->name('banners.edit');
 
-    // Update the specified banner in storage
-    Route::put('/banners/{banner}', [BannerController::class, 'update'])->name('banners.update');
+    // // Update the specified banner in storage
+    // Route::put('/banners/{banner}', [BannerController::class, 'update'])->name('banners.update');
 
-    // Update the status of a banner
-    Route::patch('/banners/{banner}/status', [BannerController::class, 'updateStatus'])->name('banners.updateStatus');
+    // // Update the status of a banner
+    // Route::patch('/banners/{banner}/status', [BannerController::class, 'updateStatus'])->name('banners.updateStatus');
 
-    Route::put('/admin/banners/{banner}/update-status', [BannerController::class, 'updateStatus'])
-        ->name('admin.banners.update-status');
+    // Route::put('/admin/banners/{banner}/update-status', [BannerController::class, 'updateStatus'])
+    //     ->name('admin.banners.update-status');
 
-    // Remove the specified banner from storage
-    Route::delete('/banners/{id}', [BannerController::class, 'destroy'])->name('banners.destroy');
+    // // Remove the specified banner from storage
+    // Route::delete('/banners/{id}', [BannerController::class, 'destroy'])->name('banners.destroy');
 });
 
 Route::middleware('auth:employer')->group(function () {
@@ -945,18 +1076,11 @@ Route::middleware('auth:employer')->group(function () {
 
     // Update the specified banner in storage
     Route::put('emp/banners/{banner}', [EmpBannerController::class, 'update'])->name('empbanners.update');
-      // Remove the specified banner from storage
-      Route::delete('emp/banners/{banner}', [EmpBannerController::class, 'destroy'])->name('empbanners.destroy');
+    // Remove the specified banner from storage
+    Route::delete('emp/banners/{banner}', [EmpBannerController::class, 'destroy'])->name('empbanners.destroy');
 });
 
 Route::middleware(['admin'])->group(function () {
-    Route::get('/countries', [CountryController::class, 'index'])->name('countries.index');
-    Route::get('/countries/create', [CountryController::class, 'create'])->name('countries.create');
-    Route::post('/countries', [CountryController::class, 'store'])->name('countries.store');
-    Route::get('/countries/{country}/edit', [CountryController::class, 'edit'])->name('countries.edit');
-    Route::put('/countries/{country}', [CountryController::class, 'update'])->name('countries.update');
-    Route::delete('/countries/{country}', [CountryController::class, 'destroy'])->name('countries.destroy');
     Route::get('/admin/job-report/date-range', [JobPostingController::class, 'generateJobAdsReportByDateRange'])
         ->name('admin.job.report.daterange');
 });
-// routes/web.php
