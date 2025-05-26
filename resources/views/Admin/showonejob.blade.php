@@ -40,62 +40,106 @@
                             <!-- Image Section -->
                             <div class="col-md-6 mb-4">
                                 <div class="position-relative overflow-hidden rounded-3 shadow-sm hover-zoom">
-                                    <img src="{{ asset('storage/app/public/' . $job->image) }}" alt="Job Image"
+                                    <img src="{{ asset('storage/' . $job->image) }}" alt="Job Image"
                                         class="img-fluid w-100 transition-transform">
+
+
                                 </div>
                             </div>
 
                             <!-- Details Section -->
                             <div class="col-md-6">
                                 <div class="details-container p-3">
-                                    <div class="detail-item mb-3 border-bottom pb-2">
-                                        <h6 class="text-primary mb-1"><i class="fas fa-tasks me-2"></i>Title</h6>
-                                        <p class="mb-0">{{ $job->title }}</p>
-                                    </div>
+                                    <form action="{{ route('job_postings.update', $job->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
 
-                                    <div class="detail-item mb-3 border-bottom pb-2">
-                                        <h6 class="text-primary mb-1"><i class="fas fa-tag me-2"></i>Category</h6>
-                                        <p class="mb-0">{{ $job->category->name }}</p>
-                                    </div>
+                                        <div class="detail-item mb-3 border-bottom pb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-tasks me-2"></i>Title</h6>
+                                            <input type="text" name="title" class="form-control"
+                                                value="{{ old('title', $job->title) }}">
+                                        </div>
 
-                                    <div class="detail-item mb-3 border-bottom pb-2">
-                                        <h6 class="text-primary mb-1"><i class="fas fa-building me-2"></i>Employer</h6>
-                                        <p class="mb-0">{{ $job->employer->company_name }}</p>
-                                    </div>
+                                        <div class="detail-item mb-3 border-bottom pb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-tag me-2"></i>Category</h6>
+                                            <select name="category_id" class="form-control">
+                                                @foreach ($categories as $category)
+                                                    <option value="{{ $category->id }}"
+                                                        {{ $job->category_id == $category->id ? 'selected' : '' }}>
+                                                        {{ $category->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
-                                    <div class="detail-item mb-3 border-bottom pb-2">
-                                        <h6 class="text-primary mb-1"><i class="fas fa-align-left me-2"></i>Description</h6>
-                                        <p class="mb-0">{{ $job->description }}</p>
-                                    </div>
+                                        <div class="detail-item mb-3 border-bottom pb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-tag me-2"></i>Sub Category</h6>
+                                            <select name="subcategory_id" class="form-control">
+                                                @foreach ($sub_categories as $sub_category)
+                                                    <option value="{{ $sub_category->id }}"
+                                                        {{ $job->subcategory_id == $sub_category->id ? 'selected' : '' }}>
+                                                        {{ $sub_category->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
-                                    <div class="detail-item mb-3 border-bottom pb-2">
-                                        <h6 class="text-primary mb-1"><i class="fas fa-map-marker-alt me-2"></i>Location
-                                        </h6>
-                                        <p class="mb-0">{{ $job->location }}</p>
-                                    </div>
+                                        <div class="detail-item mb-3 border-bottom pb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-building me-2"></i>Employer</h6>
+                                            <input type="text" name="employer" class="form-control"
+                                                value="{{ old('employer', $job->employer->company_name) }}" disabled>
+                                        </div>
 
-                                    <div class="detail-item mb-3 border-bottom pb-2">
-                                        <h6 class="text-primary mb-1"><i class="fas fa-dollar-sign me-2"></i>Salary Range
-                                        </h6>
-                                        <p class="mb-0">
-                                            {{ $job->salary_range ? number_format($job->salary_range, 2) : 'N/A' }}</p>
-                                    </div>
+                                        <div class="detail-item mb-3 border-bottom pb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-align-left me-2"></i>Description
+                                            </h6>
+                                            <textarea name="description" class="form-control">{{ old('description', $job->description) }}</textarea>
+                                        </div>
 
-                                    <div class="detail-item mb-3 border-bottom pb-2">
-                                        <h6 class="text-primary mb-1"><i class="fas fa-list-ul me-2"></i>Requirements</h6>
-                                        <p class="mb-0">{{ $job->requirements }}</p>
-                                    </div>
+                                        <div class="detail-item mb-3 border-bottom pb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-map-marker-alt me-2"></i>Location
+                                            </h6>
+                                            <input type="text" name="location" class="form-control"
+                                                value="{{ old('location', $job->location) }}">
+                                        </div>
 
-                                    <div class="detail-item mb-3 border-bottom pb-2">
-                                        <h6 class="text-primary mb-1"><i class="fas fa-calendar-alt me-2"></i>Closing Date
-                                        </h6>
-                                        <p class="mb-0">{{ $job->closing_date }}</p>
-                                    </div>
-                                    <div class="detail-item mb-3">
-                                        <h6 class="text-primary mb-1"><i class="fas fa-file-alt me-2"></i>Package
-                                        </h6>
-                                        <p class="mb-0">{{ $job->package->package_size }} ads - ({{ $job->package->duration->duration }} days) - Rs. {{ $job->package->lkr_price }}/{{ $job->package->usd_price }} USD </p>
-                                    </div>
+                                        <div class="detail-item mb-3 border-bottom pb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-dollar-sign me-2"></i>Salary
+                                                Range</h6>
+                                            <input type="number" name="salary_range" class="form-control"
+                                                value="{{ old('salary_range', $job->salary_range) }}">
+                                        </div>
+
+                                        <div class="detail-item mb-3 border-bottom pb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-list-ul me-2"></i>Requirements
+                                            </h6>
+                                            <textarea name="requirements" class="form-control">{{ old('requirements', $job->requirements) }}</textarea>
+                                        </div>
+
+                                        <div class="detail-item mb-3 border-bottom pb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-calendar-alt me-2"></i>Closing
+                                                Date</h6>
+                                            <input type="date" name="closing_date" class="form-control"
+                                                value="{{ old('closing_date', $job->closing_date) }}">
+                                        </div>
+
+                                        <div class="detail-item mb-3">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-file-alt me-2"></i>Package</h6>
+                                            <select name="package_id" class="form-control">
+                                                @foreach ($packages as $package)
+                                                    <option value="{{ $package->id }}"
+                                                        {{ $job->package_id == $package->id ? 'selected' : '' }}>
+                                                        {{ $package->package_size }} ads -
+                                                        ({{ $package->duration->duration }} days) - Rs.
+                                                        {{ $package->lkr_price }}/{{ $package->usd_price }} USD
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary mt-3">Update Job</button>
+                                    </form>
+
 
                                     @if ($job->status == 'rejected')
                                         <div class="detail-item mb-3 bg-danger-subtle p-3 rounded">
@@ -124,7 +168,8 @@
 
                             <div class="mb-4">
                                 <label for="status" class="form-label text-secondary">Update Status:</label>
-                                <select name="status" class="form-select form-select-lg shadow-sm" id="status" required>
+                                <select name="status" class="form-select form-select-lg shadow-sm" id="status"
+                                    required>
                                     <option value="pending" {{ $job->status == 'pending' ? 'selected' : '' }}>Pending
                                     </option>
                                     <option value="approved" {{ $job->status == 'approved' ? 'selected' : '' }}>Approved

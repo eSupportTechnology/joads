@@ -18,6 +18,52 @@ class EmployerAuthController extends Controller
         $employers = Employer::all(); // Fetch all employers
         return view('Admin.employerlist', compact('employers')); // Pass to view
     }
+    public function listedit($id)
+    {
+        $employer = Employer::findOrFail($id); // Find employer by ID
+        return view('Admin.employerlistedit', compact('employer')); // Pass to view
+    }
+    public function listupdate(Request $request, $id)
+    {
+        $employer = Employer::findOrFail($id);
+
+        // Validate the incoming request
+        $request->validate([
+            'company_name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'contact_details' => 'nullable|string|max:255',
+            'business_info' => 'nullable|string|max:1000',
+            'job_posting_settings' => 'nullable|string',
+            'is_active' => 'required|boolean',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        // Handle file upload
+        if ($request->hasFile('logo')) {
+            $logoName = time() . '_' . $request->file('logo')->getClientOriginalName();
+            $request->file('logo')->move(public_path('uploads/logos'), $logoName);
+            $employer->logo = $logoName;
+        }
+
+        // Update other fields
+        $employer->company_name = $request->company_name;
+        $employer->email = $request->email;
+        $employer->contact_details = $request->contact_details;
+        $employer->business_info = $request->business_info;
+        $employer->job_posting_settings = $request->job_posting_settings;
+        $employer->is_active = $request->is_active;
+
+        $employer->save();
+
+        return redirect()->route('employer.list')->with('success', 'Employer updated successfully!');
+    }
+    public function listdelete($id)
+    {
+        $employer = Employer::findOrFail($id);
+        $employer->delete();
+        return redirect()->route('employer.list')->with('success', 'Employer deleted successfully!'); // Redirect with success message
+    }
+
     // Show the login form
     public function showLoginForm()
     {
@@ -200,7 +246,7 @@ class EmployerAuthController extends Controller
             ->get();
 
         // Pass these statistics to the view
-        return view('employer.dashboard', compact('totalBannerPosted','totalJobsPosted', 'totalApplications', 'recentApplications'));
+        return view('employer.dashboard', compact('totalBannerPosted', 'totalJobsPosted', 'totalApplications', 'recentApplications'));
     }
 
     // Show Employer Profile Form
@@ -216,7 +262,7 @@ class EmployerAuthController extends Controller
         return response()->json($employers);
     }
 
-// Handle Employer Profile Update
+    // Handle Employer Profile Update
     public function updateProfile(Request $request)
     {
         $employer = Auth::guard('employer')->user();
@@ -293,5 +339,4 @@ class EmployerAuthController extends Controller
 
         return redirect()->route('employer.list')->with('success', 'Employer status updated successfully!');
     }
-
 }
