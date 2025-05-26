@@ -64,42 +64,45 @@ class CategoryController extends Controller
 
     // Update the specified category
     public function update(Request $request, $id)
-    {
-        $category = Category::findOrFail($id);
+{
+    $category = Category::findOrFail($id);
 
-        $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $id,
-            'status' => 'required|in:active,inactive',
-            'subcategories' => 'nullable|array',
-            'subcategories.*' => 'string|max:255',
-        ]);
+    $request->validate([
+        'name' => 'required|string|max:255|unique:categories,name,' . $id,
+        'status' => 'required|in:active,inactive',
+        'subcategories' => 'nullable|array',
+        'subcategories.*' => 'string|max:255',
+    ]);
 
-        // Update main category
-        $category->update([
-            'name' => $request->name,
-            'status' => $request->status,
-        ]);
+    $category->update([
+        'name' => $request->name,
+        'status' => $request->status,
+    ]);
 
-        // Handle subcategories
-        // First, remove existing subcategories
-        // $category->subcategories()->delete();
+    $existingSubcategories = $category->subcategories->pluck('name')->toArray();
 
-        // Then add new subcategories
-        if ($request->has('subcategories')) {
-            foreach ($request->subcategories as $subcategoryName) {
-                if (!empty($subcategoryName)) {
-                    Subcategory::create([
-                        'name' => $subcategoryName,
-                        'category_id' => $category->id,
-                        'status' => 'active',
-                    ]);
-                }
-            }
+    $submittedSubcategories = $request->subcategories ?? [];
+
+    foreach ($category->subcategories as $subcategory) {
+        if (!in_array($subcategory->name, $submittedSubcategories)) {
+            $subcategory->delete();
         }
-
-        // Redirect back with success message
-        return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');
     }
+    foreach ($submittedSubcategories as $subcategoryName) {
+        $subcategoryName = trim($subcategoryName);
+        if (!empty($subcategoryName) && !in_array($subcategoryName, $existingSubcategories)) {
+            Subcategory::create([
+                'name' => $subcategoryName,
+                'category_id' => $category->id,
+                'status' => 'active',
+            ]);
+        }
+    }
+
+    return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');
+}
+
+
 
     // Remove the specified category
     public function destroy($id)

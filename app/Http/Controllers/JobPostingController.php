@@ -12,6 +12,7 @@ use App\Models\Employer;
 use App\Models\JobPosting;
 use App\Models\Package;
 use App\Models\ContactList;
+use App\Models\EmailTemplate;
 use App\Models\Subcategory;
 use App\Models\User;
 use Carbon\Carbon;
@@ -290,25 +291,27 @@ public function home(Request $request)
         ->count();
 
     // Paginated job listings with filters
-    $jobs = JobPosting::with(['category', 'subcategory', 'country', 'package.duration'])
-        ->where('status', 'approved')
-        ->where('is_active', true)
-        ->whereHas('package.duration', function ($query) use ($today) {
-            $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
-        })
-        ->when($search, function ($query, $search) {
-            $query->where(function ($query) use ($search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhereHas('employer', function ($q) use ($search) {
-                        $q->where('company_name', 'like', "%{$search}%");
-                    });
-            });
-        })
-        ->when($location, fn($query, $location) => $query->where('location', 'like', "%{$location}%"))
-        ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
-        ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
-        ->paginate($categoryId && $categoryId != 45 ? 50 : 250);
+    $jobs = JobPosting::with(['category', 'subcategory', 'country', 'package.duration', 'employer'])
+    ->where('status', 'approved')
+    ->where('is_active', true)
+    ->whereHas('package.duration', function ($query) use ($today) {
+        $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
+    })
+    ->when($search, function ($query, $search) {
+        $query->where(function ($query) use ($search) {
+            $query->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%")
+                ->orWhereHas('employer', function ($q) use ($search) {
+                    $q->where('company_name', 'like', "%{$search}%");
+                });
+        });
+    })
+    ->when($location, fn($query, $location) => $query->where('location', 'like', "%{$location}%"))
+    ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
+    ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
+    ->orderBy('approved_date', 'desc')
+    ->paginate($categoryId && $categoryId != 45 ? 50 : 250);
+
 
     // Additional data for the view
     $categories = Category::with('subcategories')->orderBy('name', 'asc')->get();
@@ -350,9 +353,10 @@ public function home(Request $request)
     $job = JobPosting::with(['category', 'employer', 'package.duration'])->findOrFail($id);
     $categories = Category::all();
     $sub_categories = Subcategory::all();
+    $emailTemplates = EmailTemplate::all();
     $packages = Package::with('duration')->get();
 
-    return view('Admin.showonejob', compact('job', 'categories', 'packages', 'sub_categories'));
+    return view('Admin.showonejob', compact('job', 'categories', 'packages', 'sub_categories', 'emailTemplates'));
 }
 
     public function updatepost(Request $request, $id)
@@ -406,46 +410,38 @@ public function home(Request $request)
 
     public function updateStatus(Request $request, $id)
 {
-    // Validate the incoming request
     $request->validate([
         'status' => 'required|in:pending,approved,reject',
-        'rejection_reason' => 'nullable|string|max:255', // Validate rejection reason
+        'rejection_reason' => 'nullable|string|max:255',
+        'email_template_id' => 'nullable|exists:email_templates,id',
     ]);
 
-    // Retrieve the job posting by ID
     $job = JobPosting::findOrFail($id);
     $previousStatus = $job->status;
-
-    // Update the status
     $job->status = $request->input('status');
 
-    // Save approved date if status is approved
     if ($job->status === 'approved') {
-        $job->approved_date = now(); // Save the current timestamp
-        $job->rejection_reason = null; // Clear rejection reason if previously set
+        $job->approved_date = now();
+        $job->rejection_reason = null;
+    } elseif ($job->status === 'reject') {
+        $job->rejected_date = now();
+        $job->rejection_reason = $request->input('rejection_reason');
     }
 
-    // Save rejected date and reason if status is reject
-    if ($job->status === 'reject') {
-        $job->rejected_date = now(); // Save the current timestamp
-        $job->rejection_reason = $request->input('rejection_reason'); // Save rejection reason
-    }
-
-    // Save the admin ID who updated the status
-    $job->admin_id = auth('admin')->id(); // Assuming admin is logged in
-
-    // Save the changes to the database
+    $job->admin_id = auth('admin')->id();
     $job->save();
 
-    // Send email if newly approved
+    // Send email if status changed to approved
     if ($previousStatus !== 'approved' && $job->status === 'approved') {
-        $employer = Employer::find($job->employer_id);
-        if ($employer && $employer->email) {
-            Mail::to($employer->email)->send(new JobApprovedMail($job));
+        $templateId = $request->input('email_template_id');
+        if ($templateId) {
+            $template = EmailTemplate::find($templateId);
+            if ($template) {
+                Mail::to($job->employer->email)->send(new JobApprovedMail($job, $template));
+            }
         }
     }
 
-    // Redirect back with a success message
     return redirect()->route('job_postings.index')->with('success', 'Job status updated successfully.');
 }
     public function getJobsByCategory($categoryId)

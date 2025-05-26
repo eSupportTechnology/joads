@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutUsController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminEmailTemplateController;
 use App\Http\Controllers\AdminForgotPasswordController;
 use App\Http\Controllers\AdminResetPasswordController;
 use App\Http\Controllers\ApplicationController;
@@ -225,13 +226,9 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 });
 
 Route::get('home/about-us', [AboutUsController::class, 'indexhome'])->name('about-us.index');
-Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
-
-});
+Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {});
 Route::get('faqs', [FaqController::class, 'faqshow'])->name('faqs.home');
-Route::middleware('admin')->group(function () {
-
-});
+Route::middleware('admin')->group(function () {});
 
 Route::get('/jobs/{id}', [JobPostingController::class, 'showjob'])->name('job.details');
 Route::get('/jobs/category/{categoryId}', [JobPostingController::class, 'getJobsByCategory']);
@@ -1015,6 +1012,20 @@ Route::middleware(['auth:admin'])->group(function () {
         ->name('admin.vissionmission.update');
     Route::delete('vissionmission/{id}', [VissionMissionController::class, 'destroy'])
         ->name('admin.vissionmission.destroy');
+
+    //mail management
+    Route::get('/admin/mail-templates', [AdminEmailTemplateController::class, 'index'])
+        ->name('admin.mail-templates.index')->middleware('check.permission:admin.mail-templates.index');
+    Route::get('/admin/mail-templates/create', [AdminEmailTemplateController::class, 'create'])
+        ->name('admin.mail-templates.create')->middleware('check.permission:admin.mail-templates.create');
+    Route::post('/admin/mail-templates', [AdminEmailTemplateController::class, 'store'])
+        ->name('admin.mail-templates.store');
+    Route::get('/admin/mail-templates/{emailTemplate}/edit', [AdminEmailTemplateController::class, 'edit'])
+        ->name('admin.mail-templates.edit')->middleware('check.permission:admin.mail-templates.edit');
+    Route::put('/admin/mail-templates/{emailTemplate}', [AdminEmailTemplateController::class, 'update'])
+        ->name('admin.mail-templates.update');
+    Route::delete('/admin/mail-templates/{emailTemplate}', [AdminEmailTemplateController::class, 'destroy'])
+        ->name('admin.mail-templates.destroy');
 });
 
 

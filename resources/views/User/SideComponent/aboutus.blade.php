@@ -54,8 +54,9 @@
             font-size: 16px;
             line-height: 2.6;
         }
-
-
+        .text-center {
+            text-align: left;
+        }
         .box {
             padding: 20px;
             text-align: left;
@@ -66,44 +67,26 @@
 
         }
 
+            #description {
+        text-align: justify;
+        width: 650px;
+        margin: 0 auto; /* Center the paragraph on larger screens */
+    }
+
+    /* Responsive Design for Smaller Screens */
+    @media (max-width: 768px) {
         #description {
-            text-align: justify;
-            width: 100%;
-            margin: 0 auto;
-            /* Center the paragraph on larger screens */
+            width: 90%; /* Adjust width to fit most of the screen */
         }
+    }
 
-        .logo-container {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            /* Center the logo horizontally */
-            left: 50%;
+    @media (max-width: 480px) {
+        #description {
+            width: 100%; /* Full width for very small screens */
+            padding: 10px; /* Add padding for better readability */
         }
+    }
 
-        .logo {
-            width: 150px;
-            /* Adjust size as needed */
-            height: auto;
-        }
-
-
-        /* Responsive Design for Smaller Screens */
-        @media (max-width: 768px) {
-            #description {
-                width: 100%;
-                /* Adjust width to fit most of the screen */
-            }
-        }
-
-        @media (max-width: 480px) {
-            #description {
-                width: 100%;
-                /* Full width for very small screens */
-                padding: 10px;
-                /* Add padding for better readability */
-            }
-        }
     </style>
 </head>
 
@@ -112,59 +95,58 @@
     <div class="container">
         <div class="about-section">
             <div class="content">
-                <div class="logo-container">
-                    <img src="{{ asset('Jobads.png') }}" class="logo" alt="Illustration">
-                </div>
-                <h1>{{ $aboutUs->title }}</h1>
+                <h1>{{ $aboutUs->title }}</h1> <!-- Dynamically display the title -->
 
                 <!-- Show part of the description initially -->
-                <p id="description" class="description" style="line-height: 1.7; width: 110vh; padding-bottom: 20px;">
+                <p id="description" class="description" style="line-height: 1.7; padding-bottom:10px">
                     {{ Str::limit($aboutUs->description, 1000) }}
                 </p>
 
                 <!-- Full description hidden initially -->
-                <div id="more-content" class="more-content">
-                    <p id="full-description">{{ $aboutUs->description }}</p> <!-- Full description -->
+                <div id="more-content" class="more-content" style="line-height: 1.7;">
+                    <p id="full-description"  >{{ $aboutUs->description }}</p> <!-- Full description -->
                 </div>
 
                 <!-- Toggle button for showing/hiding full content -->
                 <a href="#" id="learn-more-btn" class="learn-more">Learn More</a>
             </div>
-
+            <div class="illustration">
+                <img src="{{ asset('Jobads.png') }}" style="width: 150px;padding-right: 250px;padding-left:300px" alt="Illustration">
+            </div>
         </div>
 
     </div>
 
     @php
-        // Fetch the first record of the Vision and Mission
-        $vissionMission = \App\Models\VissionMission::first();
-    @endphp
+    // Fetch the first record of the Vision and Mission
+    $vissionMission = \App\Models\VissionMission::first();
+@endphp
 
-    <div class="container">
-        <div class="box">
-            <h2>Our Vision</h2>
-            <p style="font-size: 16px; color: #666; line-height: 1.7;">
-                {{ $vissionMission->vission ?? 'Vision not available' }}
-            </p> <!-- Dynamically display Vision content -->
+<div class="container">
+    <div class="box">
+        <h2>Our Vision</h2>
+        <p style="font-size: 16px; color: #666; line-height: 1.7;">
+            {{ $vissionMission->vission ?? 'Vision not available' }}
+        </p> <!-- Dynamically display Vision content -->
 
-            <h2>Our Mission</h2>
-            <p style="font-size: 16px; color: #666; line-height: 1.7">
-                {{ $vissionMission->mission ?? 'Mission not available' }}
-            </p> <!-- Dynamically display Mission content -->
-        </div>
+        <h2>Our Mission</h2>
+        <p style="font-size: 16px; color: #666; line-height: 1.7;">
+            {{ $vissionMission->mission ?? 'Mission not available' }}
+        </p> <!-- Dynamically display Mission content -->
     </div>
+</div>
 
 
     @include('home.footer')
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const learnMoreBtn = document.getElementById('learn-more-btn');
             const moreContent = document.getElementById('more-content');
             const description = document.getElementById('description');
 
             // Event listener for the Learn More button
-            learnMoreBtn.addEventListener('click', function(e) {
+            learnMoreBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 if (moreContent.classList.contains('expanded')) {
                     moreContent.classList.remove('expanded');
@@ -178,6 +160,6 @@
             });
         });
     </script>
-</body>
+    </body>
 
 </html>
