@@ -19,6 +19,7 @@
 
 
  <style>
+
         .dropdown {
             padding: 8px;
             margin: 10px 0;
@@ -113,7 +114,10 @@
         .scroll-wrapper {
             background-color: #d9d9d9;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            margin: 0 10px;
+            margin: 15px 15px;
+            padding: 15px;
+            overflow-y:visible;
+
         }
 
         .categories-container {
