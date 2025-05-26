@@ -82,7 +82,7 @@ class CategoryController extends Controller
 
         // Handle subcategories
         // First, remove existing subcategories
-        $category->subcategories()->delete();
+        // $category->subcategories()->delete();
 
         // Then add new subcategories
         if ($request->has('subcategories')) {

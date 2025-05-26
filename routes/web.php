@@ -213,20 +213,18 @@ Route::prefix('admin')->group(function () {
         Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('admin.dashboard');
     });
 });
-Route::get('terms-and-conditions', [TermsAndConditionController::class, 'indexhome'])->name('terms.index');
+Route::get('home/terms-and-conditions', [TermsAndConditionController::class, 'indexhome'])->name('terms.index');
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     // Show the list of terms and conditions
 
 });
-Route::get('policy', [PolicyController::class, 'indexhome'])->name('policy.indexhome');
+Route::get('home/policy', [PolicyController::class, 'indexhome'])->name('policy.indexhome');
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     // Show the list of terms and conditions
 
 });
 
-
-
-Route::get('/about-us', [AboutUsController::class, 'indexhome'])->name('about-us.index');
+Route::get('home/about-us', [AboutUsController::class, 'indexhome'])->name('about-us.index');
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
 });

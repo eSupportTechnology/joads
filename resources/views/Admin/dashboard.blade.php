@@ -142,7 +142,7 @@
                                 <div class="card text-white bg-info shadow-sm">
                                     <div class="card-body">
                                         <i class="fas fa-users fa-2x"></i>
-                                        <h6>Total Job Seekers</h6>
+                                        <h6>Job Seekers</h6>
                                         <h5>{{ number_format($statistics['total_jobseekers'] ?? 0) }}</h5>
                                     </div>
                                 </div>
@@ -151,7 +151,7 @@
                                 <div class="card text-white bg-info shadow-sm">
                                     <div class="card-body">
                                         <i class="fas fa-user-tie fa-2x"></i>
-                                        <h6>Total Employers</h6>
+                                        <h6>Employers</h6>
                                         <h5>{{ number_format($statistics['total_companies'] ?? 0) }}</h5>
                                     </div>
                                 </div>
@@ -160,7 +160,7 @@
                                 <div class="card text-white bg-info shadow-sm">
                                     <div class="card-body">
                                         <i class="fas fa-user-shield fa-2x"></i>
-                                        <h6>Total Admins</h6>
+                                        <h6>Admins</h6>
                                         <h5>{{ number_format($statistics['total_admins'] ?? 0) }}</h5>
                                     </div>
                                 </div>
@@ -169,7 +169,7 @@
                                 <div class="card text-white bg-info shadow-sm">
                                     <div class="card-body">
                                         <i class="fas fa-user-shield fa-2x"></i>
-                                        <h6>Total Super Admins</h6>
+                                        <h6>Super Admins</h6>
                                         <h5>{{ number_format($statistics['total_super_admins'] ?? 0) }}</h5>
                                     </div>
                                 </div>
@@ -263,7 +263,7 @@
                                 <div class="card text-white bg-warning shadow-sm">
                                     <div class="card-body">
                                         <i class="fas fa-check-circle fa-2x"></i>
-                                        <h6>Approved Banners</h6>
+                                        <h6>Approved Banner</h6>
                                         <h5>{{ number_format($statistics['total_approved_banners'] ?? 0) }}</h5>
                                     </div>
                                 </div>
@@ -322,15 +322,9 @@
                                 <div class="card text-white bg-dark shadow-sm">
                                     <div class="card-body">
                                         <i class="fas fa-eye fa-2x"></i>
-                                        <div style="display: flex; flex-direction: row;">
-                                            <div style="padding-inline: 50px">
-                                                <h6>Total Views</h6>
-                                                <h5>{{ number_format($statistics['total_views'] ?? 0) }}</h5>
-                                            </div>
-                                            <div>
-                                                <h6>Daily Views</h6>
-                                                <h5>{{ number_format($statistics['daily_views'] ?? 0) }}</h5>
-                                            </div>
+                                        <div style="display: flex; flex-direction: column;">
+                                            <h6>Total View - {{ number_format($statistics['total_views'] ?? 0) }}</h6>
+                                            <h6>Daily View - {{ number_format($statistics['daily_views'] ?? 0) }}</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -439,151 +433,151 @@
     <!-- Stats Cards -->
     <!-- <div class="row g-4">
 
-            <div class="col-sm-6 col-xl-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="stat-icon applications-icon">
-                                <i class="fas fa-file-alt fa-lg"></i>
-                            </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="stat-icon applications-icon">
+                                    <i class="fas fa-file-alt fa-lg"></i>
+                                </div>
 
+                            </div>
+                            <h3 class="animated-number mb-1">
+                                {{ number_format($statistics['total_applications'] ?? 0) }}
+                            </h3>
+                            <p class="stat-label mb-0">Total Applications</p>
                         </div>
-                        <h3 class="animated-number mb-1">
-                            {{ number_format($statistics['total_applications'] ?? 0) }}
-                        </h3>
-                        <p class="stat-label mb-0">Total Applications</p>
                     </div>
                 </div>
-            </div>
 
 
-            <div class="col-sm-6 col-xl-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="stat-icon jobs-icon">
-                                <i class="fas fa-briefcase fa-lg"></i>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="stat-icon jobs-icon">
+                                    <i class="fas fa-briefcase fa-lg"></i>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-link p-0" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v text-muted"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">View Jobs</a></li>
+                                        <li><a class="dropdown-item" href="#">Post New Job</a></li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="dropdown">
-                                <button class="btn btn-link p-0" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-v text-muted"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">View Jobs</a></li>
-                                    <li><a class="dropdown-item" href="#">Post New Job</a></li>
-                                </ul>
-                            </div>
+                            <h3 class="animated-number mb-1">
+                                {{ number_format($statistics['total_jobs_posted'] ?? 0) }}
+                            </h3>
+                            <p class="stat-label mb-0">Jobs Posted</p>
                         </div>
-                        <h3 class="animated-number mb-1">
-                            {{ number_format($statistics['total_jobs_posted'] ?? 0) }}
-                        </h3>
-                        <p class="stat-label mb-0">Jobs Posted</p>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-sm-6 col-xl-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="stat-icon jobseekers-icon">
-                                <i class="fas fa-users fa-lg"></i>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="stat-icon jobseekers-icon">
+                                    <i class="fas fa-users fa-lg"></i>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-link p-0" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v text-muted"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">View Jobseekers</a></li>
+                                        <li><a class="dropdown-item" href="#">Export List</a></li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="dropdown">
-                                <button class="btn btn-link p-0" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-v text-muted"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">View Jobseekers</a></li>
-                                    <li><a class="dropdown-item" href="#">Export List</a></li>
-                                </ul>
-                            </div>
+                            <h3 class="animated-number mb-1">
+                                {{ number_format($statistics['total_jobseekers'] ?? 0) }}
+                            </h3>
+                            <p class="stat-label mb-0">Total Jobseekers</p>
                         </div>
-                        <h3 class="animated-number mb-1">
-                            {{ number_format($statistics['total_jobseekers'] ?? 0) }}
-                        </h3>
-                        <p class="stat-label mb-0">Total Jobseekers</p>
                     </div>
                 </div>
-            </div>
 
 
-            <div class="col-sm-6 col-xl-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="stat-icon views-icon">
-                                <i class="fas fa-eye fa-lg"></i>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="stat-icon views-icon">
+                                    <i class="fas fa-eye fa-lg"></i>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-link p-0" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v text-muted"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">Views</a></li>
+                                        <li><a class="dropdown-item" href="#">Export List</a></li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="dropdown">
-                                <button class="btn btn-link p-0" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-v text-muted"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Views</a></li>
-                                    <li><a class="dropdown-item" href="#">Export List</a></li>
-                                </ul>
-                            </div>
+                            <h3 class="animated-number mb-1">
+                                {{ number_format($statistics['total_views'] ?? 0) }}
+                            </h3>
+                            <p class="stat-label mb-0">Total Views</p>
                         </div>
-                        <h3 class="animated-number mb-1">
-                            {{ number_format($statistics['total_views'] ?? 0) }}
-                        </h3>
-                        <p class="stat-label mb-0">Total Views</p>
                     </div>
                 </div>
-            </div>
 
 
-            <div class="col-sm-6 col-xl-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="stat-icon earnings-icon">
-                                <i class="fas fa-dollar-sign fa-lg"></i>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="stat-icon earnings-icon">
+                                    <i class="fas fa-dollar-sign fa-lg"></i>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-link p-0" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v text-muted"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">View Earnings</a></li>
+                                        <li><a class="dropdown-item" href="#">Download Report</a></li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="dropdown">
-                                <button class="btn btn-link p-0" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-v text-muted"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">View Earnings</a></li>
-                                    <li><a class="dropdown-item" href="#">Download Report</a></li>
-                                </ul>
-                            </div>
+                            <h3 class=" mb-1">
+                                Rs. {{ number_format($statistics['total_earnings'] ?? 0) }}
+                            </h3>
+                            <p class="stat-label mb-0">Total Earnings</p>
                         </div>
-                        <h3 class=" mb-1">
-                            Rs. {{ number_format($statistics['total_earnings'] ?? 0) }}
-                        </h3>
-                        <p class="stat-label mb-0">Total Earnings</p>
                     </div>
                 </div>
-            </div>
-        </div> -->
+            </div> -->
 
     <!-- Recent Applications Section -->
     <!-- <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div>
-                                <h5 class="card-title mb-0">Recent Applications</h5>
-                                <p class="text-muted small mb-0">Last 7 days: {{ $statistics['recent_applications'] ?? 0 }}
-                                    applications
-                                    @if (isset($statistics['application_growth']))
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h5 class="card-title mb-0">Recent Applications</h5>
+                                    <p class="text-muted small mb-0">Last 7 days: {{ $statistics['recent_applications'] ?? 0 }}
+                                        applications
+                                        @if (isset($statistics['application_growth']))
     <span
-                                        class="ms-2 {{ $statistics['application_growth'] > 0 ? 'text-success' : 'text-danger' }}">
-                                        {{ $statistics['application_growth'] > 0 ? '+' : '' }}{{ $statistics['application_growth'] }}%
-                                    </span>
+                                            class="ms-2 {{ $statistics['application_growth'] > 0 ? 'text-success' : 'text-danger' }}">
+                                            {{ $statistics['application_growth'] > 0 ? '+' : '' }}{{ $statistics['application_growth'] }}%
+                                        </span>
     @endif
-                                </p>
+                                    </p>
+                                </div>
+                                <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-sm">View All</a>
                             </div>
-                            <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-sm">View All</a>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div> -->
+            </div> -->
     </div>
 @endsection
 

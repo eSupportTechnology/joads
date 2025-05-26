@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us Popup</title>
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
-    
+
     <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -169,7 +169,7 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
         margin-top: 20px;
         justify-content: center;
     }
-    
+
     /* Show social icons inside nav when menu is toggled */
     .unique-nav-links.show .social-icons {
         display: flex;
@@ -236,22 +236,22 @@ php </style>
             </a>
             <!-- Move social-icons here -->
             <div class="social-icons" style="display: flex; gap: 20px;">
-                <a href="https://www.facebook.com/jobads.lkJSG" target="_blank" style="color: #18799c;">
-                <img src="{{ asset('facebook.jpeg') }}" style="width:25px ;height:auto">
-                </a>
                 <a href="https://www.linkedin.com/company/jobads-lk/?viewAsMember=true" target="_blank" style="color:#18799c;">
                 <img src="{{ asset('linkedin.jpeg') }}" style="width:25px ;height:auto">
                 </a>
-                <a href="https://www.tiktok.com/@jobads.lk" target="_blank" style="color:#18799c;">
-                <img src="{{ asset('tiktok.jpeg') }}" style="width:25px ;height:auto">
+                <a href="https://www.facebook.com/jobads.lkJSG" target="_blank" style="color: #18799c;">
+                <img src="{{ asset('facebook.jpeg') }}" style="width:25px ;height:auto">
                 </a>
                 <a href="https://www.instagram.com/jobadslk/" target="_blank" style="color: #18799c;">
                 <img src="{{ asset('Instagram.jpeg') }}" style="width:25px ;height:auto">
                 </a>
-            </div>        
+                <a href="https://www.tiktok.com/@jobads.lk" target="_blank" style="color:#18799c;">
+                <img src="{{ asset('tiktok.jpeg') }}" style="width:25px ;height:auto">
+                </a>
+            </div>
         </nav>
         </div>
-    
+
 
 
         <div class="menu">
