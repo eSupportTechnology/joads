@@ -320,7 +320,6 @@ public function home(Request $request)
         ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$today])
         ->select('banners.*', 'duration.duration')
         ->get();
-
     return view('home.home', compact('categories', 'totalCount', 'jobs', 'contacts', 'countries', 'banners'))
         ->with('selected_category_id', session('selected_category_id'));
 }
@@ -349,26 +348,45 @@ public function home(Request $request)
         return view('Admin.showonejob', compact('job'
         ));
     }
-    public function showjob($id)
-    {
-        $contacts = ContactUs::all();
 
-        // JobPosting record එක retrieve කර view_count එක increment කිරීම
-        $job = JobPosting::with(['category', 'employer'])->findOrFail($id);
-        $job->increment('view_count');
 
-        $now = Carbon::now();
 
-        $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
-        ->join('duration', 'banner_packages.duration_id', '=', 'duration.id') // Ensure duration is included
-            ->where('banners.status', 'published')
-            ->where('banners.placement', 'category_page')
-            ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now]) // Ensures active banners
-            ->select('banners.*', 'duration.duration') // Select duration from duration table
-            ->get();
+    
+public function showjob($id)
+{
+    $contacts = ContactUs::all();
 
-        return view('home.jobs.show', compact('job', 'contacts','banners'));
-    }
+    // Retrieve job posting with relations
+    $job = JobPosting::with(['category', 'employer'])->findOrFail($id);
+
+    // Increment view_count and update_count only once, in a single query
+        $jobPosting = JobPosting::findOrFail($job->id);
+
+        // Increment view_count and update_count
+        $jobPosting->view_count += 1;
+        $jobPosting->update_count += 1;
+                $jobPosting->save();
+
+        $jobPosting->updated_at = now();
+
+        // Save the changes
+
+    $now = Carbon::now();
+
+    $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
+        ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
+        ->where('banners.status', 'published')
+        ->where('banners.placement', 'category_page')
+        ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now])
+        ->select('banners.*', 'duration.duration')
+        ->get();
+
+    return view('home.jobs.show', compact('job', 'contacts', 'banners'));
+}
+
+
+
+
 
     public function updateStatus(Request $request, $id)
     {

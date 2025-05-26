@@ -106,6 +106,7 @@
 @section('content')
 <div class="container-fluid p-4">
     <!-- Welcome Section -->
+    
     <div class="row mb-4">
         <div class="col-12">
             <div class="welcome-section p-4 shadow-sm rounded-lg">
@@ -116,9 +117,9 @@
                             class="w-50 img-fluid" alt="Welcome">
                     </div>
                     <div class="col-md-8">
-                        <h2 class="mb-3 fw-bold text-primary">Welcome to JoBads.lk</h2>
+                        <h2 class="mb-3 fw-bold text-primary">Welcome to JoBads.lk </h2>
                         <p class="mb-4 opacity-75">Here’s your dashboard overview for today.</p>
-                        <!-- <button class="btn btn-gradient px-4 py-2 rounded-pill">What's New?</button> -->
+                     <button class="btn btn-gradient px-4 py-2 rounded-pill"> What's New? </button> 
                     </div>
                 </div>
             </div>
@@ -324,13 +325,12 @@
                                 <div class="card-body">
                                     <i class="fas fa-eye fa-2x"></i>
                                     <div style="display: flex; flex-direction: row;">
-                                        <div style="padding-inline: 50px">
-                                    <h6>Total Views</h6>
+                                        <div ">
+                                    <h6>Total </h6>
                                     <h5>{{ number_format($statistics['total_views'] ?? 0) }}</h5>
-                                        </div>
-                                        <div>
-                                    <h6>Daily Views</h6>
-                                    <h5>{{ number_format($statistics['daily_views'] ?? 0) }}</h5>
+                                    </div><div>
+                                    <h6 style="padding-left:40px">Daily </h6>
+                                    <h5 style="padding-left:40px">{{ number_format($statistics['daily_views'] ?? 0) }}</h5>
                                         </div>
                                     </div>
                                 </div>
@@ -341,85 +341,89 @@
             </div>
         </div>
 
-<!-- Company Statistics Section -->
-<div class="col-12">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Companies Statistics</h5>
-            <div class="d-flex align-items-center gap-2">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    class="form-control form-control-sm" 
-                    placeholder="Search Company..." 
-                    style="width: 300px;" 
-                    onkeyup="filterAccordion()"
-                >
-                <button 
-                    id="toggleSectionButton" 
-                    class="btn btn-light btn-sm" 
-                    onclick="toggleSection()">
-                    Expand
-                </button>
-            </div>
-        </div>
-        <div id="companyStatsSection" class="card-body collapse">
-            <div class="accordion" id="companyStatsAccordion">
-                @forelse ($companyStats as $company)
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading{{ $company->id }}">
-                            <button 
-                                class="accordion-button collapsed" 
-                                type="button" 
-                                data-bs-toggle="collapse" 
-                                data-bs-target="#collapse{{ $company->id }}" 
-                                aria-expanded="false" 
-                                aria-controls="collapse{{ $company->id }}">
-                                {{ $company->company_name }}
-                            </button>
-                        </h2>
-                        <div 
-                            id="collapse{{ $company->id }}" 
-                            class="accordion-collapse collapse" 
-                            aria-labelledby="heading{{ $company->id }}" 
-                            data-bs-parent="#companyStatsAccordion"
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Companies Statistics</h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            class="form-control form-control-sm" 
+                            placeholder="Search Company..." 
+                            style="width: 300px;" 
+                            onkeyup="filterAccordion()"
                         >
-                            <div class="accordion-body p-0">
-                                <table class="table table-sm table-striped mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Job Title</th>
-                                            <th>Total Views</th>
-                                            <th>Today's Views</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @if ($company->jobPostings->isNotEmpty())
-                                            @foreach ($company->jobPostings as $job)
-                                                <tr>
-                                                    <td>{{ $job->title }}</td>
-                                                    <td>{{ number_format($job->view_count ?? 0) }}</td>
-                                                    <td>{{ number_format($job->today_views ?? 0) }}</td>
-                                                </tr>
-                                            @endforeach
-                                        @else
-                                            <tr>
-                                                <td colspan="3" class="text-center">No Job Posts</td>
-                                            </tr>
-                                        @endif
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <button 
+                            id="toggleSectionButton" 
+                            class="btn btn-light btn-sm" 
+                            onclick="toggleSection()">
+                            Expand
+                        </button>
                     </div>
-                @empty
-                    <p class="text-center mb-0">No Data Available</p>
-                @endforelse
+                </div>
+                <div id="companyStatsSection" class="card-body collapse">
+                    <div class="accordion" id="companyStatsAccordion">
+                        @forelse ($companyStats as $company)
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading{{ $company->id }}">
+                                    <button 
+                                        class="accordion-button collapsed" 
+                                        type="button" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#collapse{{ $company->id }}" 
+                                        aria-expanded="false" 
+                                        aria-controls="collapse{{ $company->id }}">
+                                        {{ $company->company_name }}
+                                    </button>
+                                </h2>
+                                <div 
+                                    id="collapse{{ $company->id }}" 
+                                    class="accordion-collapse collapse" 
+                                    aria-labelledby="heading{{ $company->id }}" 
+                                    data-bs-parent="#companyStatsAccordion"
+                                    >
+                                    <div class="accordion-body p-0">
+                                        <table class="table table-sm table-striped mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th> Job Title</th>
+                                                    <th> Total Views</th>
+                                                    <th> Today's Views</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if ($company->jobPostings->isNotEmpty())
+                                                    @foreach ($company->jobPostings as $job)
+                                                        <tr>
+                                                            <td>{{ $job->title }}</td>
+                                                            <td>{{ number_format($job->view_count ?? 0) }}</td>
+                                                            <td>{{ number_format($job->today_views ?? 0) }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                @else
+                                                    <tr>
+                                                        <td colspan="3" class="text-center">No Job Posts</td>
+                                                    </tr>
+                                                @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-center mb-0">No Data Available</p>
+                        @endforelse
+                    </div>
+                </div>
             </div>
         </div>
+        
     </div>
-</div>
 
+
+
+    
 <script>
     function toggleSection() {
         const section = document.getElementById('companyStatsSection');

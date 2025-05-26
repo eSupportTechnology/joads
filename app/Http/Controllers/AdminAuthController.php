@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class AdminAuthController extends Controller
 {
@@ -96,18 +97,11 @@ class AdminAuthController extends Controller
         return redirect()->route('admin.login')->with('success', 'Admin registered successfully. Please wait for activation by the super admin.');
     }
 
-    // Dashboard (example)
-    // public function dashboard()
-    // {
-    //     return view('Admin.dashboard'); // Ensure you have a view at resources/views/admin/dashboard.blade.php
-    // }
     public function getDashboardStatistics()
     {
         try {
-            // Get current date for calculations
+
             $currentDate = now();
-            $todayStart = $currentDate->copy()->startOfDay(); // Start of today (00:00)
-            $todayEnd = $currentDate->copy()->endOfDay(); // End of today (23:59)
     
             // Check if required tables and columns exist
             if (!Schema::hasTable('job_postings')) {
@@ -155,13 +149,14 @@ class AdminAuthController extends Controller
     
                 // Calculate total views
                 $totalViews = JobPosting::sum('view_count');
-    
-                // Calculate today's views
-                $dailyViews = JobPosting::whereBetween('updated_at', [$todayStart, $todayEnd])
-                    ->sum('view_count');
+
+                $today = Carbon::today(); // Today at 00:00:00
+
+
+                $dailyViews = JobPosting::sum('update_count');
+                      
             }
-    
-            // Get total active job postings
+
             if (Schema::hasTable('job_postings')) {
                 $totalJobs = JobPosting::count();
             }
@@ -310,38 +305,56 @@ class AdminAuthController extends Controller
         }
     }
 
+// public function companyStat()
+// {
+//     try {
+//         DB::enableQueryLog();
+
+//         $companyStats = Employer::with(['jobPostings' => function ($query) {
+//             $query->select('id', 'employer_id', 'title', 'view_count', 'updated_at')
+//                 ->addSelect([
+//                     'today_views' => JobPosting::selectRaw('view_count')
+//                         ->whereColumn('id', 'job_postings.id')
+//                         ->whereDate('updated_at', Carbon::today())
+//                         ->limit(1),
+//                 ]);
+//         }])
+//         ->whereHas('jobPostings', function ($query) {
+//             $query->whereDate('updated_at', Carbon::today());
+//         })
+//         ->get();
+
+//         \Log::info(DB::getQueryLog()); // Log generated queries
+//         return $companyStats;
+
+//     } catch (\Exception $e) {
+//         \Log::error('Error fetching company stats: ' . $e->getMessage());
+//         return [];
+//     }
+// }
+
+   
+// 
+
 public function companyStat()
 {
     try {
-        // Get current date and time boundaries for today
-        $todayStart = now()->startOfDay(); // Start of today (00:00)
-        $todayEnd = now()->endOfDay(); // End of today (23:59)
-
-        // Check if required tables and columns exist
-        if (!Schema::hasTable('employers') || !Schema::hasTable('job_postings')) {
-            throw new \Exception("Required tables do not exist");
-        }
-
-        if (!Schema::hasColumns('job_postings', ['view_count', 'employer_id', 'updated_at'])) {
-            throw new \Exception("Required columns missing in job_postings table");
-        }
-
-        // Fetch employers with job postings and their statistics
-        $companyStats = Employer::with(['jobPostings' => function ($query) use ($todayStart, $todayEnd) {
-            $query->select('id', 'employer_id', 'title', 'view_count', 'updated_at')
-                ->addSelect([
-                    'today_views' => JobPosting::selectRaw('SUM(view_count)')
-                        ->whereColumn('id', 'job_postings.id')
-                        ->whereBetween('updated_at', [$todayStart, $todayEnd])
-                        ->limit(1)
-                ]);
+        // Fetch employers along with job postings and their stats
+        $companyStats = Employer::with(['jobPostings' => function ($query) {
+            $query->select(
+                'id',
+                'employer_id',
+                'title',
+                'view_count',
+                'update_count as today_views', // Use update_count as today's views
+                'updated_at'
+            );
         }])->get();
 
         return $companyStats;
 
     } catch (\Exception $e) {
-        // Log the error and return default values
-        // \Log::error('Error in companyStat: ' . $e->getMessage());
+        Log::error('Error fetching employer stats: ' . $e->getMessage());
         return [];
     }
 }
@@ -360,19 +373,6 @@ public function companyStat()
 
 
 
-
-
-
-
-
-
-            /**
-     * Display admin dashboard
-     *
-     * @return \Illuminate\View\View
-     */
-   
-   
    
      public function dashboard()
     {
@@ -416,45 +416,43 @@ public function companyStat()
     }
 
     // Handle profile update
-    public function updateProfile(Request $request)
-    {
-        $admin = Auth::guard('admin')->user();
+public function updateProfile(Request $request)
+{
+    $admin = Auth::guard('admin')->user();
 
-        // Validate the incoming request
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => [
-                'required',
-                'email',
-                Rule::unique('admins', 'email')->ignore($admin->id),
-            ],
-            'contact' => 'nullable|string|max:20',
-            'current_password' => 'nullable|required_with:new_password',
-            'new_password' => 'nullable|min:8|confirmed',
-        ]);
+    // Validate the incoming request
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => [
+            'required',
+            'email',
+            Rule::unique('admins', 'email')->ignore($admin->id),
+        ],
+        'contact' => 'nullable|string|max:20',
+        'current_password' => 'nullable|required_with:new_password',
+        'new_password' => 'nullable|min:8|confirmed',
+    ]);
 
-        // Update name and contact
-        $admin->name = $request->name;
-        $admin->email = $request->email;
-        $admin->contact = $request->contact;
+    // Update fields
+    $admin->name = $request->name;
+    $admin->email = $request->email;
+    $admin->contact = $request->contact;
 
-        // Handle password change if new password is provided
-        if ($request->filled('new_password')) {
-            // Verify current password
-            if (!Hash::check($request->current_password, $admin->password)) {
-                return back()->withErrors(['current_password' => 'Current password is incorrect']);
-            }
-
-            // Update to new password
-            $admin->password = Hash::make($request->new_password);
+    // Handle password change
+    if ($request->filled('new_password')) {
+        if (!Hash::check($request->current_password, $admin->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect']);
         }
-
-        // Save the updates
-        $admin->save();
-
-        // Redirect back with success message
-        return redirect()->route('admin.profile')
-            ->with('success', 'Profile updated successfully');
+        $admin->password = Hash::make($request->new_password);
     }
+
+    // Save the admin
+    try {
+        $admin->db::save();
+        return redirect()->route('admin.profile')->with('success', 'Profile updated successfully');
+    } catch (\Exception $e) {
+        return back()->withErrors(['save_error' => 'An error occurred while saving your profile.']);
+    }
+}
 
 }
