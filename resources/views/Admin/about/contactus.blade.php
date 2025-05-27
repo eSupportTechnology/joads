@@ -23,31 +23,21 @@
             </div>
         </div>
 
-        <!-- Services Section -->
-        <div class="content-box">
-            <div class="box">
-                <h3>Advertising in <span class="email1">jobads.lk</span></h3>
-                <ul class="styled-list">
-                    <li>Job Vacancy advertising in <strong>www.jobads.lk</strong></li>
-                    <li>Facilitates with free Job Vacancy advertisement formats</li>
-                    <li>Advertisement design and publishing in the print media (optional)</li>
-                    <li>Facilitates Candidates to Prepare Individual CVs</li>
-                </ul>
+        @foreach ($services->chunk(2) as $servicePair)
+            <div class="content-box" style="display: flex; gap: 20px; margin-bottom: 30px;">
+                @foreach ($servicePair as $service)
+                    <div class="box" style="flex:1;">
+                        <h3>{{ $service->title }}</h3>
+                        <ul class="styled-list">
+                            @foreach ($service->features as $feature)
+                                <li>{!! $feature !!}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endforeach
             </div>
-            <div class="box">
-                <h3>Full Recruitment Services</h3>
-                <ul class="styled-list">
-                    <li>Job Vacancy advertising in <strong>www.jobads.lk</strong></li>
-                    <li>Facilitates with free Job Vacancy advertisement formats</li>
-                    <li>Advertisement design and publishing in the print media (optional)</li>
-                    <li>Headhunting services and anonymized digital media advertising</li>
-                    <li>Collection and screening of all profiles/CVs</li>
-                    <li>Compile and submit a detailed candidate summary report</li>
-                    <li>Timeline is 2 to 4 weeks from the date of signing of Engagement Acceptance</li>
-                    <li>Facilitates Candidates to Prepare Individual CVs</li>
-                </ul>
-            </div>
-        </div>
+        @endforeach
+
 
         <!-- Contact Section -->
         <div class="contact-section">
@@ -156,22 +146,29 @@
         background: #d0631e;
     }
 
-    /* Services Section */
     .content-box {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 25px;
-        padding: 20px 0;
+        display: flex;
+        gap: 20px;
+        margin-bottom: 30px;
     }
 
     .box {
-        background: white;
+        flex: 1;
         border: 1px solid #ddd;
+        padding: 15px;
+        box-sizing: border-box;
+        background: #fff;
         border-radius: 5px;
-        padding: 5px 10px;
-
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+
+    .styled-list {
+        padding-left: 20px;
+    }
+
+    .styled-list li {
+        margin-bottom: 8px;
+    }
+
 
     .box h3 {
         color: green;
