@@ -375,9 +375,9 @@ public function showjob($id)
         // Increment view_count and update_count
         $jobPosting->view_count += 1;
         $jobPosting->update_count += 1;
-                $jobPosting->save();
-
         $jobPosting->updated_at = now();
+        $jobPosting->save();
+
 
         // Save the changes
 
@@ -393,7 +393,6 @@ public function showjob($id)
 
     return view('home.jobs.show', compact('job', 'contacts', 'banners'));
 }
-
 
 
 
