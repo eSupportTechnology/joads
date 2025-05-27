@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\JobApprovedMail;
 use App\Models\Application;
 use App\Models\Banner;
 use App\Models\Category;
@@ -17,6 +18,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class JobPostingController extends Controller
 {
@@ -55,14 +57,14 @@ class JobPostingController extends Controller
             ->get();
         return view('Admin.jobview', compact('jobPostings', 'pendingJobs', 'rejectedJobs', 'expireddJobs'));
     }
-    
-    
+
+
     public function topEmployers()
     {
         $contacts = ContactUs::all();
         // Fetch top 28 employers based on job postings count and filter those with a logo
         $topEmployers = Employer::withCount('jobPostings') // Assuming 'jobPostings' is the relationship
-           
+
             ->orderBy('job_postings_count', 'desc') // Sort by the number of job postings
             ->take(8) // Limit to top 28
             ->get();
@@ -326,9 +328,9 @@ public function home(Request $request)
     return view('home.home', compact('categories', 'totalCount', 'jobs', 'contacts', 'countries', 'banners'))
         ->with('selected_category_id', session('selected_category_id'));
 }
-                        
-    
-    
+
+
+
     public function toggleActiveStatus($id)
     {
         // Find the job posting by ID and ensure it belongs to the authenticated employer
@@ -359,7 +361,7 @@ public function home(Request $request)
 
 
 
-    
+
 public function showjob($id)
 {
     $contacts = ContactUs::all();
@@ -434,7 +436,7 @@ public function showjob($id)
     return redirect()->route('job_postings.index')->with('success', 'Job status updated successfully.');
 }
 
-  
+
     public function getJobsByCategory($categoryId)
     {
         $today = Carbon::today();
@@ -515,7 +517,7 @@ public function showjob($id)
                         // Check if user and job exist before accessing properties
                         $userName = optional($app->user)->name ?? 'Unknown User';
                         $jobTitle = optional($app->job)->title ?? 'Unknown Job';
-        
+
                         return "$userName applied for $jobTitle";
                     });
 
@@ -546,7 +548,7 @@ public function showjob($id)
                         // Check if user and job exist before accessing properties
                         $userName = optional($app->user)->name ?? 'Unknown User';
                         $jobTitle = optional($app->job)->title ?? 'Unknown Job';
-        
+
                         return "$userName - $jobTitle";
                     });
 
@@ -896,8 +898,8 @@ public function showjob($id)
         $subcategories = Subcategory::where('category_id', $jobPosting->category_id)->get(); // Assuming you have a Subcategory model
         return view('employer.jobupdate', compact('countries','jobPosting', 'categories', 'subcategories'));
     }
-    
-    
+
+
     public function createForAdmin()
     {
         $categories = Category::all(); // Fetch all categories
@@ -908,6 +910,8 @@ public function showjob($id)
 
         return view('Admin.jobcreate', compact('categories', 'subcategories', 'employers', 'packages', 'countries'));
     }
+
+
 
     public function update(Request $request, JobPosting $jobPosting)
     {
