@@ -43,6 +43,7 @@ use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\PressReleaseController;
 use App\Http\Controllers\DurationController;
 use App\Http\Controllers\PolicyController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\VissionMissionController;
 
 
@@ -1026,6 +1027,20 @@ Route::middleware(['auth:admin'])->group(function () {
         ->name('admin.mail-templates.update');
     Route::delete('/admin/mail-templates/{emailTemplate}', [AdminEmailTemplateController::class, 'destroy'])
         ->name('admin.mail-templates.destroy');
+
+    //service management
+    Route::get('/admin/services', [ServiceController::class, 'index'])
+        ->name('admin.services.index')->middleware('check.permission:admin.services.index');
+    Route::get('/admin/services/create', [ServiceController::class, 'create'])
+        ->name('admin.services.create')->middleware('check.permission:admin.services.create');
+    Route::post('/admin/services', [ServiceController::class, 'store'])
+        ->name('admin.services.store');
+    Route::get('/admin/services/{service}/edit', [ServiceController::class, 'edit'])
+        ->name('admin.services.edit')->middleware('check.permission:admin.services.edit');
+    Route::put('/admin/services/{service}', [ServiceController::class, 'update'])
+        ->name('admin.services.update');
+    Route::delete('/admin/services/{service}', [ServiceController::class, 'destroy'])
+        ->name('admin.services.destroy');
 });
 
 

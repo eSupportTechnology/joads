@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Contact;
 use App\Models\ContactList;
+use App\Models\Service;
 use Illuminate\Http\Request;
 
 class ContactListController extends Controller
@@ -13,20 +14,21 @@ class ContactListController extends Controller
         $contacts = Contact::all();
         return view('Admin.packages.ContactList.index', compact('contacts'));
     }
-    
+
     public function edit(Contact $contact)
     {
 
         return view('Admin.packages.ContactList.edit', compact('contact'));
     }
-    
+
     public function ourservices()
     {
+        $services = Service::all();
         $contacts = Contact::all();
         $contactslist=ContactList::all();
-        return view('Admin.about.contactus', compact('contacts','contactslist'));
+        return view('Admin.about.contactus', compact('contacts','contactslist','services'));
     }
-    
+
     public function contactus()
     {
         $contacts = Contact::all();
