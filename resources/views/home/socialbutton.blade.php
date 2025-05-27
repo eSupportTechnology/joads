@@ -8,7 +8,7 @@
         .whatsapp-icon {
             position: fixed;
             bottom: 30px;
-            right: 20px;
+            right: 30px;
             z-index: 1000;
             opacity: 1; /* Make sure the icon is fully visible */
             transition: opacity 0.3s ease-in-out;
@@ -26,9 +26,22 @@
         }
         @media (max-width: 575px) {
             .whatsapp-icon {
+                
                 position: fixed;
-                bottom: 30px;
+                bottom: 150px;
                 right: 70px;
+                z-index: 1000;
+            }
+            .whatsapp-icon img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+                @media (max-width: 375px) {
+            .whatsapp-icon {
+                position: fixed;
+                bottom: 150px;
+                right: 120px;
                 z-index: 1000;
             }
             .whatsapp-icon img {

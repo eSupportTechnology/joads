@@ -105,7 +105,7 @@
                                             <td>{{ $job->job_id }}</td>
                                             <td>{{ $job->title }}</td>
                                             <td>{{ $job->category->name }}</td>
-                                            <td>{{ $job->employer->company_name }}</td>
+                                            <td>{{ $job->employer == null ? "" : $job->employer->company_name }}</td>
                                             <td>{{ $job->view_count }}</td>
                                             <td>{{ $job->status }}</td>
                                             <td>
