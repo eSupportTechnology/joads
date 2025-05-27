@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class EmployerAuthController extends Controller
 {
@@ -41,73 +42,138 @@ class EmployerAuthController extends Controller
         return back()->withErrors(['email' => 'Invalid credentials']);
     }
     public function employerStats()
+
     {
-        // Get current date
-        $today = now();
+       
+        $today = Carbon::today();
 
         // Daily counts for the last 30 days
         $dailyCount = Employer::selectRaw('DATE(created_at) as date, COUNT(*) as count')
-            ->whereDate('created_at', '>=', $today->copy()->subDays(30))
-            ->groupBy('date')
-            ->orderBy('date', 'desc')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'date' => $item->date,
-                    'count' => $item->count,
-                    'employers' => Employer::whereDate('created_at', $item->date)
-                        ->select('company_name', 'email')
-                        ->get()
-                        ->toArray(),
-                ];
-            });
+                    ->whereDate('created_at', '>=', $today->copy()->subDays(30))
+                    ->groupBy('date')
+                    ->orderBy('date', 'desc')
+                    ->get()
+                    ->map(function ($item) {
+                        $employers = Employer::whereDate('created_at', $item->date)
+                            ->select('id', 'company_name', 'email')
+                            ->with(['jobPostings' => function ($query) {
+                                $query->select(
+                                    'id',
+                                    'employer_id',
+                                    'title',
+                                    'view_count',
+                                    'update_count as today_views', // Use update_count as today's views
+                                    'updated_at'
+                                );
+                            }])
+                            ->get()
+                            ->map(function ($employer) {
+                                return [
+                                    'company_name' => $employer->company_name,
+                                    'email' => $employer->email,
+                                    'job_postings' => $employer->jobPostings->toArray(),
+                                ];
+                            })
+                            ->toArray();
+
+                        return [
+                            'date' => $item->date,
+                            'count' => $item->count,
+                            'employers' => $employers,
+                        ];
+                    });
 
         // Weekly counts
+
         $weeklyCount = Employer::selectRaw('
-                WEEK(created_at) as week,
-                MIN(DATE(created_at)) as week_start,
-                MAX(DATE(created_at)) as week_end,
-                COUNT(*) as count
-            ')
-            ->whereDate('created_at', '>=', $today->copy()->startOfYear())
-            ->groupBy('week')
-            ->orderBy('week', 'desc')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'week' => $item->week,
-                    'week_start' => $item->week_start,
-                    'week_end' => $item->week_end,
-                    'count' => $item->count,
-                    'employers' => Employer::whereBetween('created_at', [$item->week_start, $item->week_end])
-                        ->select('company_name', 'email')
-                        ->get()
-                        ->toArray(),
-                ];
-            });
+                        WEEK(created_at) as week,
+                        MIN(DATE(created_at)) as week_start,
+                        MAX(DATE(created_at)) as week_end,
+                        COUNT(*) as count
+                    ')
+                    ->whereDate('created_at', '>=', $today->copy()->startOfYear())
+                    ->groupBy('week')
+                    ->orderBy('week', 'desc')
+                    ->get()
+                    ->map(function ($item) {
+                        // Get employers for the week
+                        $employers = Employer::whereBetween('created_at', [$item->week_start, $item->week_end])
+                            ->select('id', 'company_name', 'email')
+                            ->with(['jobPostings' => function ($query) {
+                                $query->select(
+                                    'id',
+                                    'employer_id',
+                                    'title',
+                                    'view_count',
+                                    'update_count as today_views',
+                                    'updated_at'
+                                );
+                            }])
+                            ->get()
+                            ->map(function ($employer) {
+                                return [
+                                    'company_name' => $employer->company_name,
+                                    'email' => $employer->email,
+                                    'job_postings' => $employer->jobPostings->toArray(),
+                                ];
+                            })
+                            ->toArray();
 
-        // Monthly counts
-        $monthlyCount = Employer::selectRaw('
-                DATE_FORMAT(created_at, "%Y-%m") as month,
-                COUNT(*) as count
-            ')
-            ->whereDate('created_at', '>=', $today->copy()->startOfYear())
-            ->groupBy('month')
-            ->orderBy('month', 'desc')
-            ->get()
-            ->map(function ($item) {
-                $monthStart = \Carbon\Carbon::createFromFormat('Y-m', $item->month)->startOfMonth();
-                $monthEnd = \Carbon\Carbon::createFromFormat('Y-m', $item->month)->endOfMonth();
+                        // Return the combined weekly stats with employers and their job postings
+                        return [
+                            'week' => $item->week,
+                            'week_start' => $item->week_start,
+                            'week_end' => $item->week_end,
+                            'count' => $item->count,
+                            'employers' => $employers,
+                        ];
+                    });
 
-                return [
-                    'month' => $monthStart->format('F Y'),
-                    'count' => $item->count,
-                    'employers' => Employer::whereBetween('created_at', [$monthStart, $monthEnd])
-                        ->select('company_name', 'email')
-                        ->get()
-                        ->toArray(),
-                ];
-            });
+        // Monthly counts$today = Carbon::today();
+        
+        $monthlyCount= Employer::selectRaw('
+                        DATE_FORMAT(created_at, "%Y-%m") as month,
+                        COUNT(*) as count
+                    ')
+                    ->whereDate('created_at', '>=', $today->copy()->startOfYear())
+                    ->groupBy('month')
+                    ->orderBy('month', 'desc')
+                    ->get()
+                    ->map(function ($item) {
+                        // Calculate month start and end dates
+                        $monthStart = Carbon::createFromFormat('Y-m', $item->month)->startOfMonth();
+                        $monthEnd = Carbon::createFromFormat('Y-m', $item->month)->endOfMonth();
+
+                        // Fetch employers created within the month
+                        $employers = Employer::whereBetween('created_at', [$monthStart, $monthEnd])
+                            ->select('id', 'company_name', 'email')
+                            ->with(['jobPostings' => function ($query) {
+                                $query->select(
+                                    'id',
+                                    'employer_id',
+                                    'title',
+                                    'view_count',
+                                    'update_count as today_views',
+                                    'updated_at'
+                                );
+                            }])
+                            ->get()
+                            ->map(function ($employer) {
+                                return [
+                                    'company_name' => $employer->company_name,
+                                    'email' => $employer->email,
+                                    'job_postings' => $employer->jobPostings->toArray(),
+                                ];
+                            })
+                            ->toArray();
+
+                        // Combine monthly statistics with employer data
+                        return [
+                            'month' => $monthStart->format('F Y'),
+                            'count' => $item->count,
+                            'employers' => $employers,
+                        ];
+                    });
 
         // Get summary counts
         $dailyTotal = $dailyCount->first()['count'] ?? 0;
