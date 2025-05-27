@@ -32,7 +32,7 @@ class Employer extends Authenticatable
 
     public function jobPostings()
     {
-        return $this->hasMany(JobPosting::class);
+        return $this->hasMany(JobPosting::class,'employer_id');
     }
     public function applications()
     {

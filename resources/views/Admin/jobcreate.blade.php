@@ -283,8 +283,10 @@
 
 
     <script>
+
         const selectedCategories = new Map(); 
         const selectedSubcategories = new Map();
+
 
         function handleCategorySelect(select) {
             const value = select.value;

@@ -49,7 +49,7 @@ class VissionMissionController extends Controller
     public function edit($id)
     {
         $vissionMission = VissionMission::findOrFail($id);
-        return view('admin.vissionmission.edit', compact('vissionMission'));
+        return view('Admin.vissionmission.edit', compact('vissionMission'));
     }
 
     /**

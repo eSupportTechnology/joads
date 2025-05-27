@@ -114,8 +114,8 @@
         .scroll-wrapper {
             background-color: #d9d9d9;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            margin: 15px 15px;
-            padding: 15px;
+            margin: 12px 15px;
+            padding: 0px;
             overflow-y:visible;
 
         }
@@ -171,7 +171,7 @@
             -ms-overflow-style: none;
             max-height: calc(40px * 4.5);
             /* Adjust as needed */
-            padding: 10px 0px;
+            padding: 12px 0px 12px 0px;
 
             /* Adjust width as needed */
             scroll-behavior: smooth;

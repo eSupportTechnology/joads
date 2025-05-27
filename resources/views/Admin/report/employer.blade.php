@@ -18,163 +18,153 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Summary Cards -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Today's Registrations
-                                </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    {{ $dailyTotal }}
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <div class="container mt-5">
+        <h1>Employer Statistics</h1>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="statisticsTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="daily-tab" data-bs-toggle="tab" href="#daily" role="tab" aria-controls="daily" aria-selected="true">Daily</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="weekly-tab" data-bs-toggle="tab" href="#weekly" role="tab" aria-controls="weekly" aria-selected="false">Weekly</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="monthly-tab" data-bs-toggle="tab" href="#monthly" role="tab" aria-controls="monthly" aria-selected="false">Monthly</a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-4" id="statisticsTabContent">
+            <!-- Daily Statistics -->
+            <div class="tab-pane fade show active" id="daily" role="tabpanel" aria-labelledby="daily-tab">
+                <h2>Daily Company Statistics (Last 30 Days)</h2>
+                <table id="daily-table" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Total Companies</th>
+                            <th>Companies</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($dailyCompanyStats as $day)
+                            <tr>
+                                <td>{{ $day['date'] }}</td>
+                                <td>{{ $day['count'] }}</td>
+                                <td>
+                                    <ul>
+                                        @forelse ($day['employers'] as $employer)
+                                            <li>
+                                                <strong>{{ $employer->company_name }}</strong> ({{ $employer->email }})
+                                                <ul>
+                                                    @forelse ($employer->jobPostings as $job)
+                                                        <li>{{ $job->title }} - {{ $job->view_count }} views</li>
+                                                    @empty
+                                                        <li>No job postings available</li>
+                                                    @endforelse
+                                                </ul>
+                                            </li>
+                                        @empty
+                                            <li>No companies available</li>
+                                        @endforelse
+                                    </ul>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3">No data available for the last 30 days</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
 
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">This Week's
-                                    Registrations</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    {{ $weeklyTotal }}
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-chart-bar fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Weekly Statistics -->
+            <div class="tab-pane fade" id="weekly" role="tabpanel" aria-labelledby="weekly-tab">
+                <h2>Weekly Company Statistics (This Year)</h2>
+                <table id="weekly-table" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Week</th>
+                            <th>Total Companies</th>
+                            <th>Companies</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($weeklyCompanyStats as $week)
+                            <tr>
+                                <td>Week {{ $week['week'] }} ({{ $week['week_start'] }} - {{ $week['week_end'] }})</td>
+                                <td>{{ $week['count'] }}</td>
+                                <td>
+                                    <ul>
+                                        @forelse ($week['employers'] as $employer)
+                                            <li>
+                                                <strong>{{ $employer->company_name }}</strong> ({{ $employer->email }})
+                                                <ul>
+                                                    @forelse ($employer->jobPostings as $job)
+                                                        <li>{{ $job->title }} - {{ $job->view_count }} views</li>
+                                                    @empty
+                                                        <li>No job postings available</li>
+                                                    @endforelse
+                                                </ul>
+                                            </li>
+                                        @empty
+                                            <li>No companies available</li>
+                                        @endforelse
+                                    </ul>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3">No data available for this year</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
 
-            <!-- Detailed Reports -->
-            <div class="col-12">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Registration Details</h6>
-                    </div>
-                    <div class="card-body">
-                        <!-- Nav tabs -->
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" data-bs-toggle="tab" href="#daily">Daily</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#weekly">Weekly</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#monthly">Monthly</a>
-                            </li>
-                        </ul>
-
-                        <!-- Tab content -->
-                        <div class="tab-content">
-                            <!-- Daily Tab -->
-                            <div class="tab-pane active" id="daily">
-                                <div class="table-responsive mt-3">
-                                    <table class="display" id="daily-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Count</th>
-                                                <th>Registered Companies</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($dailyCount as $daily)
-                                                <tr>
-                                                    <td>{{ $daily['date'] }}</td>
-                                                    <td>{{ $daily['count'] }}</td>
-                                                    <td>
-                                                        <ul class="list-unstyled mb-0">
-                                                            @foreach ($daily['employers'] as $employer)
-                                                                <li class="mb-1">{{ $employer['company_name'] }}</li>
-                                                            @endforeach
-                                                        </ul>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Weekly Tab -->
-                            <div class="tab-pane fade" id="weekly">
-                                <div class="table-responsive mt-3">
-                                    <table class="display" id="weekly-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Week</th>
-                                                <th>Date Range</th>
-                                                <th>Count</th>
-                                                <th>Registered Companies</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($weeklyCount as $weekly)
-                                                <tr>
-                                                    <td>Week {{ $weekly['week'] }}</td>
-                                                    <td>{{ $weekly['week_start'] }} to {{ $weekly['week_end'] }}</td>
-                                                    <td>{{ $weekly['count'] }}</td>
-                                                    <td>
-                                                        <ul class="list-unstyled mb-0">
-                                                            @foreach ($weekly['employers'] as $employer)
-                                                                <li class="mb-1">{{ $employer['company_name'] }}</li>
-                                                            @endforeach
-                                                        </ul>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Monthly Tab -->
-                            <div class="tab-pane fade" id="monthly">
-                                <div class="table-responsive mt-3">
-                                    <table class="display" id="monthly-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Month</th>
-                                                <th>Count</th>
-                                                <th>Registered Companies</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($monthlyCount as $monthly)
-                                                <tr>
-                                                    <td>{{ $monthly['month'] }}</td>
-                                                    <td>{{ $monthly['count'] }}</td>
-                                                    <td>
-                                                        <ul class="list-unstyled mb-0">
-                                                            @foreach ($monthly['employers'] as $employer)
-                                                                <li class="mb-1">{{ $employer['company_name'] }}</li>
-                                                            @endforeach
-                                                        </ul>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Monthly Statistics -->
+            <div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
+                <h2>Monthly Company Statistics (This Year)</h2>
+                <table id="monthly-table" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Total Companies</th>
+                            <th>Companies</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($monthlyCompanyStats as $month)
+                            <tr>
+                                <td>{{ $month['month'] }}</td>
+                                <td>{{ $month['count'] }}</td>
+                                <td>
+                                    <ul>
+                                        @forelse ($month['employers'] as $employer)
+                                            <li>
+                                                <strong>{{ $employer->company_name }}</strong> ({{ $employer->email }})
+                                                <ul>
+                                                    @forelse ($employer->jobPostings as $job)
+                                                        <li>{{ $job->title }} - {{ $job->view_count }} views</li>
+                                                    @empty
+                                                        <li>No job postings available</li>
+                                                    @endforelse
+                                                </ul>
+                                            </li>
+                                        @empty
+                                            <li>No companies available</li>
+                                        @endforelse
+                                    </ul>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3">No data available for this year</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -189,28 +179,23 @@
 
     <script>
         $(document).ready(function() {
-            // DataTable configuration
-            const dtConfig = {
+            const config = {
                 dom: 'Bfrtip',
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                pageLength: 20,
+                pageLength: 10,
                 ordering: true,
                 responsive: true
             };
 
-            // Initialize all tables
-            const tables = {
-                daily: $('#daily-table').DataTable(dtConfig),
-                weekly: $('#weekly-table').DataTable(dtConfig),
-                monthly: $('#monthly-table').DataTable(dtConfig)
-            };
+            const dailyTable = $('#daily-table').DataTable(config);
+            const weeklyTable = $('#weekly-table').DataTable(config);
+            const monthlyTable = $('#monthly-table').DataTable(config);
 
-            // Handle tab changes
             $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
                 const targetId = $(e.target).attr('href').substring(1);
-                if (tables[targetId]) {
-                    tables[targetId].columns.adjust().draw();
-                }
+                if (targetId === 'daily') dailyTable.columns.adjust().draw();
+                if (targetId === 'weekly') weeklyTable.columns.adjust().draw();
+                if (targetId === 'monthly') monthlyTable.columns.adjust().draw();
             });
         });
     </script>

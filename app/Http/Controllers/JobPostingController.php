@@ -284,6 +284,7 @@ class JobPostingController extends Controller
                             $q->where('company_name', 'like', "%{$search}%");
                         });
                 });
+
             })
             ->when($location, fn($query, $location) => $query->where('location', 'like', "%{$location}%"))
             ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
@@ -332,6 +333,7 @@ class JobPostingController extends Controller
 
 
 
+
     public function toggleActiveStatus($id)
     {
         // Find the job posting by ID and ensure it belongs to the authenticated employer
@@ -356,6 +358,7 @@ class JobPostingController extends Controller
         $emailTemplates = EmailTemplate::all();
         $packages = Package::with('duration')->get();
 
+
         return view('Admin.showonejob', compact('job', 'categories', 'packages', 'sub_categories', 'emailTemplates'));
     }
 
@@ -372,6 +375,37 @@ class JobPostingController extends Controller
             'closing_date' => 'required|date',
             'package_id' => 'required|exists:packages,id',
         ]);
+
+{
+    $job = JobPosting::with(['category', 'employer', 'package.duration'])->findOrFail($id);
+    $categories = Category::all();
+    $sub_categories = Subcategory::all();
+    $emailTemplates = EmailTemplate::all();
+    $packages = Package::with('duration')->get();
+
+    return view('Admin.showonejob', compact('job', 'categories', 'packages', 'sub_categories', 'emailTemplates'));
+}
+
+
+
+
+public function showjob($id)
+{
+    $contacts = ContactUs::all();
+
+    // Retrieve job posting with relations
+    $job = JobPosting::with(['category', 'employer'])->findOrFail($id);
+
+    // Increment view_count and update_count only once, in a single query
+        $jobPosting = JobPosting::findOrFail($job->id);
+
+        // Increment view_count and update_count
+        $jobPosting->view_count += 1;
+        $jobPosting->update_count += 1;
+        $jobPosting->updated_at = now();
+        $jobPosting->save();
+
+
 
         $job = JobPosting::findOrFail($id);
 
@@ -407,8 +441,10 @@ class JobPostingController extends Controller
             ->select('banners.*', 'duration.duration') // Select duration from duration table
             ->get();
 
+
         return view('home.jobs.show', compact('job', 'contacts', 'banners'));
     }
+
 
     public function updateStatus(Request $request, $id)
     {
@@ -446,6 +482,7 @@ class JobPostingController extends Controller
 
         return redirect()->route('job_postings.index')->with('success', 'Job status updated successfully.');
     }
+
     public function getJobsByCategory($categoryId)
     {
         $today = Carbon::today();
@@ -907,6 +944,8 @@ class JobPostingController extends Controller
 
         return view('Admin.jobcreate', compact('categories', 'subcategories', 'employers', 'packages', 'countries'));
     }
+
+
 
     public function update(Request $request, JobPosting $jobPosting)
     {
