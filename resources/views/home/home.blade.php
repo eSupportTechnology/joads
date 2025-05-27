@@ -19,6 +19,7 @@
 
 
  <style>
+
         .dropdown {
             padding: 8px;
             margin: 10px 0;
@@ -113,7 +114,10 @@
         .scroll-wrapper {
             background-color: #d9d9d9;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            margin: 0 10px;
+            margin: 15px 15px;
+            padding: 15px;
+            overflow-y:visible;
+
         }
 
         .categories-container {
@@ -539,7 +543,7 @@
                                     </a>
                                     <br>
                                     <a href="{{ route('job.details', $job->id) }}" class="company-name">
-                                        {{ $job->employer->company_name }}
+                                        {{ $job->employer == null ? "" : $job->employer->company_name }}
                                     </a>
                                 </td>
                                 <td>{{ $job->description ?? 'No description provided' }}</td>
@@ -563,7 +567,7 @@
                         </a>
                         <p class="company-name"
                             style="font-size: 14px; margin-top: 2px; margin-bottom: 0px; font-weight:600; line-height:1;">
-                            {{ $job->employer->company_name }}
+                            {{$job->employer == null ? "" : $job->employer->company_name }}
                         </p>
                         <p class="location"
                             style="font-size: 12px; margin-top: 1px; margin-bottom: 0px; line-height:1;">
