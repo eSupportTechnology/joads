@@ -52,7 +52,7 @@
 
         .vision-mission-section p {
             font-size: 16px;
-            line-height: 1.6;
+            line-height: 2.6;
         }
         .text-center {
             text-align: left;
@@ -64,9 +64,9 @@
             padding: 40px;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        
+
         }
-        
+
             #description {
         text-align: justify;
         width: 650px;
@@ -86,7 +86,7 @@
             padding: 10px; /* Add padding for better readability */
         }
     }
-        
+
     </style>
 </head>
 
@@ -98,12 +98,12 @@
                 <h1>{{ $aboutUs->title }}</h1> <!-- Dynamically display the title -->
 
                 <!-- Show part of the description initially -->
-                <p id="description" class="description">
+                <p id="description" class="description" style="line-height: 1.7; padding-bottom:10px">
                     {{ Str::limit($aboutUs->description, 1000) }}
                 </p>
-                
+
                 <!-- Full description hidden initially -->
-                <div id="more-content" class="more-content" style="text-align: justify;width:650px">
+                <div id="more-content" class="more-content" style="line-height: 1.7;">
                     <p id="full-description"  >{{ $aboutUs->description }}</p> <!-- Full description -->
                 </div>
 
@@ -125,12 +125,12 @@
 <div class="container">
     <div class="box">
         <h2>Our Vision</h2>
-        <p style="font-size: 16px; color: #666;">
+        <p style="font-size: 16px; color: #666; line-height: 1.7;">
             {{ $vissionMission->vission ?? 'Vision not available' }}
         </p> <!-- Dynamically display Vision content -->
 
         <h2>Our Mission</h2>
-        <p style="font-size: 16px; color: #666;">
+        <p style="font-size: 16px; color: #666; line-height: 1.7;">
             {{ $vissionMission->mission ?? 'Mission not available' }}
         </p> <!-- Dynamically display Mission content -->
     </div>
@@ -144,7 +144,7 @@
             const learnMoreBtn = document.getElementById('learn-more-btn');
             const moreContent = document.getElementById('more-content');
             const description = document.getElementById('description');
-    
+
             // Event listener for the Learn More button
             learnMoreBtn.addEventListener('click', function (e) {
                 e.preventDefault();

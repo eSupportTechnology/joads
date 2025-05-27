@@ -130,7 +130,8 @@
                                                     <option value="{{ $package->id }}"
                                                         {{ $job->package_id == $package->id ? 'selected' : '' }}>
                                                         {{ $package->package_size }} ads -
-                                                        ({{ $package->duration->duration }} days) - Rs.
+                                                        ({{ $package->duration->duration }} days)
+                                                        - Rs.
                                                         {{ $package->lkr_price }}/{{ $package->usd_price }} USD
                                                     </option>
                                                 @endforeach
@@ -160,6 +161,8 @@
                         <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Update Job Status</h5>
                     </div>
 
+
+
                     <div class="card-body">
                         <form action="{{ route('job_postings.updateStatus', $job->id) }}" method="POST"
                             class="needs-validation" novalidate>
@@ -185,9 +188,23 @@
                                     placeholder="Please provide a detailed reason for rejection"></textarea>
                             </div>
 
+                            <div class="mb-4" id="email-template-container" style="display: none;">
+                                <label for="email_template_id" class="form-label text-secondary">Select Email
+                                    Template:</label>
+                                <select name="email_template_id" class="form-select form-select-lg shadow-sm"
+                                    id="email_template_id">
+                                    <option value="">-- Select Template --</option>
+                                    @foreach ($emailTemplates as $template)
+                                        <option value="{{ $template->id }}">{{ $template->subject }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
                             <button type="submit" class="btn btn-primary btn-lg px-4 shadow-sm hover-lift">
                                 <i class="fas fa-save me-2"></i>Update Status
                             </button>
+
+
                         </form>
                     </div>
                 </div>
@@ -267,14 +284,21 @@
 
         // Status change handler
         document.getElementById('status').addEventListener('change', function() {
-            const rejectionReasonContainer = document.getElementById('rejection-reason-container');
+            let rejectionBox = document.getElementById('rejection-reason-container');
+            let templateBox = document.getElementById('email-template-container');
             if (this.value === 'reject') {
-                rejectionReasonContainer.style.display = 'block';
-                document.getElementById('rejection-reason').setAttribute('required', '');
+                rejectionBox.style.display = 'block';
+                templateBox.style.display = 'none';
+            } else if (this.value === 'approved') {
+                templateBox.style.display = 'block';
+                rejectionBox.style.display = 'none';
             } else {
-                rejectionReasonContainer.style.display = 'none';
-                document.getElementById('rejection-reason').removeAttribute('required');
+                rejectionBox.style.display = 'none';
+                templateBox.style.display = 'none';
             }
         });
+
+        // Trigger change on page load
+        document.getElementById('status').dispatchEvent(new Event('change'));
     </script>
 @endsection
