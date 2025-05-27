@@ -61,28 +61,28 @@
                                         </div>
 
                                         <div class="detail-item mb-3 border-bottom pb-2">
-    <h6 class="text-primary mb-1"><i class="fas fa-tag me-2"></i>Category</h6>
-    <select name="category_id" class="form-control" id="category_select">
-        @foreach ($categories as $category)
-            <option value="{{ $category->id }}"
-                {{ $job->category_id == $category->id ? 'selected' : '' }}>
-                {{ $category->name }}
-            </option>
-        @endforeach
-    </select>
-</div>
+                                            <h6 class="text-primary mb-1"><i class="fas fa-tag me-2"></i>Category</h6>
+                                            <select name="category_id" class="form-control" id="category_select">
+                                                @foreach ($categories as $category)
+                                                    <option value="{{ $category->id }}"
+                                                        {{ $job->category_id == $category->id ? 'selected' : '' }}>
+                                                        {{ $category->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
-<div class="detail-item mb-3 border-bottom pb-2">
-    <h6 class="text-primary mb-1"><i class="fas fa-tag me-2"></i>Sub Category</h6>
-    <select name="subcategory_id" class="form-control" id="subcategory_select">
-        @foreach ($sub_categories->where('category_id', $job->category_id) as $sub_category)
-            <option value="{{ $sub_category->id }}"
-                {{ $job->subcategory_id == $sub_category->id ? 'selected' : '' }}>
-                {{ $sub_category->name }}
-            </option>
-        @endforeach
-    </select>
-</div>
+                                        <div class="detail-item mb-3 border-bottom pb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-tag me-2"></i>Sub Category</h6>
+                                            <select name="subcategory_id" class="form-control" id="subcategory_select">
+                                                @foreach ($sub_categories->where('category_id', $job->category_id) as $sub_category)
+                                                    <option value="{{ $sub_category->id }}"
+                                                        {{ $job->subcategory_id == $sub_category->id ? 'selected' : '' }}>
+                                                        {{ $sub_category->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
 
                                         <div class="detail-item mb-3 border-bottom pb-2">
@@ -267,32 +267,31 @@
     </style>
 
     <script>
-
         const subcategories = @json($sub_categories);
 
-    document.getElementById('category_select').addEventListener('change', function () {
-        const selectedCategoryId = this.value;
-        const subcategorySelect = document.getElementById('subcategory_select');
+        document.getElementById('category_select').addEventListener('change', function() {
+            const selectedCategoryId = this.value;
+            const subcategorySelect = document.getElementById('subcategory_select');
 
-        // Clear current options
-        subcategorySelect.innerHTML = '';
+            // Clear current options
+            subcategorySelect.innerHTML = '';
 
-        // Add default option
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = 'Select subcategory';
-        subcategorySelect.appendChild(defaultOption);
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select subcategory';
+            subcategorySelect.appendChild(defaultOption);
 
-        // Filter and add subcategories
-        subcategories.forEach(sub => {
-            if (sub.category_id == selectedCategoryId) {
-                const option = document.createElement('option');
-                option.value = sub.id;
-                option.textContent = sub.name;
-                subcategorySelect.appendChild(option);
-            }
+            // Filter and add subcategories
+            subcategories.forEach(sub => {
+                if (sub.category_id == selectedCategoryId) {
+                    const option = document.createElement('option');
+                    option.value = sub.id;
+                    option.textContent = sub.name;
+                    subcategorySelect.appendChild(option);
+                }
+            });
         });
-    });
         // Form validation
         (function() {
             'use strict'

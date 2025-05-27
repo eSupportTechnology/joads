@@ -20,7 +20,7 @@
 <body>
     @include('home.header')
 
-    
+
 <div class="container">
         <h1 class="page-title">Press Releases</h1>
 
@@ -29,7 +29,7 @@
                 <div class="press-card">
                     <div class="press-image">
                         @if($pressRelease->image)
-                            <img src="{{ asset('storage/app/public/' . $pressRelease->image) }}" alt="{{ $pressRelease->title }}">
+                            <img src="{{ asset('storage/' . $pressRelease->image) }}" alt="{{ $pressRelease->title }}">
                         @else
                             <img src="{{ asset('images/default-placeholder.png') }}" alt="Default Image">
                         @endif
