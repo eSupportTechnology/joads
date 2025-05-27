@@ -43,7 +43,7 @@
                         </a>
                     </li>
                     <li style="margin-bottom: 10px;">
-                        <a href="feedback" style="color: #f4f4f4; text-decoration: none; transition: color 0.3s;">
+                        <a href="{{ route('login') }}" style="color: #f4f4f4; text-decoration: none; transition: color 0.3s;">
                             <i class="fa fa-chevron-right" style="margin-right: 10px; color: goldenrod;"></i>Add
                             Feedback
                         </a>

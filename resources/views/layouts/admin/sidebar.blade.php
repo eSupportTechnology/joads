@@ -158,7 +158,7 @@
                             <li><a href="{{ route('banner_packages.index') }}">Package Prices</a></li>
                         </ul>
                     </li>
-                    
+
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
                             class="sidebar-link sidebar-title link-nav" href="{{ route('durations.index') }}">
                             <svg class="stroke-icon">
@@ -167,10 +167,20 @@
                             <svg class="fill-icon">
                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-table') }}"> </use>
                             </svg><span>Package Durations</span></a></li>
-                            
-                            
-                    
-                    <li class="sidebar-list"> <i class="fa fa-thumb-tack"></i> <a class="sidebar-link sidebar-title" href="#"> <svg class="stroke-icon"> <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-calendar') }}"></use> </svg> <svg class="fill-icon"> <use href="{{ asset('assets/svg/icon-sprite.svg#fill-calendar') }}"></use> </svg> <span>Press Release</span> <!-- Updated Label --> </a> <ul class="sidebar-submenu"> <li><a href="{{ route('press-releases.index') }}">View Press Releases</a></li> <li><a href="{{ route('press-releases.create') }}">Add Press Release</a></li> </ul> </li>
+
+
+
+                    <li class="sidebar-list"> <i class="fa fa-thumb-tack"></i> <a class="sidebar-link sidebar-title"
+                            href="#"> <svg class="stroke-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-calendar') }}"></use>
+                            </svg> <svg class="fill-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#fill-calendar') }}"></use>
+                            </svg> <span>Press Release</span> <!-- Updated Label --> </a>
+                        <ul class="sidebar-submenu">
+                            <li><a href="{{ route('press-releases.index') }}">View Press Releases</a></li>
+                            <li><a href="{{ route('press-releases.create') }}">Add Press Release</a></li>
+                        </ul>
+                    </li>
 
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
                             class="sidebar-link sidebar-title link-nav"
@@ -192,6 +202,19 @@
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title"
                             href="#">
                             <svg class="stroke-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-calendar') }}"></use>
+                            </svg>
+                            <svg class="fill-icon">
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#fill-calendar') }}"></use>
+                            </svg><span>Email Templates</span></a>
+                        <ul class="sidebar-submenu">
+                            <li><a href="{{ route('admin.mail-templates.index') }}">All Templates </a></li>
+                            <li><a href="{{ route('admin.mail-templates.create') }}">Create Templates</a></li>
+                        </ul>
+                    </li>
+                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title"
+                            href="#">
+                            <svg class="stroke-icon">
                                 <use href="{{ asset('assets/svg/icon-sprite.svg#rate') }}"></use>
                             </svg>
                             <svg class="fill-icon">
@@ -201,9 +224,6 @@
                             <li><a href="{{ route('reports.job-ads') }}">Jobs </a></li>
                             <li><a href="{{ route('admin.employer.stats') }}">Employer</a></li>
                             <li><a href="{{ route('reports.customers') }}">Jobseeker </a></li>
-
-
-
                         </ul>
                     </li>
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title"
@@ -221,14 +241,13 @@
                             <li><a href="{{ route('admin.policy.index') }}">Policy Details </a></li>
                             <li><a href="{{ route('faqs.index') }}">FAQ</a></li>
                             <li><a href="{{ route('admin.vissionmission.index') }}">Vision & Mission</a></li>
-
-
+                            <li><a href="{{ route('superadmin.permissions.form') }}">Admin Permissions</a></li>
                         </ul>
                     </li>
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
-                          </li>
-                          <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
-                          </li>
+                    </li>
+                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
+                    </li>
 
 
                 </ul>

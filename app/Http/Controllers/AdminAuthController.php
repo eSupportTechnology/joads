@@ -7,6 +7,7 @@ use App\Models\Application;
 use App\Models\Banner;
 use App\Models\Employer;
 use App\Models\JobPosting;
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -305,36 +306,7 @@ class AdminAuthController extends Controller
         }
     }
 
-// public function companyStat()
-// {
-//     try {
-//         DB::enableQueryLog();
-
-//         $companyStats = Employer::with(['jobPostings' => function ($query) {
-//             $query->select('id', 'employer_id', 'title', 'view_count', 'updated_at')
-//                 ->addSelect([
-//                     'today_views' => JobPosting::selectRaw('view_count')
-//                         ->whereColumn('id', 'job_postings.id')
-//                         ->whereDate('updated_at', Carbon::today())
-//                         ->limit(1),
-//                 ]);
-//         }])
-//         ->whereHas('jobPostings', function ($query) {
-//             $query->whereDate('updated_at', Carbon::today());
-//         })
-//         ->get();
-
-//         \Log::info(DB::getQueryLog()); // Log generated queries
-//         return $companyStats;
-
-//     } catch (\Exception $e) {
-//         \Log::error('Error fetching company stats: ' . $e->getMessage());
-//         return [];
-//     }
-// }
-
-   
-// 
+ 
 
 public function companyStat()
 {
@@ -360,20 +332,6 @@ public function companyStat()
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
      public function dashboard()
     {
         $companyStats=$this->companyStat();
@@ -454,5 +412,31 @@ public function updateProfile(Request $request)
         return back()->withErrors(['save_error' => 'An error occurred while saving your profile.']);
     }
 }
+
+
+    public function showPermissionForm(Request $request)
+{
+    $admins = Admin::where('role', '!=', 'super_admin')->get();
+    $permissions = Permission::all();
+
+    $selectedAdmin = null;
+    if ($request->has('admin_id')) {
+        $selectedAdmin = Admin::with('permissions')->find($request->admin_id);
+    }
+
+    return view('Admin.permissions.index', compact('admins', 'permissions', 'selectedAdmin'));
+}
+
+
+
+public function assignPermissions(Request $request)
+{
+    $admin = Admin::findOrFail($request->admin_id);
+    $admin->permissions()->sync($request->permissions ?? []);
+
+    return redirect()->route('superadmin.show.permissions', ['admin_id' => $admin->id])
+                     ->with('success', 'Permissions updated.');
+}
+
 
 }

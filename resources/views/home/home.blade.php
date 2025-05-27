@@ -71,12 +71,12 @@
             flex: 1;
             min-width: 220px;
         }
-        
+
         .filters input,
         .filters select {
             font-size: 12px;
         }
-        
+
             .contact-table th, .contact-table td {
         padding: 10px;
         border: 1px solid #ddd;
@@ -84,7 +84,7 @@
         width: auto;
         text-align: left;
     }
-            
+
             .text-input::placeholder {
         font-size: 12px; /* Adjust the size as needed */
     }
@@ -210,8 +210,8 @@
             /* This prevents the items from shrinking */
         }
 
-        
-       
+
+
 
         @media (max-width: 768px) {
             .category-link {
@@ -382,16 +382,16 @@
                 <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
                    class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
                    style="
-                        text-decoration: none; 
+                        text-decoration: none;
                         background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
-                        color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};                            
-                        padding: 4px 15px; 
-                        border-radius: 5px; 
-                        min-width: 230px; 
+                        color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};
+                        padding: 4px 15px;
+                        border-radius: 5px;
+                        min-width: 230px;
                         width: auto;
-                        font-size: 14px; 
-                        transition: all 0.3s ease; 
-                        white-space: nowrap; 
+                        font-size: 14px;
+                        transition: all 0.3s ease;
+                        white-space: nowrap;
                         display: inline-block;
                         position: sticky; top: 0; z-index: 10;
                    ">
@@ -406,16 +406,16 @@
                 <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
                    class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
                    style="
-                        text-decoration: none; 
+                        text-decoration: none;
                         background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
                         color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};
-                        padding: 4px 15px; 
-                        border-radius: 5px; 
-                        min-width: 230px; 
+                        padding: 4px 15px;
+                        border-radius: 5px;
+                        min-width: 230px;
                         width: auto;
-                        font-size: 14px; 
-                        transition: all 0.3s ease; 
-                        white-space: nowrap; 
+                        font-size: 14px;
+                        transition: all 0.3s ease;
+                        white-space: nowrap;
                         display: inline-block;
                    ">
                     {{ $category->name }}
@@ -430,7 +430,7 @@
         <i class="fa fa-chevron-right"></i>
     </button>
 </div>
-    
+
     </section>
     <!-- <div class="ads-banner">
         <img src="{{ asset('assets/images/ads.jpg') }}" alt="">
@@ -593,7 +593,7 @@
         </div>
     @endif
 </section>
-        
+
 
 
 
