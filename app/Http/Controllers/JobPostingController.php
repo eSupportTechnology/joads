@@ -945,7 +945,36 @@ public function showjob($id)
         return view('Admin.jobcreate', compact('categories', 'subcategories', 'employers', 'packages', 'countries'));
     }
 
+ public function updatepost(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'subcategory_id' => 'required|exists:subcategories,id',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'salary_range' => 'nullable|numeric',
+            'requirements' => 'nullable|string',
+            'closing_date' => 'required|date',
+            'package_id' => 'required|exists:packages,id',
+        ]);
 
+        $job = JobPosting::findOrFail($id);
+
+        $job->title = $request->title;
+        $job->category_id = $request->category_id;
+        $job->subcategory_id = $request->subcategory_id;
+        $job->description = $request->description;
+        $job->location = $request->location;
+        $job->salary_range = $request->salary_range;
+        $job->requirements = $request->requirements;
+        $job->closing_date = $request->closing_date;
+        $job->package_id = $request->package_id;
+
+        $job->save();
+
+        return redirect()->route('job_postings.show', $job->id)->with('success', 'Job updated successfully.');
+    }
 
     public function update(Request $request, JobPosting $jobPosting)
     {
