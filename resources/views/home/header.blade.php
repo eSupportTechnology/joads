@@ -207,7 +207,7 @@ php </style>
         <button class="menu-toggle" aria-label="Toggle Navigation">
             ☰
         </button>
-        <nav class="nav-links unique-nav-links" style="margin-left:100px;margin-top:11px;height:250px ;z-index: 100; ">
+        <nav class="nav-links unique-nav-links" style="margin-left:100px;margin-top:11px;height:225px ;z-index: 100; ">
             <!-- "Post Your Vacancy" as a button -->
             <a href="{{ route('user.postvacancy') }}"
                 style="background: linear-gradient(to bottom, #28adce, #18799c); color: white;transition: color 0.3s ease,
