@@ -57,7 +57,7 @@
                             <div class="form-group mb-3">
                                 <label for="image">Current Image</label><br>
                                 @if($pressRelease->image)
-                                    <img src="{{ asset('storage/app/public/' . $pressRelease->image) }}" class="preview-img" alt="Press Release Image">
+                                    <img src="{{ asset('storage/' . $pressRelease->image) }}" class="preview-img" alt="Press Release Image">
                                 @else
                                     <p>No Image Available</p>
                                 @endif

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\JobApprovedMail;
 use App\Models\Application;
 use App\Models\Banner;
 use App\Models\Category;
@@ -17,6 +18,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class JobPostingController extends Controller
 {
@@ -55,14 +57,14 @@ class JobPostingController extends Controller
             ->get();
         return view('Admin.jobview', compact('jobPostings', 'pendingJobs', 'rejectedJobs', 'expireddJobs'));
     }
-    
-    
+
+
     public function topEmployers()
     {
         $contacts = ContactUs::all();
         // Fetch top 28 employers based on job postings count and filter those with a logo
         $topEmployers = Employer::withCount('jobPostings') // Assuming 'jobPostings' is the relationship
-           
+
             ->orderBy('job_postings_count', 'desc') // Sort by the number of job postings
             ->take(8) // Limit to top 28
             ->get();
@@ -316,7 +318,6 @@ class JobPostingController extends Controller
         $contacts = ContactUs::all();
         $countries = Country::all();
 
-<<<<<<< HEAD
         $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
             ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
             ->where('banners.status', 'published')
@@ -331,21 +332,6 @@ class JobPostingController extends Controller
 
 
 
-=======
-    $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
-        ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
-        ->where('banners.status', 'published')
-        ->where('banners.placement', 'banner')
-        ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$today])
-        ->select('banners.*', 'duration.duration')
-        ->get();
-    return view('home.home', compact('categories', 'totalCount', 'jobs', 'contacts', 'countries', 'banners'))
-        ->with('selected_category_id', session('selected_category_id'));
-}
-                        
-    
-    
->>>>>>> 81f3a4d569c7e70ce470672f9968aaa29cecd826
     public function toggleActiveStatus($id)
     {
         // Find the job posting by ID and ensure it belongs to the authenticated employer
@@ -363,32 +349,22 @@ class JobPostingController extends Controller
     }
 
     public function show($id)
-<<<<<<< HEAD
     {
         $job = JobPosting::with(['category', 'employer', 'package.duration'])->findOrFail($id);
         $categories = Category::all();
         $sub_categories = Subcategory::all();
         $emailTemplates = EmailTemplate::all();
         $packages = Package::with('duration')->get();
-=======
-
-{
-    $job = JobPosting::with(['category', 'employer', 'package.duration'])->findOrFail($id);
-    $categories = Category::all();
-    $sub_categories = Subcategory::all();
-    $emailTemplates = EmailTemplate::all();
-    $packages = Package::with('duration')->get();
->>>>>>> 81f3a4d569c7e70ce470672f9968aaa29cecd826
 
         return view('Admin.showonejob', compact('job', 'categories', 'packages', 'sub_categories', 'emailTemplates'));
     }
 
-<<<<<<< HEAD
     public function updatepost(Request $request, $id)
     {
         $request->validate([
             'title' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
+            'subcategory_id' => 'required|exists:subcategories,id',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
             'salary_range' => 'nullable|numeric',
@@ -401,6 +377,7 @@ class JobPostingController extends Controller
 
         $job->title = $request->title;
         $job->category_id = $request->category_id;
+        $job->subcategory_id = $request->subcategory_id;
         $job->description = $request->description;
         $job->location = $request->location;
         $job->salary_range = $request->salary_range;
@@ -415,46 +392,13 @@ class JobPostingController extends Controller
     public function showjob($id)
     {
         $contacts = ContactUs::all();
-=======
 
+        // JobPosting record එක retrieve කර view_count එක increment කිරීම
+        $job = JobPosting::with(['category', 'employer'])->findOrFail($id);
+        $job->increment('view_count');
 
-    
-public function showjob($id)
-{
-    $contacts = ContactUs::all();
+        $now = Carbon::now();
 
-    // Retrieve job posting with relations
-    $job = JobPosting::with(['category', 'employer'])->findOrFail($id);
-
-    // Increment view_count and update_count only once, in a single query
-        $jobPosting = JobPosting::findOrFail($job->id);
-
-        // Increment view_count and update_count
-        $jobPosting->view_count += 1;
-        $jobPosting->update_count += 1;
-                $jobPosting->save();
-
-        $jobPosting->updated_at = now();
-
-        // Save the changes
-
-    $now = Carbon::now();
-
-    $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
-        ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
-        ->where('banners.status', 'published')
-        ->where('banners.placement', 'category_page')
-        ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now])
-        ->select('banners.*', 'duration.duration')
-        ->get();
-
-    return view('home.jobs.show', compact('job', 'contacts', 'banners'));
-}
->>>>>>> 81f3a4d569c7e70ce470672f9968aaa29cecd826
-
-
-
-<<<<<<< HEAD
         $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
             ->join('duration', 'banner_packages.duration_id', '=', 'duration.id') // Ensure duration is included
             ->where('banners.status', 'published')
@@ -462,9 +406,9 @@ public function showjob($id)
             ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now]) // Ensures active banners
             ->select('banners.*', 'duration.duration') // Select duration from duration table
             ->get();
-=======
->>>>>>> 81f3a4d569c7e70ce470672f9968aaa29cecd826
 
+        return view('home.jobs.show', compact('job', 'contacts', 'banners'));
+    }
 
     public function updateStatus(Request $request, $id)
     {
@@ -498,18 +442,10 @@ public function showjob($id)
                     Mail::to($job->employer->email)->send(new JobApprovedMail($job, $template));
                 }
             }
-
         }
 
-<<<<<<< HEAD
         return redirect()->route('job_postings.index')->with('success', 'Job status updated successfully.');
     }
-=======
-    return redirect()->route('job_postings.index')->with('success', 'Job status updated successfully.');
-}
-
-  
->>>>>>> 81f3a4d569c7e70ce470672f9968aaa29cecd826
     public function getJobsByCategory($categoryId)
     {
         $today = Carbon::today();
@@ -590,7 +526,7 @@ public function showjob($id)
                         // Check if user and job exist before accessing properties
                         $userName = optional($app->user)->name ?? 'Unknown User';
                         $jobTitle = optional($app->job)->title ?? 'Unknown Job';
-        
+
                         return "$userName applied for $jobTitle";
                     });
 
@@ -621,7 +557,7 @@ public function showjob($id)
                         // Check if user and job exist before accessing properties
                         $userName = optional($app->user)->name ?? 'Unknown User';
                         $jobTitle = optional($app->job)->title ?? 'Unknown Job';
-        
+
                         return "$userName - $jobTitle";
                     });
 
@@ -846,115 +782,106 @@ public function showjob($id)
         }
     }
     public function storeForAdmin(Request $request)
-    {
-        // Validate package selection, job postings, and payment method
-        $validatedData = $request->validate([
-            'package_id' => 'required|exists:packages,id',
-            'payment_method' => 'required|in:contact_contributor,online',
-            'job_postings.*.title' => 'required|string|max:255',
-            'job_postings.*.description' => 'nullable|string',
-            'job_postings.*.category_id' => 'required|exists:categories,id',
-            'job_postings.*.subcategory_id' => 'required|exists:subcategories,id',
-            'job_postings.*.location' => 'required|string|max:255',
-            'job_postings.*.country_id' => 'required|exists:countries,id',
-            'job_postings.*.salary_range' => 'nullable|numeric',
-            'job_postings.*.image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
-            'job_postings.*.requirements' => 'nullable|string',
-            'job_postings.*.closing_date' => 'required|date',
-            'job_postings.*.status' => 'required|in:pending,reject,approved',
-            'job_postings.*.employer_id' => 'required|exists:employers,id',
-        ]);
+{
+    $validatedData = $request->validate([
+        'package_id' => 'required|exists:packages,id',
+        'payment_method' => 'required|in:contact_contributor,online',
+        'job_postings.*.title' => 'required|string|max:255',
+        'job_postings.*.description' => 'nullable|string',
+        'job_postings.*.category_ids' => 'required|array|min:1',
+        'job_postings.*.category_ids.*' => 'exists:categories,id',
+        'job_postings.*.subcategory_ids' => 'required|array|min:1',
+        'job_postings.*.subcategory_ids.*' => 'exists:subcategories,id',
+        'job_postings.*.location' => 'required|string|max:255',
+        'job_postings.*.country_id' => 'required|exists:countries,id',
+        'job_postings.*.salary_range' => 'nullable|numeric',
+        'job_postings.*.image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
+        'job_postings.*.requirements' => 'nullable|string',
+        'job_postings.*.closing_date' => 'required|date',
+        'job_postings.*.status' => 'required|in:pending,reject,approved',
+        'job_postings.*.employer_id' => 'required|exists:employers,id',
+    ]);
 
-        $adminId = auth('admin')->id();
-        $packageId = $request->input('package_id');
-        $jobPostings = $request->input('job_postings', []);
-        $paymentMethod = $request->input('payment_method');
+    $adminId = auth('admin')->id();
+    $packageId = $request->input('package_id');
+    $jobPostings = $request->input('job_postings', []);
+    $paymentMethod = $request->input('payment_method');
 
-        if (empty($jobPostings)) {
-            return redirect()->back()->withErrors(['job_postings' => 'No job postings provided.']);
-        }
+    DB::beginTransaction();
+    try {
+        $storedPostings = [];
+        foreach ($jobPostings as $index => $jobData) {
+    $categoryIds = $jobData['category_ids'] ?? [];
+    $subcategoryIds = $jobData['subcategory_ids'] ?? [];
 
-        // // Check package limitations
-        // $package = Package::find($packageId);
-        // $existingJobCount = JobPosting::where('creator_id', $adminId)
-        //     ->where('package_id', $packageId)
-        //     ->count();
-
-        // if ($existingJobCount + count($jobPostings) > $package->package_size) {
-        //     return redirect()->back()
-        //         ->withErrors(['package_id' => 'Exceeded maximum allowed job postings for this package.'])
-        //         ->withInput();
-        // }
-
-        // Use transaction to ensure data consistency
-        DB::beginTransaction();
-        try {
-            $storedPostings = [];
-            foreach ($jobPostings as $index => $jobData) {
-                // Get the latest job_id in correct numerical order with lock to prevent race conditions
-                $latestJob = JobPosting::where('job_id', 'like', 'J%')
-                    ->lockForUpdate()
-                    ->orderByRaw('CAST(SUBSTRING(job_id, 2, 6) AS UNSIGNED) DESC')
-                    ->first();
-
-                if ($latestJob) {
-                    // Extract the numeric part by removing 'J' and convert to integer
-                    $latestId = (int) substr($latestJob->job_id, 1);
-                    // Increment and pad the number with zeros to ensure 6 digits (e.g., J000002)
-                    $jobId = 'J' . str_pad($latestId + 1, 6, '0', STR_PAD_LEFT);
-                } else {
-                    // If no records exist, start from J000001
-                    $jobId = 'J000001';
-                }
-
-                // Prepare job posting data
-                $jobPostingData = [
-                    'job_id' => $jobId,
-                    'creator_id' => $adminId,
-                    'admin_id' => $adminId,
-                    'package_id' => $packageId,
-                    'employer_id' => $jobData['employer_id'],
-                    'title' => $jobData['title'],
-                    'description' => $jobData['description'] ?? 'No Description',
-                    'category_id' => $jobData['category_id'],
-                    'subcategory_id' => $jobData['subcategory_id'],
-                    'location' => $jobData['location'],
-                    'country_id' => $jobData['country_id'],
-                    'salary_range' => $jobData['salary_range'] ?? null,
-                    'requirements' => $jobData['requirements'],
-                    'closing_date' => $jobData['closing_date'],
-                    'status' => $jobData['status'],
-                    'payment_method' => $paymentMethod,
-                    'is_active' => true,
-                ];
-
-                // Handle image upload
-                if ($request->hasFile("job_postings.$index.image")) {
-                    $jobPostingData['image'] = $request->file("job_postings.$index.image")
-                        ->store('job_images', 'public');
-                }
-
-                // Create job posting
-                $storedPostings[] = JobPosting::create($jobPostingData);
-            }
-
-            DB::commit();
-
-            if ($paymentMethod === 'online') {
-                // Store necessary data in session for payment processing
-                session(['pending_job_postings' => collect($storedPostings)->pluck('id')]);
-                return redirect()->route('admin.payment.checkout');
-            }
-
-            return redirect()->route('job_postings.index')
-                ->with('success', 'Job postings created successfully!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()
-                ->withErrors(['error' => 'An error occurred while creating job postings: ' . $e->getMessage()])
-                ->withInput();
-        }
+    if (empty($categoryIds) || empty($subcategoryIds)) {
+        continue;
     }
+
+    // Fetch subcategories with their category_id
+    $subcategories = \App\Models\Subcategory::whereIn('id', $subcategoryIds)->get();
+
+    foreach ($subcategories as $subcategory) {
+        if (!in_array($subcategory->category_id, $categoryIds)) {
+            continue; // Skip if subcategory doesn't belong to selected categories
+        }
+
+        // Generate new job ID
+        $latestJob = JobPosting::where('job_id', 'like', 'J%')
+            ->lockForUpdate()
+            ->orderByRaw('CAST(SUBSTRING(job_id, 2, 6) AS UNSIGNED) DESC')
+            ->first();
+
+        $latestId = $latestJob ? (int) substr($latestJob->job_id, 1) : 0;
+        $jobId = 'J' . str_pad($latestId + 1, 6, '0', STR_PAD_LEFT);
+
+        $jobPostingData = [
+            'job_id' => $jobId,
+            'creator_id' => $adminId,
+            'admin_id' => $adminId,
+            'package_id' => $packageId,
+            'employer_id' => $jobData['employer_id'],
+            'title' => $jobData['title'],
+            'description' => $jobData['description'] ?? 'No Description',
+            'category_id' => $subcategory->category_id,
+            'subcategory_id' => $subcategory->id,
+            'location' => $jobData['location'],
+            'country_id' => $jobData['country_id'],
+            'salary_range' => $jobData['salary_range'] ?? null,
+            'requirements' => $jobData['requirements'],
+            'closing_date' => $jobData['closing_date'],
+            'status' => $jobData['status'],
+            'payment_method' => $paymentMethod,
+            'is_active' => true,
+        ];
+
+        if ($request->hasFile("job_postings.$index.image")) {
+            $jobPostingData['image'] = $request->file("job_postings.$index.image")
+                ->store('job_images', 'public');
+        }
+
+        $storedPostings[] = JobPosting::create($jobPostingData);
+    }
+}
+
+
+        DB::commit();
+
+        if ($paymentMethod === 'online') {
+            session(['pending_job_postings' => collect($storedPostings)->pluck('id')]);
+            return redirect()->route('admin.payment.checkout');
+        }
+
+        return redirect()->route('job_postings.index')
+            ->with('success', 'Job postings created successfully!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()
+            ->withErrors(['error' => 'An error occurred while creating job postings: ' . $e->getMessage()])
+            ->withInput();
+    }
+}
+
     public function getSubcategories($categoryId)
     {
         $subcategories = Subcategory::where('category_id', $categoryId)->get();
@@ -968,8 +895,8 @@ public function showjob($id)
         $subcategories = Subcategory::where('category_id', $jobPosting->category_id)->get(); // Assuming you have a Subcategory model
         return view('employer.jobupdate', compact('countries', 'jobPosting', 'categories', 'subcategories'));
     }
-    
-    
+
+
     public function createForAdmin()
     {
         $categories = Category::all(); // Fetch all categories

@@ -111,7 +111,7 @@
                                             <td>{{ Str::limit($pressRelease->description, 100) }}</td>
                                             <td>
                                                 @if($pressRelease->image)
-                                                    <img src="{{ asset('storage/app/public/' . $pressRelease->image) }}" alt="Image"
+                                                    <img src="{{ asset('storage/' . $pressRelease->image) }}" alt="Image"
                                                         height="50" style="border-radius: 5px;">
                                                 @else
                                                     No Image
