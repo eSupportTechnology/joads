@@ -19,6 +19,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+
 
 class JobPostingController extends Controller
 {
@@ -839,6 +841,7 @@ public function showjob($id)
         'job_postings.*.employer_id' => 'required|exists:employers,id',
     ]);
 
+
     $adminId = auth('admin')->id();
     $packageId = $request->input('package_id');
     $jobPostings = $request->input('job_postings', []);
@@ -857,6 +860,7 @@ public function showjob($id)
 
     // Fetch subcategories with their category_id
     $subcategories = \App\Models\Subcategory::whereIn('id', $subcategoryIds)->get();
+
 
     foreach ($subcategories as $subcategory) {
         if (!in_array($subcategory->category_id, $categoryIds)) {
@@ -918,6 +922,7 @@ public function showjob($id)
             ->withInput();
     }
 }
+
 
     public function getSubcategories($categoryId)
     {
