@@ -70,6 +70,23 @@
                             </div>
 
                             <div class="form-group mb-3">
+                                <label for="video">Current Video</label><br>
+                                @if($pressRelease->video)
+                                    <video controls class="preview-img">
+                                        <source src="{{ asset('storage/' . $pressRelease->video) }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                @else
+                                    <p>No Video Available</p>
+                                @endif
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="video">Upload New Video (Optional)</label>
+                                <input type="file" name="video" class="form-control" accept="video/*">
+                            </div>
+
+                            <div class="form-group mb-3">
                                 <label for="link">Full Article Link (Optional)</label>
                                 <input type="url" name="link" class="form-control" value="{{ old('link', $pressRelease->link) }}">
                             </div>

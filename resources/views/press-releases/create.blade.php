@@ -50,6 +50,10 @@
                                         <input type="file" name="press_releases[0][image]" class="form-control" required>
                                     </div>
                                     <div class="form-group mb-3">
+                                        <label for="video">Video (Optional)</label>
+                                        <input type="file" name="press_releases[0][video]" class="form-control">
+                                    </div>
+                                    <div class="form-group mb-3">
                                         <label for="link">Full Article Link (Optional)</label>
                                         <input type="url" name="press_releases[0][link]" class="form-control">
                                     </div>
@@ -85,6 +89,10 @@
                         <div class="form-group mb-3">
                             <label for="image">Image</label>
                             <input type="file" name="press_releases[${pressReleaseIndex}][image]" class="form-control" required>
+                        </div>
+                        <div class="form-group mb-3"></div>
+                            <label for="video">Video (Optional)</label>
+                            <input type="file" name="press_releases[${pressReleaseIndex}][video]" class="form-control">
                         </div>
                         <div class="form-group mb-3">
                             <label for="link">Full Article Link (Optional)</label>
