@@ -283,8 +283,10 @@
 
 
     <script>
-        const selectedCategories = new Map(); // key = id, value = name
-        const selectedSubcategories = new Map(); // key = id, value = {name, category_id}
+
+        const selectedCategories = new Map(); 
+        const selectedSubcategories = new Map();
+
 
         function handleCategorySelect(select) {
             const value = select.value;
