@@ -179,6 +179,8 @@
                         <ul class="sidebar-submenu">
                             <li><a href="{{ route('press-releases.index') }}">View Press Releases</a></li>
                             <li><a href="{{ route('press-releases.create') }}">Add Press Release</a></li>
+                            <li><a href="{{ route('admin.service-gallery.index') }}">View Gallery</a></li>
+                            <li><a href="{{ route('admin.service-gallery.create') }}">Add Gallery</a></li>
                         </ul>
                     </li>
 

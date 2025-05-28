@@ -26,15 +26,22 @@ class PressReleaseController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'video' => 'nullable|file|mimes:mp4,avi,mov|max:20480',
             'link' => 'nullable|url',
         ]);
 
         $imagePath = $request->file('image')->store('press-releases', 'public');
+        if ($request->hasFile('video')) {
+            $videoPath = $request->file('video')->store('press-releases/videos', 'public');
+            // You can handle the video path as needed, e.g., save it to the database
+        }
+
 
         PressRelease::create([
             'title' => $request->title,
             'description' => $request->description,
             'image' => $imagePath,
+            'video' => $request->hasFile('video') ? $videoPath : null,
             'link' => $request->link,
         ]);
 
@@ -57,6 +64,7 @@ class PressReleaseController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'video' => 'nullable|file|mimes:mp4,avi,mov|max:20480',
             'link' => 'nullable|url',
         ]);
 
@@ -64,6 +72,11 @@ class PressReleaseController extends Controller
             Storage::delete('public/' . $pressRelease->image);
             $imagePath = $request->file('image')->store('press-releases', 'public');
             $pressRelease->image = $imagePath;
+        }
+        if ($request->hasFile('video')) {
+            Storage::delete('public/' . $pressRelease->video);
+            $videoPath = $request->file('video')->store('press-releases/videos', 'public');
+            $pressRelease->video = $videoPath;
         }
 
         $pressRelease->update([
@@ -78,6 +91,9 @@ class PressReleaseController extends Controller
     public function destroy(PressRelease $pressRelease)
     {
         Storage::delete('public/' . $pressRelease->image);
+        if ($pressRelease->video) {
+            Storage::delete('public/' . $pressRelease->video);
+        }
         $pressRelease->delete();
 
         return redirect()->route('press-releases.index')->with('success', 'Press release deleted successfully!');
@@ -90,16 +106,24 @@ class PressReleaseController extends Controller
         'press_releases.*.title' => 'required|string|max:255',
         'press_releases.*.description' => 'required|string',
         'press_releases.*.image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'press_releases.*.video' => 'nullable|file|mimes:mp4,avi,mov|max:20480',
         'press_releases.*.link' => 'nullable|url',
     ]);
 
     foreach ($request->press_releases as $pressReleaseData) {
         $imagePath = $pressReleaseData['image']->store('press-releases', 'public');
+        if ($pressReleaseData['video']) {
+            $videoPath = $pressReleaseData['video']->store('press-releases/videos', 'public');
+            // You can handle the video path as needed, e.g., save it to the database
+        } else {
+            $videoPath = null; // Handle case where video is not provided
+        }
 
         PressRelease::create([
             'title' => $pressReleaseData['title'],
             'description' => $pressReleaseData['description'],
             'image' => $imagePath,
+            'video' => $videoPath,
             'link' => $pressReleaseData['link'],
         ]);
     }

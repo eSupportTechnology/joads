@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use App\Models\ContactList;
 use App\Models\Service;
+use App\Models\ServiceGallary;
 use Illuminate\Http\Request;
 
 class ContactListController extends Controller
@@ -26,7 +27,8 @@ class ContactListController extends Controller
         $services = Service::all();
         $contacts = Contact::all();
         $contactslist=ContactList::all();
-        return view('Admin.about.contactus', compact('contacts','contactslist','services'));
+        $gallaries = ServiceGallary::all();
+        return view('Admin.about.contactus', compact('contacts','contactslist','services','gallaries'));
     }
 
     public function contactus()

@@ -38,6 +38,40 @@
             </div>
         @endforeach
 
+        @php
+            $images = $gallaries->whereNotNull('image')->values();
+            $videos = $gallaries->whereNotNull('video')->values();
+            $max = max($images->count(), $videos->count());
+        @endphp
+
+        @for ($i = 0; $i < $max; $i++)
+            <div class="content-box" style="display: flex; gap: 20px; margin-bottom: 30px;">
+                {{-- Left: Image --}}
+                @if (isset($images[$i]))
+                    <div class="box" style="flex: 1;">
+                        <img src="{{ asset('storage/' . $images[$i]->image) }}" alt="Image"
+                            style="width: 100%; border-radius: 5px;">
+                    </div>
+                @else
+                    <div class="box" style="flex: 1;"></div>
+                @endif
+
+                {{-- Right: Video --}}
+                @if (isset($videos[$i]))
+                    <div class="box" style="flex: 1;">
+                        <video controls style="width: 100%; height: 100%; border-radius: 5px; object-fit: cover;">
+                            <source src="{{ asset('storage/' . $videos[$i]->video) }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                @else
+                    <div class="box" style="flex: 1;"></div>
+                @endif
+            </div>
+        @endfor
+
+
+
 
         <!-- Contact Section -->
         <div class="contact-section">
@@ -56,7 +90,8 @@
                             <td class="email" colspan="2">jobs@jobads.lk</td>
                         </tr>
                         <tr>
-                            <th rowspan="{{ count($contacts) + 1 }}" style="background-color: #fad157;">Call or WhatsApp
+                            <th rowspan="{{ count($contacts) + 1 }}" style="background-color: #fad157;">Call or
+                                WhatsApp
                             </th>
                         </tr>
                         @foreach ($contacts as $contact)

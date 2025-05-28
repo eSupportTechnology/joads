@@ -1041,6 +1041,20 @@ Route::middleware(['auth:admin'])->group(function () {
         ->name('admin.services.update');
     Route::delete('/admin/services/{service}', [ServiceController::class, 'destroy'])
         ->name('admin.services.destroy');
+
+    //service gallery management
+    Route::get('/admin/service-gallery', [ServiceController::class, 'indexgallary'])
+        ->name('admin.service-gallery.index')->middleware('check.permission:admin.service-gallery.index');
+    Route::get('/admin/service-gallery/create', [ServiceController::class, 'creategallary'])
+        ->name('admin.service-gallery.create')->middleware('check.permission:admin.service-gallery.create');
+    Route::post('/admin/service-gallery', [ServiceController::class, 'storegallary'])
+        ->name('admin.service-gallery.store');
+    Route::get('/admin/service-gallery/{id}/edit', [ServiceController::class, 'editgallary'])
+        ->name('admin.service-gallery.edit')->middleware('check.permission:admin.service-gallery.edit');
+    Route::put('/admin/service-gallery/{id}', [ServiceController::class, 'updategallary'])
+        ->name('admin.service-gallery.update');
+    Route::delete('/admin/service-gallery/{id}', [ServiceController::class, 'destroygallary'])
+        ->name('admin.service-gallery.destroy');
 });
 
 
