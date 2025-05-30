@@ -135,7 +135,6 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
                 margin-left: 280px;
                 margin-top: -35px;
                 border-radius: 5px;
-                z-index: 1;
 
                 right: 0;
                 /* Align dropdown to the right */
@@ -235,7 +234,7 @@ php </style>
                 style="text-decoration: none; color: black; font-size: 16px; transition: color 0.3s ease, transform 0.3s ease;"
                 onmouseover="this.style.color='black'; this.style.transform='translateY(-2px)';"
                 onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
-                Our Services
+                Direct recruitment
             </a>
             <a href="/topemployees"
                 style="text-decoration: none;color: black;font-size: 16px;  transition: color 0.3s ease, transform 0.3s ease;"

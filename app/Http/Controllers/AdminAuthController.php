@@ -73,7 +73,7 @@ class AdminAuthController extends Controller
     // Show the registration form
     public function showRegisterForm()
     {
-        return view('admin.register'); // Ensure you have a view at resources/views/admin/register.blade.php
+        return view('Admin.register'); // Ensure you have a view at resources/views/admin/register.blade.php
     }
 
     // Handle admin registration
