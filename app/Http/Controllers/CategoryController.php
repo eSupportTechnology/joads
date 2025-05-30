@@ -9,11 +9,25 @@ use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
     // Display a listing of categories
-    public function index()
-    {
-        $categories = Category::with('subcategories')->get();
-        return view('Admin.categoryview', compact('categories'));
-    }
+   public function index()
+{
+    $categories = Category::with('subcategories')
+        ->withCount([
+            'jobPostings as approved_job_postings_count' => function ($query) {
+                $query->where('status', 'approved');
+            }
+        ])
+        ->withSum([
+            'jobPostings as approved_view_count' => function ($query) {
+                $query->where('status', 'approved');
+            }
+        ], 'view_count')
+        ->get();
+
+    return view('Admin.categoryview', compact('categories'));
+}
+
+
 
     // Show the form for creating a new category
     public function create()

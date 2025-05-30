@@ -47,6 +47,8 @@
                                         <th>ID</th>
                                         <th>Name</th>
                                         <th>Parent</th>
+                                        <th>NO. of Posts</th>
+                                        <th>NO. of Views</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -57,6 +59,8 @@
                                             <td>{{ $category->id }}</td>
                                             <td>{{ $category->name }}</td>
                                             <td>{{ $category->parent ? $category->parent->name : 'Main Category' }}</td>
+                                            <td>{{ $category->approved_job_postings_count }}</td>
+                                            <td>{{ $category->approved_view_count ?? 0 }}</td>
                                             <td>{{ ucfirst($category->status) }}</td>
                                             <td>
                                                 <a href="{{ route('admin.categories.edit', $category->id) }}"

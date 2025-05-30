@@ -107,7 +107,7 @@
                                         <div class="detail-item mb-3 border-bottom pb-2">
                                             <h6 class="text-primary mb-1"><i class="fas fa-dollar-sign me-2"></i>Salary
                                                 Range</h6>
-                                            <input type="number" name="salary_range" class="form-control"
+                                            <input type="text" name="salary_range" class="form-control"
                                                 value="{{ old('salary_range', $job->salary_range) }}">
                                         </div>
 
