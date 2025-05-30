@@ -89,207 +89,207 @@ class JobPostingController extends Controller
         return view('User.topemployerjob', compact('employer', 'jobs', 'contacts'));
     }
 
-public function generateJobAdsReport(Request $request)
-{
-    // 1) Summary data per date: total count + earnings per day (only approved jobs)
-    $dailyCount = DB::table('job_postings')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->select(
-            DB::raw('DATE(job_postings.created_at) as date'),
-            DB::raw('COUNT(*) as count'),
-            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-        )
-        ->groupBy('date')
-        ->orderBy('date', 'desc')
-        ->get();
-
-    // 2) Get job details per date (title, company, approved_by)
-    $jobDetailsByDate = DB::table('job_postings')
-        ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-        ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
-        ->where('job_postings.status', 'approved')
-        ->select(
-            DB::raw('DATE(job_postings.created_at) as date'),
-            'job_postings.title',
-            'employers.company_name',
-            DB::raw('COALESCE(admins.name, "N/A") as approved_by')
-        )
-        ->orderBy('job_postings.created_at', 'desc')
-        ->get()
-        ->groupBy('date');
-
-    // 3) Attach job list to each daily summary item
-    $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
-        $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
-        return $item;
-    });
-
-    // Totals for today
-    $today = Carbon::today();
-    $dailyTotalData = DB::table('job_postings')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->whereDate('job_postings.created_at', $today)
-        ->select(
-            DB::raw('COUNT(*) as count'),
-            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-        )
-        ->first();
-
-    // Totals for this week
-    $startOfWeek = Carbon::now()->startOfWeek();
-    $weeklyTotalData = DB::table('job_postings')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->whereBetween('job_postings.created_at', [$startOfWeek, Carbon::now()])
-        ->select(
-            DB::raw('COUNT(*) as count'),
-            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-        )
-        ->first();
-
-    // Prepare variables for filtered date range if requested
-    $totalJobs = 0;
-    $totalEarnings = 0;
-    $jobsInRange = collect();
-
-    if ($request->filled('start_date') && $request->filled('end_date')) {
-        $startDate = Carbon::parse($request->start_date)->startOfDay();
-        $endDate = Carbon::parse($request->end_date)->endOfDay();
-
-        // Total jobs and earnings in range
-        $totals = DB::table('job_postings')
+    public function generateJobAdsReport(Request $request)
+    {
+        // 1) Summary data per date: total count + earnings per day (only approved jobs)
+        $dailyCount = DB::table('job_postings')
             ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
             ->where('job_postings.status', 'approved')
-            ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw('DATE(job_postings.created_at) as date'),
+                DB::raw('COUNT(*) as count'),
+                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+            )
+            ->groupBy('date')
+            ->orderBy('date', 'desc')
+            ->get();
+
+        // 2) Get job details per date (title, company, approved_by)
+        $jobDetailsByDate = DB::table('job_postings')
+            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+            ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+            ->where('job_postings.status', 'approved')
+            ->select(
+                DB::raw('DATE(job_postings.created_at) as date'),
+                'job_postings.title',
+                'employers.company_name',
+                DB::raw('COALESCE(admins.name, "N/A") as approved_by')
+            )
+            ->orderBy('job_postings.created_at', 'desc')
+            ->get()
+            ->groupBy('date');
+
+        // 3) Attach job list to each daily summary item
+        $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
+            $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
+            return $item;
+        });
+
+        // Totals for today
+        $today = Carbon::today();
+        $dailyTotalData = DB::table('job_postings')
+            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+            ->where('job_postings.status', 'approved')
+            ->whereDate('job_postings.created_at', $today)
             ->select(
                 DB::raw('COUNT(*) as count'),
                 DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
             )
             ->first();
 
-        $totalJobs = $totals->count ?? 0;
-        $totalEarnings = $totals->earnings ?? 0;
-
-        // Get jobs details in range
-        $jobsInRange = DB::table('job_postings')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-            ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+        // Totals for this week
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $weeklyTotalData = DB::table('job_postings')
             ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
             ->where('job_postings.status', 'approved')
-            ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+            ->whereBetween('job_postings.created_at', [$startOfWeek, Carbon::now()])
             ->select(
-                'job_postings.created_at',
-                'job_postings.title',
-                'employers.company_name',
-                DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price'),
-                'job_postings.payment_method',
-                DB::raw('COALESCE(admins.name, "N/A") as approved_by')
+                DB::raw('COUNT(*) as count'),
+                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
             )
-            ->orderBy('job_postings.created_at', 'desc')
-            ->get();
-    }
+            ->first();
 
-    return view('Admin.report.jobads', [
-        'dailyCount' => $dailyCount,
-        'dailyTotal' => $dailyTotalData->count ?? 0,
-        'weeklyTotal' => $weeklyTotalData->count ?? 0,
-        'totalJobs' => $totalJobs,
-        'totalEarnings' => $totalEarnings,
-        'jobsInRange' => $jobsInRange,
-    ]);
-}
+        // Prepare variables for filtered date range if requested
+        $totalJobs = 0;
+        $totalEarnings = 0;
+        $jobsInRange = collect();
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+            // Total jobs and earnings in range
+            $totals = DB::table('job_postings')
+                ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+                ->where('job_postings.status', 'approved')
+                ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+                ->select(
+                    DB::raw('COUNT(*) as count'),
+                    DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+                )
+                ->first();
+
+            $totalJobs = $totals->count ?? 0;
+            $totalEarnings = $totals->earnings ?? 0;
+
+            // Get jobs details in range
+            $jobsInRange = DB::table('job_postings')
+                ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+                ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+                ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+                ->where('job_postings.status', 'approved')
+                ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+                ->select(
+                    'job_postings.created_at',
+                    'job_postings.title',
+                    'employers.company_name',
+                    DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price'),
+                    'job_postings.payment_method',
+                    DB::raw('COALESCE(admins.name, "N/A") as approved_by')
+                )
+                ->orderBy('job_postings.created_at', 'desc')
+                ->get();
+        }
+
+        return view('Admin.report.jobads', [
+            'dailyCount' => $dailyCount,
+            'dailyTotal' => $dailyTotalData->count ?? 0,
+            'weeklyTotal' => $weeklyTotalData->count ?? 0,
+            'totalJobs' => $totalJobs,
+            'totalEarnings' => $totalEarnings,
+            'jobsInRange' => $jobsInRange,
+        ]);
+    }
 
 
     public function home(Request $request)
-{
-    $today = Carbon::today();
+    {
+        $today = Carbon::today();
 
-    // Handle category selection and session management
-    $categoryId = $request->input('category_id');
-    if ($categoryId && $categoryId !== 'all') {
-        session(['selected_category_id' => $categoryId]);
-    } elseif ($categoryId === 'all') {
-        session()->forget('selected_category_id');
-        $categoryId = null; // Reset category ID to null for "All"
-    } else {
-        $categoryId = session('selected_category_id');
-    }
+        // Handle category selection and session management
+        $categoryId = $request->input('category_id');
+        if ($categoryId && $categoryId !== 'all') {
+            session(['selected_category_id' => $categoryId]);
+        } elseif ($categoryId === 'all') {
+            session()->forget('selected_category_id');
+            $categoryId = null; // Reset category ID to null for "All"
+        } else {
+            $categoryId = session('selected_category_id');
+        }
 
-    // Check if no filters are applied, and reset the session
-    if (
-        !$request->has('search') &&
-        !$request->has('location') &&
-        !$request->has('country') &&
-        (!$request->has('category_id') || $request->input('category_id') === '')
-    ) {
-        session()->forget('selected_category_id');
-    }
+        // Check if no filters are applied, and reset the session
+        if (
+            !$request->has('search') &&
+            !$request->has('location') &&
+            !$request->has('country') &&
+            (!$request->has('category_id') || $request->input('category_id') === '')
+        ) {
+            session()->forget('selected_category_id');
+        }
 
-    // Input filters
-    $search = $request->input('search');
-    $location = $request->input('location');
-    $countryId = $request->input('country');
+        // Input filters
+        $search = $request->input('search');
+        $location = $request->input('location');
+        $countryId = $request->input('country');
 
-    // Total count of jobs matching filters
-    $totalCount = JobPosting::where('status', 'approved')
-        ->where('is_active', true)
-        ->whereHas('package.duration', function ($query) use ($today) {
-            $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
-        })
-        ->when($search, function ($query, $search) {
-            $query->where(function ($query) use ($search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhereHas('employer', function ($q) use ($search) {
-                        $q->where('company_name', 'like', "%{$search}%");
-                    });
-            });
-        })
-        ->when($location, fn($query, $location) => $query->where('location', 'like', "%{$location}%"))
-        ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
-        ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
-        ->count();
-
-    // Paginated job listings with filters
-    $jobs = JobPosting::with(['category', 'subcategory', 'country', 'package.duration', 'employer'])
-    ->where('status', 'approved')
-    ->where('is_active', true)
-    ->whereHas('package.duration', function ($query) use ($today) {
-        $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
-    })
-    ->when($search, function ($query, $search) {
-        $query->where(function ($query) use ($search) {
-            $query->where('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%")
-                ->orWhereHas('employer', function ($q) use ($search) {
-                    $q->where('company_name', 'like', "%{$search}%");
+        // Total count of jobs matching filters
+        $totalCount = JobPosting::where('status', 'approved')
+            ->where('is_active', true)
+            ->whereHas('package.duration', function ($query) use ($today) {
+                $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
+            })
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhereHas('employer', function ($q) use ($search) {
+                            $q->where('company_name', 'like', "%{$search}%");
+                        });
                 });
-        });
-    })
-    ->when($location, fn($query, $location) => $query->where('location', 'like', "%{$location}%"))
-    ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
-    ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
-    ->orderBy('approved_date', 'desc')
-    ->paginate($categoryId && $categoryId != 45 ? 50 : 250);
+            })
+            ->when($location, fn($query, $location) => $query->where('location', 'like', "%{$location}%"))
+            ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
+            ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
+            ->count();
+
+        // Paginated job listings with filters
+        $jobs = JobPosting::with(['category', 'subcategory', 'country', 'package.duration', 'employer'])
+            ->where('status', 'approved')
+            ->where('is_active', true)
+            ->whereHas('package.duration', function ($query) use ($today) {
+                $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
+            })
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhereHas('employer', function ($q) use ($search) {
+                            $q->where('company_name', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->when($location, fn($query, $location) => $query->where('location', 'like', "%{$location}%"))
+            ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
+            ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
+            ->orderBy('approved_date', 'desc')
+            ->paginate($categoryId && $categoryId != 45 ? 50 : 250);
 
 
-    // Additional data for the view
-    $categories = Category::with('subcategories')->orderBy('name', 'asc')->get();
-    $contacts = ContactUs::all();
-    $countries = Country::all();
+        // Additional data for the view
+        $categories = Category::with('subcategories')->orderBy('name', 'asc')->get();
+        $contacts = ContactUs::all();
+        $countries = Country::all();
 
-    $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
-        ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
-        ->where('banners.status', 'published')
-        ->where('banners.placement', 'banner')
-        ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$today])
-        ->select('banners.*', 'duration.duration')
-        ->get();
-    return view('home.home', compact('categories', 'totalCount', 'jobs', 'contacts', 'countries', 'banners'))
-        ->with('selected_category_id', session('selected_category_id'));
-}
+        $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
+            ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
+            ->where('banners.status', 'published')
+            ->where('banners.placement', 'banner')
+            ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$today])
+            ->select('banners.*', 'duration.duration')
+            ->get();
+        return view('home.home', compact('categories', 'totalCount', 'jobs', 'contacts', 'countries', 'banners'))
+            ->with('selected_category_id', session('selected_category_id'));
+    }
 
 
 
@@ -311,27 +311,27 @@ public function generateJobAdsReport(Request $request)
 
     public function show($id)
 
-{
-    $job = JobPosting::with(['category', 'employer', 'package.duration'])->findOrFail($id);
-    $categories = Category::all();
-    $sub_categories = Subcategory::all();
-    $emailTemplates = EmailTemplate::all();
-    $packages = Package::with('duration')->get();
+    {
+        $job = JobPosting::with(['category', 'employer', 'package.duration'])->findOrFail($id);
+        $categories = Category::all();
+        $sub_categories = Subcategory::all();
+        $emailTemplates = EmailTemplate::all();
+        $packages = Package::with('duration')->get();
 
-    return view('Admin.showonejob', compact('job', 'categories', 'packages', 'sub_categories', 'emailTemplates'));
-}
-
-
+        return view('Admin.showonejob', compact('job', 'categories', 'packages', 'sub_categories', 'emailTemplates'));
+    }
 
 
-public function showjob($id)
-{
-    $contacts = ContactUs::all();
 
-    // Retrieve job posting with relations
-    $job = JobPosting::with(['category', 'employer'])->findOrFail($id);
 
-    // Increment view_count and update_count only once, in a single query
+    public function showjob($id)
+    {
+        $contacts = ContactUs::all();
+
+        // Retrieve job posting with relations
+        $job = JobPosting::with(['category', 'employer'])->findOrFail($id);
+
+        // Increment view_count and update_count only once, in a single query
         $jobPosting = JobPosting::findOrFail($job->id);
 
         // Increment view_count and update_count
@@ -343,59 +343,58 @@ public function showjob($id)
 
         // Save the changes
 
-    $now = Carbon::now();
+        $now = Carbon::now();
 
-    $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
-        ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
-        ->where('banners.status', 'published')
-        ->where('banners.placement', 'category_page')
-        ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now])
-        ->select('banners.*', 'duration.duration')
-        ->get();
+        $banners = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
+            ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
+            ->where('banners.status', 'published')
+            ->where('banners.placement', 'category_page')
+            ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now])
+            ->select('banners.*', 'duration.duration')
+            ->get();
 
-    return view('home.jobs.show', compact('job', 'contacts', 'banners'));
-}
+        return view('home.jobs.show', compact('job', 'contacts', 'banners'));
+    }
 
 
 
 
     public function updateStatus(Request $request, $id)
-{
-    $request->validate([
-        'status' => 'required|in:pending,approved,reject',
-        'rejection_reason' => 'nullable|string|max:255',
-        'email_template_id' => 'nullable|exists:email_templates,id',
-    ]);
+    {
+        $request->validate([
+            'status' => 'required|in:pending,approved,reject',
+            'rejection_reason' => 'nullable|string|max:255',
+            'email_template_id' => 'nullable|exists:email_templates,id',
+        ]);
 
-    $job = JobPosting::findOrFail($id);
-    $previousStatus = $job->status;
-    $job->status = $request->input('status');
+        $job = JobPosting::findOrFail($id);
+        $previousStatus = $job->status;
+        $job->status = $request->input('status');
 
-    if ($job->status === 'approved') {
-        $job->approved_date = now();
-        $job->rejection_reason = null;
-    } elseif ($job->status === 'reject') {
-        $job->rejected_date = now();
-        $job->rejection_reason = $request->input('rejection_reason');
-    }
-
-    $job->admin_id = auth('admin')->id();
-    $job->save();
-
-    // Send email if status changed to approved
-    if ($previousStatus !== 'approved' && $job->status === 'approved') {
-        $templateId = $request->input('email_template_id');
-        if ($templateId) {
-            $template = EmailTemplate::find($templateId);
-            if ($template) {
-                Mail::to($job->employer->email)->send(new JobApprovedMail($job, $template));
-            }
-
+        if ($job->status === 'approved') {
+            $job->approved_date = now();
+            $job->rejection_reason = null;
+        } elseif ($job->status === 'reject') {
+            $job->rejected_date = now();
+            $job->rejection_reason = $request->input('rejection_reason');
         }
-    }
 
-    return redirect()->route('job_postings.index')->with('success', 'Job status updated successfully.');
-}
+        $job->admin_id = auth('admin')->id();
+        $job->save();
+
+        // Send email if status changed to approved
+        if ($previousStatus !== 'approved' && $job->status === 'approved') {
+            $templateId = $request->input('email_template_id');
+            if ($templateId) {
+                $template = EmailTemplate::find($templateId);
+                if ($template) {
+                    Mail::to($job->employer->email)->send(new JobApprovedMail($job, $template));
+                }
+            }
+        }
+
+        return redirect()->route('job_postings.index')->with('success', 'Job status updated successfully.');
+    }
 
 
     public function getJobsByCategory($categoryId)
@@ -643,6 +642,8 @@ public function showjob($id)
                 ->withInput();
         }
 
+        $package = \App\Models\Package::findOrFail($packageId); // Fetch once
+
         DB::beginTransaction();
 
         foreach ($jobPostings as $index => $jobData) {
@@ -660,6 +661,7 @@ public function showjob($id)
                 "job_postings.{$index}.requirements" => 'nullable|string',
                 "job_postings.{$index}.closing_date" => 'required|date',
                 "job_postings.{$index}.status" => 'required|in:pending,reject,approved',
+                "job_postings.{$index}.image" => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
             ]);
 
             $categoryIds = $jobData['category_ids'];
@@ -667,7 +669,7 @@ public function showjob($id)
 
             foreach ($categoryIds as $catId) {
                 foreach ($subcategoryIds as $subId) {
-                    // Generate new job ID
+                    // Generate unique job_id
                     $latestJob = JobPosting::where('job_id', 'like', 'J%')
                         ->lockForUpdate()
                         ->orderByRaw('CAST(SUBSTRING(job_id, 2) AS UNSIGNED) DESC')
@@ -677,10 +679,11 @@ public function showjob($id)
                         ? 'J' . str_pad((int) substr($latestJob->job_id, 1) + 1, 6, '0', STR_PAD_LEFT)
                         : 'J000001';
 
-                    $posting = JobPosting::create([
+                    $jobPostingData = [
                         'job_id' => $jobId,
                         'employer_id' => $employerId,
                         'package_id' => $packageId,
+                        'package_price' => $package->lkr_price,
                         'title' => $jobData['title'],
                         'description' => $jobData['description'] ?? 'No Description',
                         'category_id' => $catId,
@@ -691,10 +694,11 @@ public function showjob($id)
                         'requirements' => $jobData['requirements'],
                         'closing_date' => $jobData['closing_date'],
                         'status' => $jobData['status'],
-                        'payment_method' => $paymentMethod, // Global
-                    ]);
+                        'payment_method' => $paymentMethod,
+                    ];
 
-                    // Handle image upload
+                    $posting = JobPosting::create($jobPostingData);
+
                     if ($request->hasFile("job_postings.{$index}.image")) {
                         $imagePath = $request->file("job_postings.{$index}.image")
                             ->store('job_images', 'public');
@@ -709,12 +713,11 @@ public function showjob($id)
 
         return $paymentMethod === 'contact_contributor'
             ? redirect()->route('employer.job_postings.post.create')->with('success', 'Job postings created successfully!')
-            : response()->json(['success' => true]); // for AJAX redirect to /payment/checkout
+            : response()->json(['success' => true]); // AJAX response
 
     } catch (\Exception $e) {
         DB::rollBack();
 
-        // Return JSON error for AJAX request
         if ($request->expectsJson()) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
@@ -724,106 +727,110 @@ public function showjob($id)
 }
 
 
+
     public function storeForAdmin(Request $request)
-{
-    $validatedData = $request->validate([
-        'package_id' => 'required|exists:packages,id',
-        'payment_method' => 'required|in:contact_contributor,online',
-        'job_postings.*.title' => 'required|string|max:255',
-        'job_postings.*.description' => 'nullable|string',
-        'job_postings.*.category_ids' => 'required|array|min:1',
-        'job_postings.*.category_ids.*' => 'exists:categories,id',
-        'job_postings.*.subcategory_ids' => 'required|array|min:1',
-        'job_postings.*.subcategory_ids.*' => 'exists:subcategories,id',
-        'job_postings.*.location' => 'required|string|max:255',
-        'job_postings.*.country_id' => 'required|exists:countries,id',
-        'job_postings.*.salary_range' => 'nullable|string|max:255',
-        'job_postings.*.image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
-        'job_postings.*.requirements' => 'nullable|string',
-        'job_postings.*.closing_date' => 'required|date',
-        'job_postings.*.status' => 'required|in:pending,reject,approved',
-        'job_postings.*.employer_id' => 'required|exists:employers,id',
-    ]);
+    {
+        $validatedData = $request->validate([
+            'package_id' => 'required|exists:packages,id',
+            'payment_method' => 'required|in:contact_contributor,online',
+            'job_postings.*.title' => 'required|string|max:255',
+            'job_postings.*.description' => 'nullable|string',
+            'job_postings.*.category_ids' => 'required|array|min:1',
+            'job_postings.*.category_ids.*' => 'exists:categories,id',
+            'job_postings.*.subcategory_ids' => 'required|array|min:1',
+            'job_postings.*.subcategory_ids.*' => 'exists:subcategories,id',
+            'job_postings.*.location' => 'required|string|max:255',
+            'job_postings.*.country_id' => 'required|exists:countries,id',
+            'job_postings.*.salary_range' => 'nullable|string|max:255',
+            'job_postings.*.image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
+            'job_postings.*.requirements' => 'nullable|string',
+            'job_postings.*.closing_date' => 'required|date',
+            'job_postings.*.status' => 'required|in:pending,reject,approved',
+            'job_postings.*.employer_id' => 'required|exists:employers,id',
+        ]);
 
-    $adminId = auth('admin')->id();
-    $packageId = $request->input('package_id');
-    $jobPostings = $request->input('job_postings', []);
-    $paymentMethod = $request->input('payment_method');
+        $adminId = auth('admin')->id();
+        $packageId = $request->input('package_id');
+        $jobPostings = $request->input('job_postings', []);
+        $paymentMethod = $request->input('payment_method');
 
-    DB::beginTransaction();
-    try {
-        $storedPostings = [];
-        foreach ($jobPostings as $index => $jobData) {
-    $categoryIds = $jobData['category_ids'] ?? [];
-    $subcategoryIds = $jobData['subcategory_ids'] ?? [];
+        DB::beginTransaction();
+        $package = \App\Models\Package::findOrFail($packageId); // Get current package details
 
-    if (empty($categoryIds) || empty($subcategoryIds)) {
-        continue;
-    }
+        try {
+            $storedPostings = [];
+            foreach ($jobPostings as $index => $jobData) {
+                $categoryIds = $jobData['category_ids'] ?? [];
+                $subcategoryIds = $jobData['subcategory_ids'] ?? [];
 
-    // Fetch subcategories with their category_id
-    $subcategories = \App\Models\Subcategory::whereIn('id', $subcategoryIds)->get();
+                if (empty($categoryIds) || empty($subcategoryIds)) {
+                    continue;
+                }
 
-    foreach ($subcategories as $subcategory) {
-        if (!in_array($subcategory->category_id, $categoryIds)) {
-            continue; // Skip if subcategory doesn't belong to selected categories
+                // Fetch subcategories with their category_id
+                $subcategories = \App\Models\Subcategory::whereIn('id', $subcategoryIds)->get();
+
+                foreach ($subcategories as $subcategory) {
+                    if (!in_array($subcategory->category_id, $categoryIds)) {
+                        continue; // Skip if subcategory doesn't belong to selected categories
+                    }
+
+                    // Generate new job ID
+                    $latestJob = JobPosting::where('job_id', 'like', 'J%')
+                        ->lockForUpdate()
+                        ->orderByRaw('CAST(SUBSTRING(job_id, 2, 6) AS UNSIGNED) DESC')
+                        ->first();
+
+                    $latestId = $latestJob ? (int) substr($latestJob->job_id, 1) : 0;
+                    $jobId = 'J' . str_pad($latestId + 1, 6, '0', STR_PAD_LEFT);
+
+                    $jobPostingData = [
+                        'job_id' => $jobId,
+                        'creator_id' => $adminId,
+                        'admin_id' => $adminId,
+                        'package_id' => $packageId,
+                        'employer_id' => $jobData['employer_id'],
+                        'title' => $jobData['title'],
+                        'description' => $jobData['description'] ?? 'No Description',
+                        'category_id' => $subcategory->category_id,
+                        'subcategory_id' => $subcategory->id,
+                        'location' => $jobData['location'],
+                        'country_id' => $jobData['country_id'],
+                        'salary_range' => $jobData['salary_range'] ?? null,
+                        'requirements' => $jobData['requirements'],
+                        'closing_date' => $jobData['closing_date'],
+                        'status' => $jobData['status'],
+                        'payment_method' => $paymentMethod,
+                        'is_active' => true,
+                        'package_price' => $package->lkr_price,
+                    ];
+
+                    if ($request->hasFile("job_postings.$index.image")) {
+                        $jobPostingData['image'] = $request->file("job_postings.$index.image")
+                            ->store('job_images', 'public');
+                    }
+
+                    $storedPostings[] = JobPosting::create($jobPostingData);
+                }
+            }
+
+
+            DB::commit();
+
+            if ($paymentMethod === 'online') {
+                session(['pending_job_postings' => collect($storedPostings)->pluck('id')]);
+                return redirect()->route('admin.payment.checkout');
+            }
+
+            return redirect()->route('job_postings.index')
+                ->with('success', 'Job postings created successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withErrors(['error' => 'An error occurred while creating job postings: ' . $e->getMessage()])
+                ->withInput();
         }
-
-        // Generate new job ID
-        $latestJob = JobPosting::where('job_id', 'like', 'J%')
-            ->lockForUpdate()
-            ->orderByRaw('CAST(SUBSTRING(job_id, 2, 6) AS UNSIGNED) DESC')
-            ->first();
-
-        $latestId = $latestJob ? (int) substr($latestJob->job_id, 1) : 0;
-        $jobId = 'J' . str_pad($latestId + 1, 6, '0', STR_PAD_LEFT);
-
-        $jobPostingData = [
-            'job_id' => $jobId,
-            'creator_id' => $adminId,
-            'admin_id' => $adminId,
-            'package_id' => $packageId,
-            'employer_id' => $jobData['employer_id'],
-            'title' => $jobData['title'],
-            'description' => $jobData['description'] ?? 'No Description',
-            'category_id' => $subcategory->category_id,
-            'subcategory_id' => $subcategory->id,
-            'location' => $jobData['location'],
-            'country_id' => $jobData['country_id'],
-            'salary_range' => $jobData['salary_range'] ?? null,
-            'requirements' => $jobData['requirements'],
-            'closing_date' => $jobData['closing_date'],
-            'status' => $jobData['status'],
-            'payment_method' => $paymentMethod,
-            'is_active' => true,
-        ];
-
-        if ($request->hasFile("job_postings.$index.image")) {
-            $jobPostingData['image'] = $request->file("job_postings.$index.image")
-                ->store('job_images', 'public');
-        }
-
-        $storedPostings[] = JobPosting::create($jobPostingData);
     }
-}
-
-
-        DB::commit();
-
-        if ($paymentMethod === 'online') {
-            session(['pending_job_postings' => collect($storedPostings)->pluck('id')]);
-            return redirect()->route('admin.payment.checkout');
-        }
-
-        return redirect()->route('job_postings.index')
-            ->with('success', 'Job postings created successfully!');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()
-            ->withErrors(['error' => 'An error occurred while creating job postings: ' . $e->getMessage()])
-            ->withInput();
-    }
-}
 
 
     public function getSubcategories($categoryId)
@@ -837,7 +844,7 @@ public function showjob($id)
         $categories = Category::all(); // Assuming you have a Category model
         $countries = Country::all();
         $subcategories = Subcategory::where('category_id', $jobPosting->category_id)->get(); // Assuming you have a Subcategory model
-        return view('employer.jobupdate', compact('countries','jobPosting', 'categories', 'subcategories'));
+        return view('employer.jobupdate', compact('countries', 'jobPosting', 'categories', 'subcategories'));
     }
 
 
@@ -852,36 +859,45 @@ public function showjob($id)
         return view('Admin.jobcreate', compact('categories', 'subcategories', 'employers', 'packages', 'countries'));
     }
 
- public function updatepost(Request $request, $id)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'subcategory_id' => 'required|exists:subcategories,id',
-            'description' => 'required|string',
-            'location' => 'required|string|max:255',
-            'salary_range' => 'nullable|string',
-            'requirements' => 'nullable|string',
-            'closing_date' => 'required|date',
-            'package_id' => 'required|exists:packages,id',
-        ]);
+    public function updatepost(Request $request, $id)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'category_id' => 'required|exists:categories,id',
+        'subcategory_id' => 'required|exists:subcategories,id',
+        'description' => 'required|string',
+        'location' => 'required|string|max:255',
+        'salary_range' => 'nullable|string',
+        'requirements' => 'nullable|string',
+        'closing_date' => 'required|date',
+        'package_id' => 'required|exists:packages,id',
+    ]);
 
-        $job = JobPosting::findOrFail($id);
+    $job = JobPosting::findOrFail($id);
 
-        $job->title = $request->title;
-        $job->category_id = $request->category_id;
-        $job->subcategory_id = $request->subcategory_id;
-        $job->description = $request->description;
-        $job->location = $request->location;
-        $job->salary_range = $request->salary_range;
-        $job->requirements = $request->requirements;
-        $job->closing_date = $request->closing_date;
-        $job->package_id = $request->package_id;
+    // Update basic fields
+    $job->title = $request->title;
+    $job->category_id = $request->category_id;
+    $job->subcategory_id = $request->subcategory_id;
+    $job->description = $request->description;
+    $job->location = $request->location;
+    $job->salary_range = $request->salary_range;
+    $job->requirements = $request->requirements;
+    $job->closing_date = $request->closing_date;
 
-        $job->save();
-
-        return redirect()->route('job_postings.show', $job->id)->with('success', 'Job updated successfully.');
+    // Check if package has changed
+    if ($job->package_id != $request->package_id) {
+        $package = \App\Models\Package::findOrFail($request->package_id);
+        $job->package_id = $package->id;
+        $job->package_price = $package->lkr_price; // Update to new price
     }
+
+    $job->save();
+
+    return redirect()->route('job_postings.show', $job->id)
+        ->with('success', 'Job updated successfully.');
+}
+
 
     public function update(Request $request, JobPosting $jobPosting)
     {
