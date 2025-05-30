@@ -25,10 +25,10 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule)
-    {
-        $schedule->command('reset:update-count')->daily();
-    }
+        protected function schedule(Schedule $schedule)
+        {
+            $schedule->command('reset:update-count')->daily();
+        }
 
     /**
      * The commands to be registered.
