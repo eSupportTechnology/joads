@@ -323,8 +323,19 @@
                                     <div class="card-body">
                                         <i class="fas fa-eye fa-2x"></i>
                                         <div style="display: flex; flex-direction: column;">
-                                            <h6>Total View - {{ number_format($statistics['total_views'] ?? 0) }}</h6>
-                                            <h6>Daily View - {{ number_format($statistics['daily_views'] ?? 0) }}</h6>
+                                            <h6>Total View</h6>
+                                            <h5>{{ number_format($statistics['total_views'] ?? 0) }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card text-white bg-dark shadow-sm">
+                                    <div class="card-body">
+                                        <i class="fas fa-eye fa-2x"></i>
+                                        <div style="display: flex; flex-direction: column;">
+                                            <h6>Daily View </h6>
+                                            <h5>{{ number_format($statistics['daily_views'] ?? 0) }}</h5>
                                         </div>
                                     </div>
                                 </div>

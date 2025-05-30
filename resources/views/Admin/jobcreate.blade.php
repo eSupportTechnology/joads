@@ -211,7 +211,7 @@
 
                             <div class="mb-3">
                                 <label for="salary_range_0" class="form-label">Salary Range</label>
-                                <input type="number" name="job_postings[0][salary_range]" id="salary_range_0"
+                                <input type="text" name="job_postings[0][salary_range]" id="salary_range_0"
                                     class="form-control">
                             </div>
 
@@ -284,7 +284,7 @@
 
     <script>
 
-        const selectedCategories = new Map(); 
+        const selectedCategories = new Map();
         const selectedSubcategories = new Map();
 
 

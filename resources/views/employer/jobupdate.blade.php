@@ -122,7 +122,7 @@
 
         <div class="mb-3">
             <label for="salary_range" class="form-label">Salary Range</label>
-            <input type="number" name="salary_range" id="salary_range" class="form-control"
+            <input type="text" name="salary_range" id="salary_range" class="form-control"
                 value="{{ old('salary_range', $jobPosting->salary_range) }}">
             @error('salary_range')
             <div class="text-danger">{{ $message }}</div>
@@ -133,7 +133,7 @@
             <label for="image" class="form-label">Image</label>
             <input type="file" name="image" id="image" class="form-control" accept="image/*">
             <div id="imagePreviewContainer" class="mt-3">
-                <img id="imagePreview" src="{{ asset('storage/app/public/' . $jobPosting->image) }}" alt="Current Image"
+                <img id="imagePreview" src="{{ asset('storage/' . $jobPosting->image) }}" alt="Current Image"
                     style="max-width: 100%; display: {{ $jobPosting->image ? 'block' : 'none' }};">
             </div>
             @error('image')

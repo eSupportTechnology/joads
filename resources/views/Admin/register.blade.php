@@ -18,7 +18,7 @@
                 <div class="login-card">
                     <div>
                         <div class="text-center">
-                            <a class="logo" href="{{ route('index') }}">
+                            <a class="logo" href="{{ route('home') }}">
                                 <x-application-logo />
                             </a>
                         </div>

@@ -664,85 +664,77 @@ public function showjob($id)
     }
 
     public function store(Request $request)
-    {
-        try {
-            // First validate the package selection and payment method
+{
+    try {
+        // Validate global fields
+        $request->validate([
+            'package_id' => 'required|exists:packages,id',
+            'payment_method' => 'required|in:contact_contributor,online',
+        ]);
+
+        $employerId = auth('employer')->id();
+        $packageId = $request->input('package_id');
+        $jobPostings = $request->input('job_postings', []);
+        $paymentMethod = $request->input('payment_method');
+
+        if (!is_array($jobPostings) || empty($jobPostings)) {
+            return redirect()->back()
+                ->withErrors(['job_postings' => 'No job postings provided.'])
+                ->withInput();
+        }
+
+        DB::beginTransaction();
+
+        foreach ($jobPostings as $index => $jobData) {
+            // Validate each job posting input
             $request->validate([
-                'package_id' => 'required|exists:packages,id',
-                'payment_method' => 'required|in:contact_contributor,online',
+                "job_postings.{$index}.title" => 'required|string|max:255',
+                "job_postings.{$index}.description" => 'nullable|string',
+                "job_postings.{$index}.category_ids" => 'required|array|min:1',
+                "job_postings.{$index}.category_ids.*" => 'exists:categories,id',
+                "job_postings.{$index}.subcategory_ids" => 'required|array|min:1',
+                "job_postings.{$index}.subcategory_ids.*" => 'exists:subcategories,id',
+                "job_postings.{$index}.location" => 'required|string|max:255',
+                "job_postings.{$index}.country_id" => 'required|exists:countries,id',
+                "job_postings.{$index}.salary_range" => 'nullable|string',
+                "job_postings.{$index}.requirements" => 'nullable|string',
+                "job_postings.{$index}.closing_date" => 'required|date',
+                "job_postings.{$index}.status" => 'required|in:pending,reject,approved',
             ]);
 
-            $employerId = auth('employer')->id();
-            $packageId = $request->input('package_id');
-            $jobPostings = $request->input('job_postings', []);
-            $paymentMethod = $request->input('payment_method');
+            $categoryIds = $jobData['category_ids'];
+            $subcategoryIds = $jobData['subcategory_ids'];
 
-            // Check if job postings exist
-            if (!is_array($jobPostings) || empty($jobPostings)) {
-                return redirect()->back()
-                    ->withErrors(['job_postings' => 'No job postings provided.'])
-                    ->withInput();
-            }
+            foreach ($categoryIds as $catId) {
+                foreach ($subcategoryIds as $subId) {
+                    // Generate new job ID
+                    $latestJob = JobPosting::where('job_id', 'like', 'J%')
+                        ->lockForUpdate()
+                        ->orderByRaw('CAST(SUBSTRING(job_id, 2) AS UNSIGNED) DESC')
+                        ->first();
 
-            // Validate all job postings first
-            foreach ($request->job_postings as $index => $posting) {
-                $request->validate([
-                    "job_postings.{$index}.title" => 'required|string|max:255',
-                    "job_postings.{$index}.description" => 'nullable|string',
-                    "job_postings.{$index}.category_id" => 'required|exists:categories,id',
-                    "job_postings.{$index}.subcategory_id" => 'required|exists:subcategories,id',
-                    "job_postings.{$index}.location" => 'required|string|max:255',
-                    "job_postings.{$index}.country_id" => 'required|exists:countries,id',
-                    "job_postings.{$index}.salary_range" => 'nullable|numeric',
-                    "job_postings.{$index}.image" => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4048',
-                    "job_postings.{$index}.requirements" => 'nullable|string',
-                    "job_postings.{$index}.closing_date" => 'required|date',
-                    "job_postings.{$index}.status" => 'required|in:pending,reject,approved',
-                    "job_postings.{$index}.payment_method" => 'required|in:contact_contributor,online',
-                ]);
-            }
+                    $jobId = $latestJob
+                        ? 'J' . str_pad((int) substr($latestJob->job_id, 1) + 1, 6, '0', STR_PAD_LEFT)
+                        : 'J000001';
 
-            // Process each job posting within a transaction
-            DB::beginTransaction();
-            try {
-                foreach ($jobPostings as $index => $jobData) {
-                // Get the latest job_id in correct numerical order with lock to prevent race conditions
-                $latestJob = JobPosting::where('job_id', 'like', 'J%')
-                    ->lockForUpdate()
-                    ->orderByRaw('CAST(SUBSTRING(job_id, 2, 6) AS UNSIGNED) DESC')
-                    ->first();
-
-                if ($latestJob) {
-                    // Extract the numeric part by removing 'J' and convert to integer
-                    $latestId = (int) substr($latestJob->job_id, 1);
-                    // Increment and pad the number with zeros to ensure 6 digits (e.g., J000002)
-                    $jobId = 'J' . str_pad($latestId + 1, 6, '0', STR_PAD_LEFT);
-                } else {
-                    // If no records exist, start from J000001
-                    $jobId = 'J000001';
-                }
-                    // Create job posting data
-                    $jobPostingData = [
+                    $posting = JobPosting::create([
                         'job_id' => $jobId,
                         'employer_id' => $employerId,
                         'package_id' => $packageId,
                         'title' => $jobData['title'],
                         'description' => $jobData['description'] ?? 'No Description',
-                        'category_id' => $jobData['category_id'],
-                        'subcategory_id' => $jobData['subcategory_id'],
+                        'category_id' => $catId,
+                        'subcategory_id' => $subId,
                         'location' => $jobData['location'],
                         'country_id' => $jobData['country_id'],
                         'salary_range' => $jobData['salary_range'] ?? null,
                         'requirements' => $jobData['requirements'],
                         'closing_date' => $jobData['closing_date'],
                         'status' => $jobData['status'],
-                        'payment_method' => $jobData['payment_method'],
-                    ];
+                        'payment_method' => $paymentMethod, // Global
+                    ]);
 
-                    // Create the job posting
-                    $posting = JobPosting::create($jobPostingData);
-
-                    // Handle image upload if present
+                    // Handle image upload
                     if ($request->hasFile("job_postings.{$index}.image")) {
                         $imagePath = $request->file("job_postings.{$index}.image")
                             ->store('job_images', 'public');
@@ -750,31 +742,28 @@ public function showjob($id)
                         $posting->save();
                     }
                 }
-
-                DB::commit();
-
-                if ($paymentMethod === 'contact_contributor') {
-                    return redirect()->route('employer.job_postings.post.create')
-                        ->with('success', 'Job postings created successfully!');
-                } else {
-                    // For online payment, redirect to payment page
-                    return redirect()->route('payment.checkout')
-                        ->with('success', 'Please complete your payment to publish the job postings.');
-                }
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return redirect()->back()
-                    ->withErrors(['error' => 'Failed to create job postings. Please try again.'])
-                    ->withInput();
             }
-
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withErrors(['error' => 'An error occurred. Please try again.'])
-                ->withInput();
         }
+
+        DB::commit();
+
+        return $paymentMethod === 'contact_contributor'
+            ? redirect()->route('employer.job_postings.post.create')->with('success', 'Job postings created successfully!')
+            : response()->json(['success' => true]); // for AJAX redirect to /payment/checkout
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        // Return JSON error for AJAX request
+        if ($request->expectsJson()) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+
+        return redirect()->back()->withErrors(['error' => $e->getMessage()])->withInput();
     }
+}
+
+
     public function storeForAdmin(Request $request)
 {
     $validatedData = $request->validate([
@@ -788,7 +777,7 @@ public function showjob($id)
         'job_postings.*.subcategory_ids.*' => 'exists:subcategories,id',
         'job_postings.*.location' => 'required|string|max:255',
         'job_postings.*.country_id' => 'required|exists:countries,id',
-        'job_postings.*.salary_range' => 'nullable|numeric',
+        'job_postings.*.salary_range' => 'nullable|string|max:255',
         'job_postings.*.image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
         'job_postings.*.requirements' => 'nullable|string',
         'job_postings.*.closing_date' => 'required|date',
@@ -911,7 +900,7 @@ public function showjob($id)
             'subcategory_id' => 'required|exists:subcategories,id',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
-            'salary_range' => 'nullable|numeric',
+            'salary_range' => 'nullable|string',
             'requirements' => 'nullable|string',
             'closing_date' => 'required|date',
             'package_id' => 'required|exists:packages,id',
@@ -945,7 +934,7 @@ public function showjob($id)
                 'subcategory_id' => 'required|exists:subcategories,id',
                 'location' => 'required|string|max:255',
                 'country_id' => 'required|exists:countries,id',
-                'salary_range' => 'nullable|numeric',
+                'salary_range' => 'nullable|string',
                 'image' => 'nullable|image|max:2048',
                 'requirements' => 'required',
                 'closing_date' => 'required|date',
