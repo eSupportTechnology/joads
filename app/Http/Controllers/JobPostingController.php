@@ -89,160 +89,120 @@ class JobPostingController extends Controller
         return view('User.topemployerjob', compact('employer', 'jobs', 'contacts'));
     }
 
-    public function generateJobAdsReport()
-    {
-        // Daily jobs with details and earnings
-        $dailyCount = DB::table('job_postings')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+public function generateJobAdsReport(Request $request)
+{
+    // 1) Summary data per date: total count + earnings per day (only approved jobs)
+    $dailyCount = DB::table('job_postings')
+        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+        ->where('job_postings.status', 'approved')
+        ->select(
+            DB::raw('DATE(job_postings.created_at) as date'),
+            DB::raw('COUNT(*) as count'),
+            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+        )
+        ->groupBy('date')
+        ->orderBy('date', 'desc')
+        ->get();
+
+    // 2) Get job details per date (title, company, approved_by)
+    $jobDetailsByDate = DB::table('job_postings')
+        ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+        ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+        ->where('job_postings.status', 'approved')
+        ->select(
+            DB::raw('DATE(job_postings.created_at) as date'),
+            'job_postings.title',
+            'employers.company_name',
+            DB::raw('COALESCE(admins.name, "N/A") as approved_by')
+        )
+        ->orderBy('job_postings.created_at', 'desc')
+        ->get()
+        ->groupBy('date');
+
+    // 3) Attach job list to each daily summary item
+    $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
+        $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
+        return $item;
+    });
+
+    // Totals for today
+    $today = Carbon::today();
+    $dailyTotalData = DB::table('job_postings')
+        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+        ->where('job_postings.status', 'approved')
+        ->whereDate('job_postings.created_at', $today)
+        ->select(
+            DB::raw('COUNT(*) as count'),
+            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+        )
+        ->first();
+
+    // Totals for this week
+    $startOfWeek = Carbon::now()->startOfWeek();
+    $weeklyTotalData = DB::table('job_postings')
+        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+        ->where('job_postings.status', 'approved')
+        ->whereBetween('job_postings.created_at', [$startOfWeek, Carbon::now()])
+        ->select(
+            DB::raw('COUNT(*) as count'),
+            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+        )
+        ->first();
+
+    // Prepare variables for filtered date range if requested
+    $totalJobs = 0;
+    $totalEarnings = 0;
+    $jobsInRange = collect();
+
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+        // Total jobs and earnings in range
+        $totals = DB::table('job_postings')
             ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+            ->where('job_postings.status', 'approved')
+            ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw('COUNT(*) as count'),
+                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+            )
+            ->first();
+
+        $totalJobs = $totals->count ?? 0;
+        $totalEarnings = $totals->earnings ?? 0;
+
+        // Get jobs details in range
+        $jobsInRange = DB::table('job_postings')
+            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
             ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
-            ->select(
-                DB::raw('DATE(job_postings.created_at) as date'),
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings'),
-                DB::raw('GROUP_CONCAT(CONCAT(
-                job_postings.title,
-                " - ",
-                employers.company_name,
-                " (Approved by: ",
-                COALESCE(admins.name, "N/A"),
-                ")"
-            ) SEPARATOR "||") as jobs')
-            )
-            ->where('job_postings.status', 'approved')
-            ->groupBy('date')
-            ->orderBy('date', 'desc')
-            ->get()
-            ->map(function ($item) {
-                $item->jobs = collect(explode('||', $item->jobs));
-                return $item;
-            });
-
-        // Weekly jobs with details and earnings
-        $weeklyCount = DB::table('job_postings')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
             ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->select(
-                DB::raw('YEARWEEK(job_postings.created_at, 1) as week'),
-                DB::raw('MIN(DATE(job_postings.created_at)) as week_start'),
-                DB::raw('MAX(DATE(job_postings.created_at)) as week_end'),
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings'),
-                DB::raw('GROUP_CONCAT(CONCAT(job_postings.title, " - ", employers.company_name) SEPARATOR "||") as jobs')
-            )
             ->where('job_postings.status', 'approved')
-            ->groupBy('week')
-            ->orderBy('week', 'desc')
-            ->get()
-            ->map(function ($item) {
-                $item->jobs = collect(explode('||', $item->jobs));
-                return $item;
-            });
-
-        // Monthly jobs with details and earnings
-        $monthlyCount = DB::table('job_postings')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+            ->whereBetween('job_postings.created_at', [$startDate, $endDate])
             ->select(
-                DB::raw('DATE_FORMAT(job_postings.created_at, "%Y-%m") as month'),
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings'),
-                DB::raw('GROUP_CONCAT(CONCAT(job_postings.title, " - ", employers.company_name) SEPARATOR "||") as jobs')
-            )
-            ->where('job_postings.status', 'approved')
-            ->groupBy('month')
-            ->orderBy('month', 'desc')
-            ->get()
-            ->map(function ($item) {
-                $item->jobs = collect(explode('||', $item->jobs));
-                return $item;
-            });
-
-        // Payment details
-        $paymentDetails = DB::table('job_postings')
-            ->select('payment_method', DB::raw('COUNT(*) as count'))
-            ->where('status', 'approved')
-            ->groupBy('payment_method')
-            ->get();
-
-        // Posted by details
-        $postedBy = DB::table('job_postings')
-            ->where('status', 'approved')
-            ->selectRaw("
-            CASE
-                WHEN creator_id IS NOT NULL THEN CONCAT('Admin: ', (SELECT name FROM admins WHERE admins.id = job_postings.creator_id))
-                WHEN employer_id IS NOT NULL THEN CONCAT('Employer: ', (SELECT company_name FROM employers WHERE employers.id = job_postings.employer_id))
-                ELSE 'Unknown'
-            END as posted_by,
-            COUNT(*) as count
-        ")
-            ->groupByRaw("
-            CASE
-                WHEN creator_id IS NOT NULL THEN CONCAT('Admin: ', (SELECT name FROM admins WHERE admins.id = job_postings.creator_id))
-                WHEN employer_id IS NOT NULL THEN CONCAT('Employer: ', (SELECT company_name FROM employers WHERE employers.id = job_postings.employer_id))
-                ELSE 'Unknown'
-            END
-        ")
-            ->get();
-
-        // Repeated employers
-        $repeatedEmployers = DB::table('job_postings')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-            ->where('job_postings.status', 'approved')
-            ->select(
-                'job_postings.employer_id',
+                'job_postings.created_at',
+                'job_postings.title',
                 'employers.company_name',
-                DB::raw('COUNT(job_postings.id) as post_count')
+                DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price'),
+                'job_postings.payment_method',
+                DB::raw('COALESCE(admins.name, "N/A") as approved_by')
             )
-            ->groupBy('job_postings.employer_id', 'employers.company_name')
-            ->having('post_count', '>', 1)
+            ->orderBy('job_postings.created_at', 'desc')
             ->get();
-
-        // Calculate today's and this week's totals with earnings
-        $today = Carbon::today();
-        $startOfWeek = Carbon::now()->startOfWeek();
-
-        $dailyTotalData = DB::table('job_postings')
-            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->where('job_postings.status', 'approved')
-            ->whereDate('job_postings.created_at', $today)
-            ->select(
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-            )
-            ->first();
-
-        $weeklyTotalData = DB::table('job_postings')
-            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->where('job_postings.status', 'approved')
-            ->whereBetween('job_postings.created_at', [$startOfWeek, Carbon::now()])
-            ->select(
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-            )
-            ->first();
-
-        $dailyTotal = $dailyTotalData->count;
-        $dailyEarnings = $dailyTotalData->earnings;
-        $weeklyTotal = $weeklyTotalData->count;
-        $weeklyEarnings = $weeklyTotalData->earnings;
-
-        return view('Admin.report.jobads', compact(
-            'dailyCount',
-            'weeklyCount',
-            'monthlyCount',
-            'paymentDetails',
-            'postedBy',
-            'repeatedEmployers',
-            'dailyTotal',
-            'weeklyTotal',
-            'dailyEarnings',
-            'weeklyEarnings'
-        ));
     }
 
+    return view('Admin.report.jobads', [
+        'dailyCount' => $dailyCount,
+        'dailyTotal' => $dailyTotalData->count ?? 0,
+        'weeklyTotal' => $weeklyTotalData->count ?? 0,
+        'totalJobs' => $totalJobs,
+        'totalEarnings' => $totalEarnings,
+        'jobsInRange' => $jobsInRange,
+    ]);
+}
 
-public function home(Request $request)
+
+    public function home(Request $request)
 {
     $today = Carbon::today();
 
