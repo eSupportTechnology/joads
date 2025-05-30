@@ -47,10 +47,6 @@ class JobPosting extends Model
         return $this->belongsTo(Subcategory::class);
     }
 
-    public function employer()
-    {
-        return $this->belongsTo(Employer::class);
-    }
 
     public function admin()
     {
@@ -68,9 +64,14 @@ class JobPosting extends Model
     {
         return $this->belongsTo(Country::class);
     }
-    public function package()
-    {
-        return $this->belongsTo(Package::class);
-    }
 
+public function employer()
+{
+    return $this->belongsTo(Employer::class, 'employer_id');
+}
+
+public function package()
+{
+    return $this->belongsTo(Package::class, 'package_id');
+}
 }

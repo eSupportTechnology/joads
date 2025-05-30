@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 
 class EmployerAuthController extends Controller
 {
@@ -90,86 +92,56 @@ class EmployerAuthController extends Controller
 
 
 
-public function employerStats()
-    {
-        $today = Carbon::today();
 
-        // DAILY - last 30 days, newest first
-        $dailyCompanyStats = Employer::selectRaw('DATE(created_at) as date, COUNT(*) as count')
-            ->whereDate('created_at', '>=', $today->copy()->subDays(30))
-            ->groupBy('date')
-            ->orderBy('date', 'desc') // <-- descending order, newest first
-            ->get()
-            ->map(function ($item) {
-                $employers = Employer::whereDate('created_at', $item->date)
-                    ->select('id', 'company_name', 'email')
-                    ->with('jobPostings')
-                    ->get();
+public function getFilteredJobPostings(Request $request)
+{
+    $query = DB::table('job_postings')
+        ->join('packages', 'job_postings.package_id', '=', 'packages.id')
+        ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+        ->select(
+            'job_postings.title',
+            'job_postings.approved_date',
+            'job_postings.created_at',
+            'employers.company_name',
+            'job_postings.view_count',
+            'packages.lkr_price'
+        );
 
-                return [
-                    'date' => $item->date,
-                    'count' => $item->count,
-                    'employers' => $employers,
-                ];
-            });
-
-        // WEEKLY - current year, newest first
-        $weeklyCompanyStats = Employer::selectRaw('
-            WEEK(created_at, 1) as week,
-            MIN(DATE(created_at)) as week_start,
-            MAX(DATE(created_at)) as week_end,
-            COUNT(*) as count
-        ')
-            ->whereYear('created_at', $today->year)
-            ->groupBy('week')
-            ->orderBy('week', 'desc')  // descending, newest week first
-            ->get()
-            ->map(function ($item) {
-                $employers = Employer::whereBetween('created_at', [$item->week_start, $item->week_end])
-                    ->select('id', 'company_name', 'email')
-                    ->with('jobPostings')
-                    ->get();
-
-                return [
-                    'week' => $item->week,
-                    'week_start' => $item->week_start,
-                    'week_end' => $item->week_end,
-                    'count' => $item->count,
-                    'employers' => $employers,
-                ];
-            });
-
-        // MONTHLY - current year, newest first
-        $monthlyCompanyStats = Employer::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
-            ->whereYear('created_at', $today->year)
-            ->groupBy('month')
-            ->orderBy('month', 'desc')  // descending order by month (newest first)
-            ->get()
-            ->map(function ($item) {
-                $monthStart = Carbon::createFromFormat('Y-m', $item->month)->startOfMonth();
-                $monthEnd = Carbon::createFromFormat('Y-m', $item->month)->endOfMonth();
-
-                $employers = Employer::whereBetween('created_at', [$monthStart, $monthEnd])
-                    ->select('id', 'company_name', 'email')
-                    ->with('jobPostings')
-                    ->get();
-
-                return [
-                    'month' => $monthStart->format('F Y'),
-                    'count' => $item->count,
-                    'employers' => $employers,
-                ];
-            });
-
-        return view('Admin.report.employer', compact(
-            'dailyCompanyStats',
-            'weeklyCompanyStats',
-            'monthlyCompanyStats'
-        ));
+    // Filter by date range if provided
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $query->whereBetween('job_postings.created_at', [$request->start_date, $request->end_date]);
     }
 
+    $results = $query->orderBy('job_postings.created_at', 'desc')->get();
 
+    // Calculate total LKR price for all filtered posts
+    $totalLkr = $results->sum('lkr_price');
 
+    // Group by created_at date and sum lkr_price per date
+    $dailyTotals = $results->groupBy(function($item) {
+        return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
+    })->map(function($group) {
+        return $group->sum('lkr_price');
+    });
+
+    // Get today's and weekly employer counts
+    $today = \Carbon\Carbon::today();
+    $dailyEmployerCount = DB::table('job_postings')->whereDate('created_at', $today)->count();
+
+    $weeklyEmployerCount = DB::table('job_postings')
+        ->whereBetween('created_at', [$today->copy()->subDays(6), $today])
+        ->count();
+
+    return view('Admin.report.employer', [
+        'jobPostings' => $results,
+        'totalEarningsLkr' => $totalLkr,
+        'dailyTotals' => $dailyTotals,
+        'startDate' => $request->start_date,
+        'endDate' => $request->end_date,
+        'dailyEmployerCount' => $dailyEmployerCount,
+        'weeklyEmployerCount' => $weeklyEmployerCount,
+    ]);
+}
 
     // Handle logout
     public function logout()
