@@ -1,10 +1,8 @@
 @extends('layouts.admin.master')
+
 @section('title', 'Employer Registration Report')
 
 @section('css')
-@endsection
-
-@section('style')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatable-extension.css') }}">
 @endsection
@@ -19,154 +17,118 @@
 
 @section('content')
     <div class="container mt-5">
-        <h1>Employer Statistics</h1>
-
-        <!-- Navigation Tabs -->
-        <ul class="nav nav-tabs" id="statisticsTabs" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="daily-tab" data-bs-toggle="tab" href="#daily" role="tab" aria-controls="daily" aria-selected="true">Daily</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="weekly-tab" data-bs-toggle="tab" href="#weekly" role="tab" aria-controls="weekly" aria-selected="false">Weekly</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="monthly-tab" data-bs-toggle="tab" href="#monthly" role="tab" aria-controls="monthly" aria-selected="false">Monthly</a>
-            </li>
-        </ul>
-
-        <div class="tab-content mt-4" id="statisticsTabContent">
-            <!-- Daily Statistics -->
-            <div class="tab-pane fade show active" id="daily" role="tabpanel" aria-labelledby="daily-tab">
-                <h2>Daily Company Statistics (Last 30 Days)</h2>
-                <table id="daily-table" class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Total Companies</th>
-                            <th>Companies</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($dailyCompanyStats as $day)
-                            <tr>
-                                <td>{{ $day['date'] }}</td>
-                                <td>{{ $day['count'] }}</td>
-                                <td>
-                                    <ul>
-                                        @forelse ($day['employers'] as $employer)
-                                            <li>
-                                                <strong>{{ $employer->company_name }}</strong> ({{ $employer->email }})
-                                                <ul>
-                                                    @forelse ($employer->jobPostings as $job)
-                                                        <li>{{ $job->title }} - {{ $job->view_count }} views</li>
-                                                    @empty
-                                                        <li>No job postings available</li>
-                                                    @endforelse
-                                                </ul>
-                                            </li>
-                                        @empty
-                                            <li>No companies available</li>
-                                        @endforelse
-                                    </ul>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3">No data available for the last 30 days</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Weekly Statistics -->
-            <div class="tab-pane fade" id="weekly" role="tabpanel" aria-labelledby="weekly-tab">
-                <h2>Weekly Company Statistics (This Year)</h2>
-                <table id="weekly-table" class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Week</th>
-                            <th>Total Companies</th>
-                            <th>Companies</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($weeklyCompanyStats as $week)
-                            <tr>
-                                <td>Week {{ $week['week'] }} ({{ $week['week_start'] }} - {{ $week['week_end'] }})</td>
-                                <td>{{ $week['count'] }}</td>
-                                <td>
-                                    <ul>
-                                        @forelse ($week['employers'] as $employer)
-                                            <li>
-                                                <strong>{{ $employer->company_name }}</strong> ({{ $employer->email }})
-                                                <ul>
-                                                    @forelse ($employer->jobPostings as $job)
-                                                        <li>{{ $job->title }} - {{ $job->view_count }} views</li>
-                                                    @empty
-                                                        <li>No job postings available</li>
-                                                    @endforelse
-                                                </ul>
-                                            </li>
-                                        @empty
-                                            <li>No companies available</li>
-                                        @endforelse
-                                    </ul>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3">No data available for this year</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Monthly Statistics -->
-            <div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
-                <h2>Monthly Company Statistics (This Year)</h2>
-                <table id="monthly-table" class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Month</th>
-                            <th>Total Companies</th>
-                            <th>Companies</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($monthlyCompanyStats as $month)
-                            <tr>
-                                <td>{{ $month['month'] }}</td>
-                                <td>{{ $month['count'] }}</td>
-                                <td>
-                                    <ul>
-                                        @forelse ($month['employers'] as $employer)
-                                            <li>
-                                                <strong>{{ $employer->company_name }}</strong> ({{ $employer->email }})
-                                                <ul>
-                                                    @forelse ($employer->jobPostings as $job)
-                                                        <li>{{ $job->title }} - {{ $job->view_count }} views</li>
-                                                    @empty
-                                                        <li>No job postings available</li>
-                                                    @endforelse
-                                                </ul>
-                                            </li>
-                                        @empty
-                                            <li>No companies available</li>
-                                        @endforelse
-                                    </ul>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3">No data available for this year</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+        <div class="container mt-5">
+    <h1>Employer Registration Report</h1>
+            </br>
+    <div class="row mb-4">
+        <!-- Daily Employers -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Today's Employers</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $dailyEmployerCount }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-building fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- Weekly Employers -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">This Week's Employers</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $weeklyEmployerCount }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-week fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Existing filter form and table -->
+    </div>
+
+        <h1>Employer Registration Report</h1>
+
+        <form method="GET" action="{{ url()->current() }}" class="mb-4 row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="start_date" class="col-form-label">Start Date:</label>
+            </div>
+            <div class="col-auto">
+                <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $startDate ?? '') }}" class="form-control" />
+            </div>
+
+            <div class="col-auto">
+                <label for="end_date" class="col-form-label">End Date:</label>
+            </div>
+            <div class="col-auto">
+                <input type="date" name="end_date" id="end_date" value="{{ old('end_date', $endDate ?? '') }}" class="form-control" />
+            </div>
+
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+
+        <table id="job-postings-table" class="table table-bordered" style="width:100%">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Post Date</th>
+                    <th>Approved Date</th>
+                    <th>Company</th>
+                    <th>Post</th>
+                    <th>Views</th>
+                    <th>Paid Amount (LKR)</th>
+                    <th>Daily Earnings (LKR)</th> <!-- New column -->
+                </tr>
+            </thead>
+            <tbody>
+                @php $lastDate = null; @endphp
+                @forelse ($jobPostings as $key => $job)
+                    @php
+                        $currentDate = \Carbon\Carbon::parse($job->created_at)->format('Y-m-d');
+                    @endphp
+                    <tr>
+                        <td>{{ $key + 1 }}</td>
+                        <td>{{ $currentDate }}</td>
+                        <td>{{ $job->approved_date ? \Carbon\Carbon::parse($job->approved_date)->format('Y-m-d') : 'Not Approved' }}</td>
+                        <td>{{ $job->company_name ?? 'N/A' }}</td>
+                        <td>{{ $job->title }}</td>
+                        <td>{{ $job->view_count }}</td>
+                        <td>{{ number_format($job->lkr_price, 2) }}</td>
+                        <td>
+                            @if ($lastDate !== $currentDate)
+                                {{ number_format($dailyTotals->get($currentDate, 0), 2) }}
+                            @endif
+                        </td>
+                    </tr>
+                    @php $lastDate = $currentDate; @endphp
+                @empty
+                    <tr>
+                        <td colspan="8" class="text-center">No job postings available.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+            <tfoot>
+                {{--  <tr>
+                    <th colspan="6" style="text-align:right">Total Earnings (LKR):</th>
+                    <th>{{ number_format($totalEarningsLkr, 2) }}</th>
+                    <th></th>
+                </tr>  --}}
+            </tfoot>
+        </table>
     </div>
 @endsection
 
@@ -178,24 +140,13 @@
     <script src="{{ asset('assets/js/datatable/datatable-extension/buttons.print.min.js') }}"></script>
 
     <script>
-        $(document).ready(function() {
-            const config = {
+        $(document).ready(function () {
+            $('#job-postings-table').DataTable({
                 dom: 'Bfrtip',
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                 pageLength: 10,
                 ordering: true,
                 responsive: true
-            };
-
-            const dailyTable = $('#daily-table').DataTable(config);
-            const weeklyTable = $('#weekly-table').DataTable(config);
-            const monthlyTable = $('#monthly-table').DataTable(config);
-
-            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-                const targetId = $(e.target).attr('href').substring(1);
-                if (targetId === 'daily') dailyTable.columns.adjust().draw();
-                if (targetId === 'weekly') weeklyTable.columns.adjust().draw();
-                if (targetId === 'monthly') monthlyTable.columns.adjust().draw();
             });
         });
     </script>

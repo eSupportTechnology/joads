@@ -933,7 +933,7 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('/reports/job-ads', [JobPostingController::class, 'generateJobAdsReport'])
         ->name('reports.job-ads')->middleware('check.permission:reports.job-ads');
 
-    Route::get('/admin/employer-stats', [EmployerAuthController::class, 'employerStats'])
+    Route::get('/admin/employer-stats', [EmployerAuthController::class, 'getFilteredJobPostings'])
         ->name('admin.employer.stats')->middleware('check.permission:admin.employer.stats');
 
     Route::get('/reports/customers', [JobPostingController::class, 'generateCustomerReport'])
