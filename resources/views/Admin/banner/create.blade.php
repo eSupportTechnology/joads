@@ -122,7 +122,7 @@
                                 <input type="text" class="form-control" id="title" name="title" required>
                             </div>
 
-                            
+
 
                             <div class="mb-3">
                                 <label for="placement" class="form-label">Banner Placement</label>
@@ -132,7 +132,7 @@
                                 </select>
                             </div>
 
-                            
+
 
                             <div class="mb-3" id="categorySection" style="display: none;">
                                 <label for="category_id" class="form-label">Category</label>

@@ -120,7 +120,7 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
                                                 @if ($account->logo)
-                                                    <img src="{{ asset('storage/app/public/' . $account->logo) }}" style="height:40px; width:90px;"
+                                                    <img src="{{ asset('storage/' . $account->logo) }}" style="height:40px; width:90px;"
                                                         alt="{{ $account->bank_name }} Logo" class="logo-thumbnail">
                                                 @else
                                                     <span class="text-muted">No</span>

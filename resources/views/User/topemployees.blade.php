@@ -8,9 +8,9 @@
     <title>Top Employers</title>
 
     <link rel="stylesheet" href="{{ asset('css/topemployees.css') }}">
-    
+
     <style>
-        
+
         .contact-table th, .contact-table td {
     padding: 10px;
     border: 1px solid #ddd;
@@ -20,7 +20,7 @@
 }
 
     </style>
-  
+
 </head>
 
 <body>
@@ -43,10 +43,10 @@
                         {{ $employer->company_name }}
                         </div>
                         @else
-                        <img src="{{ $employer->logo ? asset('storage/app/public/' . $employer->logo) : asset('images/default-logo.png') }}"
+                        <img src="{{ $employer->logo ? asset('storage/' . $employer->logo) : asset('images/default-logo.png') }}"
                         alt="{{ $employer['alt'] }}">
                         @endif
-                        
+
                     </a>
                 </div>
             @endforeach

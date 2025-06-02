@@ -194,14 +194,16 @@
                                                         <button type="submit"
                                                             class="btn btn-primary btn-sm">Update</button>
                                                     </form>
-                                                    
+
 
                                                 </td>
                                                 <td>
-                                                <form action="{{ route('banners.destroy', $banner->id) }}" method="POST" class="d-inline">
+                                                    <form action="{{ route('banners.destroy', $banner->id) }}"
+                                                        method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm " title="Delete Banner" 
+                                                        <button type="submit" class="btn btn-danger btn-sm "
+                                                            title="Delete Banner"
                                                             onclick="return confirm('Are you sure you want to delete this banner?')">
                                                             Delete
                                                         </button>
@@ -223,34 +225,35 @@
                                                         <div class="modal-body">
                                                             <div class="row">
                                                                 <div class="col-12 mb-4">
-                                                                    <img src="{{ asset('storage/app/public/' . $banner->image) }}"
-     class="banner-modal-image"
-     alt="{{ $banner->title }}" style="width:70%;">
+                                                                    <img src="{{ asset('storage/' . $banner->image) }}"
+                                                                        class="banner-modal-image"
+                                                                        alt="{{ $banner->title }}" style="width:70%;">
 
                                                                 </div>
                                                                 <div class="col-12">
                                                                     <ul class="banner-details-list">
                                                                         <li>
-                                                                            <span class="banner-details-label">Title: </span>
+                                                                            <span class="banner-details-label">Title:
+                                                                            </span>
                                                                             <span
                                                                                 class="banner-details-value">{{ $banner->title }}</span>
                                                                         </li>
                                                                         <!-- <li>
-                                                                            <span
-                                                                                class="banner-details-label">Category</span>
-                                                                            <span class="banner-details-value">
-                                                                                {{ $banner->category_id ? $banner->category->name : 'No' }}
-                                                                            </span>
-                                                                        </li> -->
+                                                                                <span
+                                                                                    class="banner-details-label">Category</span>
+                                                                                <span class="banner-details-value">
+                                                                                    {{ $banner->category_id ? $banner->category->name : 'No' }}
+                                                                                </span>
+                                                                            </li> -->
                                                                         <li>
-                                                                            <span
-                                                                                class="banner-details-label">Placement: </span>
+                                                                            <span class="banner-details-label">Placement:
+                                                                            </span>
                                                                             <span
                                                                                 class="banner-details-value">{{ ucfirst($banner->placement) }}</span>
                                                                         </li>
                                                                         <li>
-                                                                            <span
-                                                                                class="banner-details-label">Package Duration: </span>
+                                                                            <span class="banner-details-label">Package
+                                                                                Duration: </span>
                                                                             <span
                                                                                 class="banner-details-value">{{ $banner->package->duration->duration }}</span>
                                                                         </li>
@@ -261,7 +264,8 @@
                                                                                 class="banner-details-value">{{ number_format($banner->view_count) }}</span>
                                                                         </li>
                                                                         <li>
-                                                                            <span class="banner-details-label">Click-through
+                                                                            <span
+                                                                                class="banner-details-label">Click-through
                                                                                 Rate</span>
                                                                             <span
                                                                                 class="banner-details-value">{{ number_format($banner->ctr, 2) }}%</span>

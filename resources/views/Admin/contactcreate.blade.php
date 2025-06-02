@@ -76,7 +76,7 @@
                                 class="form-control @error('logo_img') is-invalid @enderror" onchange="previewLogo(event)">
                             @if (isset($contactus) && $contactus->logo_img)
                                 <div class="mt-3">
-                                    <img src="{{ asset('storage/app/public/' . $contactus->logo_img) }}" alt="Logo"
+                                    <img src="{{ asset('storage/' . $contactus->logo_img) }}" alt="Logo"
                                         class="img-fluid" style="max-width: 200px; max-height: 200px; object-fit: contain;">
                                 </div>
                             @endif

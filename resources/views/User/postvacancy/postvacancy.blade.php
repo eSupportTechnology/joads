@@ -49,7 +49,7 @@
 
         .postcontent {
             padding: 15px;
-           
+
 
         }
 
@@ -81,7 +81,7 @@
         .contact-table th {
             font-weight: bold;
         }
-        
+
         .table-align {
 
             display: flex;
@@ -141,7 +141,7 @@
         }
 
         .payment-scroll-wrapper {
-           
+
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             /* Smooth scrolling on iOS */
@@ -278,7 +278,7 @@
             /* Fix column sizes */
         }
 
-        
+
 
         .contact-name {
             width: 40%;
@@ -338,7 +338,7 @@
         .payment-table2 {
             overflow-x: visible;
         }
-        
+
         .active::after {
             content: '';
             position: absolute;
@@ -352,8 +352,8 @@
             border-top: 8px solid darkblue;
             /* Same color as button */
         }
-        
-        
+
+
 
         /* Mobile specific styles */
         @media (max-width: 768px) {
@@ -623,7 +623,7 @@
                                         @foreach ($localBanks as $lb)
                                             <th colspan="2" style="text-align:center;">
                                                 @if ($lb->logo)
-                                                    <img src="{{ asset('storage/app/public/' . $lb->logo) }}"
+                                                    <img src="{{ asset('storage/' . $lb->logo) }}"
                                                         style="height:50px; width:100px;"
                                                         alt="{{ $lb->bank_name }} Logo" class="logo-thumbnail">
                                                 @else
@@ -707,7 +707,7 @@
                                     @foreach ($foreignBanks as $fb)
                                         <th style="text-align:center;">
                                             @if ($fb->logo)
-                                                <img src="{{ asset('storage/app/public/' . $fb->logo) }}"
+                                                <img src="{{ asset('storage/' . $fb->logo) }}"
                                                     style="height:50px; width:100px;" alt="{{ $fb->bank_name }} Logo"
                                                     class="logo-thumbnail">
                                             @else
@@ -853,7 +853,7 @@
                     </div>
                     <div class="postcontent">
                         <div class="rate-scroll-wrapper">
-  
+
                         <table class="rate-table">
                         <tr>
                             <th class="package">Package size (Banner Posts)</th>
@@ -969,7 +969,7 @@
                                         @foreach ($localBanks as $lb)
                                             <th colspan="2" style="text-align:center;">
                                                 @if ($lb->logo)
-                                                    <img src="{{ asset('storage/app/public/' . $lb->logo) }}"
+                                                    <img src="{{ asset('storage/' . $lb->logo) }}"
                                                         style="height:50px; width:100px;"
                                                         alt="{{ $lb->bank_name }} Logo" class="logo-thumbnail">
                                                 @else
@@ -1055,7 +1055,7 @@
                                     @foreach ($foreignBanks as $fb)
                                         <th style="text-align:center;">
                                             @if ($fb->logo)
-                                                <img src="{{ asset('storage/app/public/' . $fb->logo) }}"
+                                                <img src="{{ asset('storage/' . $fb->logo) }}"
                                                     style="height:50px; width:100px;" alt="{{ $fb->bank_name }} Logo"
                                                     class="logo-thumbnail">
                                             @else
