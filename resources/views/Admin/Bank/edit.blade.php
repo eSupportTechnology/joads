@@ -99,7 +99,7 @@
                                     </div>
                                     <div class="image-preview mt-2">
                                         @if ($bankAccount->logo)
-                                        <img id="logoPreview" src="{{ asset('storage/app/' . $bankAccount->logo) }}"
+                                        <img id="logoPreview" src="{{ asset('storage/' . $bankAccount->logo) }}"
                                             alt="Current Logo" style="max-width: 200px;" class="img-thumbnail">
                                         @else
                                         <img id="logoPreview" src="#" alt="Logo Preview"

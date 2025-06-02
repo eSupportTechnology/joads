@@ -19,7 +19,7 @@ class CVController extends Controller
 
         return view('User.cv', compact('user', 'experiences', 'educations'));
     }
-    
+
     public function index2()
     {
         $user = auth()->user(); // Fetch authenticated user
@@ -28,7 +28,7 @@ class CVController extends Controller
 
         return view('User.cv2', compact('user', 'experiences', 'educations'));
     }
-    
+
     public function index3()
     {
         $user = auth()->user(); // Fetch authenticated user
@@ -37,7 +37,7 @@ class CVController extends Controller
 
         return view('User.cv3', compact('user', 'experiences', 'educations'));
     }
-    
+
     public function generateCV(Request $request)
     {
         // Validate the request
@@ -107,7 +107,7 @@ class CVController extends Controller
                 ->withInput();
         }
     }
-    
+
     public function generateCV2(Request $request)
     {
         // Validate the request
@@ -177,7 +177,7 @@ class CVController extends Controller
                 ->withInput();
         }
     }
-    
+
     public function downloadCV($template)
     {
         try {
@@ -210,8 +210,8 @@ class CVController extends Controller
                 ->with('error', 'Unable to download CV. Please try again.');
         }
     }
-    
-    
+
+
     public function generateCV3(Request $request)
     {
         // Validate the request

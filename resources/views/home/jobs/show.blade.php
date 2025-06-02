@@ -395,7 +395,7 @@
                         <div class="swiper-wrapper">
                             @forelse ($banners as $banner)
                                 <div class="swiper-slide banner-item">
-                                    <img src="{{ asset('storage/app/public/' . $banner->image) }}"
+                                    <img src="{{ asset('storage/' . $banner->image) }}"
                                         alt="{{ $banner->title }}">
                                 </div>
                             @empty
@@ -427,7 +427,7 @@
                     <!-- Header Section -->
                     <div class="header">
                         @if (!empty($job->image))
-                            <img src="{{ asset('storage/app/public/' . $job->image) }}" alt="Company banner">
+                            <img src="{{ asset('storage/' . $job->image) }}" alt="Company banner">
                             <div class="overlay"></div>
                         @endif
                     </div>
@@ -437,12 +437,12 @@
                         <!-- Job Title and Company -->
                         <small> JOB ID : {{ $job->job_id }}</small>
                         <div class="job-title">
-                            
+
                             <h1>{{ $job->title }}</h1>
                             <p class="company-name">{{ $job->employer->company_name }}</p>
                         </div>
                         <p>
-                            <i class="fas fa-eye"></i> {{ $job->view_count +1}} Views
+                            <i class="fas fa-eye"></i> {{ $job->view_count + 1 }} Views
                         </p>
 
                         <!-- Key Details -->
@@ -468,9 +468,10 @@
                             @if (!empty($job->salary_range))
                                 <div class="detail">
                                     <i class="fas fa-money-bill-wave"></i>&nbsp;&nbsp;
-                                    <span>Salary: {{ number_format($job->salary_range, 2) }}</span>
+                                    <span>Salary: {{ $job->salary_range }}</span>
                                 </div>
                             @endif
+
                             @if (!empty($job->closing_date))
                                 <div class="detail">
                                     <i class="fas fa-hourglass-end"></i>&nbsp;&nbsp;
