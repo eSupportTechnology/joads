@@ -88,7 +88,7 @@
                                         <div class="detail-item mb-3 border-bottom pb-2">
                                             <h6 class="text-primary mb-1"><i class="fas fa-building me-2"></i>Employer</h6>
                                             <input type="text" name="employer" class="form-control"
-                                                value="{{ old('employer', $job->employer->company_name) }}" disabled>
+                                                value="{{ old('employer', $job->employer->company_name ?? 'N/A') }}" disabled>
                                         </div>
 
                                         <div class="detail-item mb-3 border-bottom pb-2">
