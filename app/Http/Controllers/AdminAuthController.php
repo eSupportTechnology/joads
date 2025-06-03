@@ -27,7 +27,7 @@ class AdminAuthController extends Controller
         return view('Admin.adminlist', compact('admins')); // Pass admins to the view
     }
 
-// Method to toggle active/inactive status
+    // Method to toggle active/inactive status
     public function toggleStatus($id)
     {
         $admin = Admin::findOrFail($id);
@@ -103,16 +103,16 @@ class AdminAuthController extends Controller
         try {
 
             $currentDate = now();
-    
+
             // Check if required tables and columns exist
             if (!Schema::hasTable('job_postings')) {
                 throw new \Exception("Job postings table does not exist");
             }
-    
+
             if (!Schema::hasColumn('job_postings', 'view_count')) {
                 throw new \Exception("view_count column missing in job_postings table");
             }
-    
+
             // Initialize variables with default values
             $totalApplications = 0;
             $totalJobsPosted = 0;
@@ -132,12 +132,12 @@ class AdminAuthController extends Controller
             $totalApprovedBanners = 0;
             $totalCurrentBanners = 0;
             $totalBannerEarnings = 0;
-    
+
             // Get total applications count if table exists
             if (Schema::hasTable('applications')) {
                 $totalApplications = Application::count();
             }
-    
+
             $today = Carbon::today();
             // Get total active job postings
             if (Schema::hasTable('job_postings')) {
@@ -147,7 +147,7 @@ class AdminAuthController extends Controller
                         $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
                     })
                     ->count();
-    
+
                 // Calculate total views
                 $totalViews = JobPosting::sum('view_count');
 
@@ -155,42 +155,41 @@ class AdminAuthController extends Controller
 
 
                 $dailyViews = JobPosting::sum('update_count');
-                      
             }
 
             if (Schema::hasTable('job_postings')) {
                 $totalJobs = JobPosting::count();
             }
-    
+
             // Get total pending job postings
             if (Schema::hasTable('job_postings')) {
                 $totalPendingJobs = JobPosting::where('status', 'pending')
                     ->count();
             }
-    
+
             // Get total approved job postings
             if (Schema::hasTable('job_postings')) {
                 $totalApprovedJobs = JobPosting::where('status', 'approved')
                     ->count();
             }
-    
+
             // Get total banners
             if (Schema::hasTable('banners')) {
                 $totalBanners = Banner::count();
             }
-    
+
             // Get total approved banners
             if (Schema::hasTable('banners')) {
                 $totalApprovedBanners = Banner::where('status', 'published')
                     ->count();
             }
-    
+
             // Get total pending banners
             if (Schema::hasTable('banners')) {
                 $totalPendingBanners = Banner::where('status', 'pending')
                     ->count();
             }
-    
+
             $now = Carbon::now();
             // Get total current banners
             if (Schema::hasTable('banners')) {
@@ -200,53 +199,53 @@ class AdminAuthController extends Controller
                     ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now]) // Ensure within duration
                     ->count();
             }
-    
+
             // Get total banner earnings
             if (Schema::hasTable('banners')) {
                 $totalBannerEarnings = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
                     ->where('banners.status', 'published')
                     ->sum('banner_packages.price_lkr');
             }
-    
+
             // Get total active jobseekers
             if (Schema::hasTable('users')) {
                 $totalJobseekers = User::count();
             }
-    
+
             // Get total active companies
             if (Schema::hasTable('employers')) {
                 $totalCompanies = Employer::count();
             }
-    
+
             // Get total admins
             if (Schema::hasTable('admins')) {
                 $totalAdmins = Admin::count();
             }
-    
+
             // Get total super admins
             if (Schema::hasTable('admins')) {
                 $totalSuperAdmins = Admin::where('role', 'super_admin')->count();
             }
-    
+
             // Get total earnings
             try {
                 $totalEarnings = DB::table('job_postings')
-                    ->join('packages', 'job_postings.package_id', '=', 'packages.id')
-                    ->where('job_postings.status', 'approved')
-                    ->sum('packages.lkr_price');
+                    ->where('status', 'approved')
+                    ->sum('package_price');
             } catch (\Exception $e) {
                 $totalEarnings = 0;
             }
-    
+
+
             // Get recent applications (last 7 days)
             if (Schema::hasTable('applications')) {
                 $recentApplications = Application::whereDate('created_at', '>=', $currentDate->copy()->subDays(7))
                     ->count();
-    
+
                 $previousWeekApplications = Application::whereDate('created_at', '>=', $currentDate->copy()->subDays(14))
                     ->whereDate('created_at', '<', $currentDate->copy()->subDays(7))
                     ->count();
-    
+
                 $applicationGrowth = $previousWeekApplications > 0
                     ? (($recentApplications - $previousWeekApplications) / $previousWeekApplications) * 100
                     : 0;
@@ -254,7 +253,7 @@ class AdminAuthController extends Controller
                 $recentApplications = 0;
                 $applicationGrowth = 0;
             }
-    
+
             // Return the statistics including daily views
             return [
                 'total_applications' => $totalApplications,
@@ -277,11 +276,10 @@ class AdminAuthController extends Controller
                 'total_current_banners' => $totalCurrentBanners,
                 'total_banner_earnings' => $totalBannerEarnings,
             ];
-    
         } catch (\Exception $e) {
             // Log error and return default values to avoid issues in blade templates
             // \Log::error('Error in getDashboardStatistics: ' . $e->getMessage());
-    
+
             return [
                 'total_applications' => 0,
                 'total_jobs_posted' => 0,
@@ -306,35 +304,34 @@ class AdminAuthController extends Controller
         }
     }
 
- 
-
-public function companyStat()
-{
-    try {
-        // Fetch employers along with job postings and their stats
-        $companyStats = Employer::with(['jobPostings' => function ($query) {
-            $query->select(
-                'id',
-                'employer_id',
-                'title',
-                'view_count',
-                'update_count as today_views', // Use update_count as today's views
-                'updated_at'
-            );
-        }])->get();
-
-        return $companyStats;
-
-    } catch (\Exception $e) {
-        Log::error('Error fetching employer stats: ' . $e->getMessage());
-        return [];
-    }
-}
 
 
-     public function dashboard()
+    public function companyStat()
     {
-        $companyStats=$this->companyStat();
+        try {
+            // Fetch employers along with job postings and their stats
+            $companyStats = Employer::with(['jobPostings' => function ($query) {
+                $query->select(
+                    'id',
+                    'employer_id',
+                    'title',
+                    'view_count',
+                    'update_count as today_views', // Use update_count as today's views
+                    'updated_at'
+                );
+            }])->get();
+
+            return $companyStats;
+        } catch (\Exception $e) {
+            Log::error('Error fetching employer stats: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+
+    public function dashboard()
+    {
+        $companyStats = $this->companyStat();
         $currentDate = now();
         $statistics = $this->getDashboardStatistics();
 
@@ -364,7 +361,7 @@ public function companyStat()
                 ];
             });
 
-        return view('Admin.dashboard', compact('statistics', 'recentApplications','companyStats'));
+        return view('Admin.dashboard', compact('statistics', 'recentApplications', 'companyStats'));
     }
 
     public function showProfileForm()
@@ -374,69 +371,67 @@ public function companyStat()
     }
 
     // Handle profile update
-public function updateProfile(Request $request)
-{
-    $admin = Auth::guard('admin')->user();
+    public function updateProfile(Request $request)
+    {
+        $admin = Auth::guard('admin')->user();
 
-    // Validate the incoming request
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => [
-            'required',
-            'email',
-            Rule::unique('admins', 'email')->ignore($admin->id),
-        ],
-        'contact' => 'nullable|string|max:20',
-        'current_password' => 'nullable|required_with:new_password',
-        'new_password' => 'nullable|min:8|confirmed',
-    ]);
+        // Validate the incoming request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('admins', 'email')->ignore($admin->id),
+            ],
+            'contact' => 'nullable|string|max:20',
+            'current_password' => 'nullable|required_with:new_password',
+            'new_password' => 'nullable|min:8|confirmed',
+        ]);
 
-    // Update fields
-    $admin->name = $request->name;
-    $admin->email = $request->email;
-    $admin->contact = $request->contact;
+        // Update fields
+        $admin->name = $request->name;
+        $admin->email = $request->email;
+        $admin->contact = $request->contact;
 
-    // Handle password change
-    if ($request->filled('new_password')) {
-        if (!Hash::check($request->current_password, $admin->password)) {
-            return back()->withErrors(['current_password' => 'Current password is incorrect']);
+        // Handle password change
+        if ($request->filled('new_password')) {
+            if (!Hash::check($request->current_password, $admin->password)) {
+                return back()->withErrors(['current_password' => 'Current password is incorrect']);
+            }
+            $admin->password = Hash::make($request->new_password);
         }
-        $admin->password = Hash::make($request->new_password);
-    }
 
-    // Save the admin
-    try {
-        $admin->db::save();
-        return redirect()->route('admin.profile')->with('success', 'Profile updated successfully');
-    } catch (\Exception $e) {
-        return back()->withErrors(['save_error' => 'An error occurred while saving your profile.']);
+        // Save the admin
+        try {
+            $admin->db::save();
+            return redirect()->route('admin.profile')->with('success', 'Profile updated successfully');
+        } catch (\Exception $e) {
+            return back()->withErrors(['save_error' => 'An error occurred while saving your profile.']);
+        }
     }
-}
 
 
     public function showPermissionForm(Request $request)
-{
-    $admins = Admin::where('role', '!=', 'super_admin')->get();
-    $permissions = Permission::all();
+    {
+        $admins = Admin::where('role', '!=', 'super_admin')->get();
+        $permissions = Permission::all();
 
-    $selectedAdmin = null;
-    if ($request->has('admin_id')) {
-        $selectedAdmin = Admin::with('permissions')->find($request->admin_id);
+        $selectedAdmin = null;
+        if ($request->has('admin_id')) {
+            $selectedAdmin = Admin::with('permissions')->find($request->admin_id);
+        }
+
+        return view('Admin.permissions.index', compact('admins', 'permissions', 'selectedAdmin'));
     }
 
-    return view('Admin.permissions.index', compact('admins', 'permissions', 'selectedAdmin'));
-}
 
 
+    public function assignPermissions(Request $request)
+    {
+        $admin = Admin::findOrFail($request->admin_id);
+        $admin->permissions()->sync($request->permissions ?? []);
 
-public function assignPermissions(Request $request)
-{
-    $admin = Admin::findOrFail($request->admin_id);
-    $admin->permissions()->sync($request->permissions ?? []);
-
-    return redirect()->route('superadmin.show.permissions', ['admin_id' => $admin->id])
-                     ->with('success', 'Permissions updated.');
-}
-
-
+        return redirect()->route('superadmin.show.permissions', ['admin_id' => $admin->id])
+            ->with('success', 'Permissions updated.');
+    }
 }

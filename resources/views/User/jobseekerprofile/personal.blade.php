@@ -193,8 +193,8 @@
             </div>
             <div class="profile-image-section">
                 @if (Auth::user()->profile_image)
-                    <img src="{{ asset('storage/app/public/profile_images/' . Auth::user()->profile_image) }}" alt="Profile Image"
-                        class="profile-preview">
+                    <img src="{{ asset('storage/profile_images/' . Auth::user()->profile_image) }}"
+                        alt="Profile Image" class="profile-preview">
                     <p>Current Profile Image</p>
                 @else
                     <p>No Profile Image</p>
@@ -557,7 +557,7 @@
         @if (Auth::user()->profile_image)
             const img = new Image();
             img.src =
-                "{{ asset('storage/app/public/profile_images/' . Auth::user()->profile_image) }}?{{ time() }}";
+                "{{ asset('storage/' . Auth::user()->profile_image) }}?{{ time() }}";
             img.onload = function() {
                 if (profilePreview) {
                     profilePreview.src = this.src;

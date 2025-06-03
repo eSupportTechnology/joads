@@ -34,6 +34,7 @@ class JobPosting extends Model
         'creator_id',
         'payment_method',
         'country_id',
+        'package_price',
     ];
 
     // Relationships

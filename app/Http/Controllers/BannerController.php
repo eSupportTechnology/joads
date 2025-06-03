@@ -46,21 +46,21 @@ class BannerController extends Controller
 
     public function store(Request $request)
     {
-        
-            // Validate the request
-            $validated = $request->validate([
-                'employer_id' => 'required|exists:employers,id',
-                'title' => 'required|string|max:255',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'category_id' => 'nullable|exists:categories,id',
-                'package_id' => 'required|exists:banner_packages,id',
-                'payment_method' => 'required|in:contact_admin,online',
-                'placement' => 'required|in:banner,category_page',
-            ]);
-            $adminId = Auth('admin')->id();
-            // Start transaction
-            DB::beginTransaction();
-            try {
+
+        // Validate the request
+        $validated = $request->validate([
+            'employer_id' => 'required|exists:employers,id',
+            'title' => 'required|string|max:255',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'category_id' => 'nullable|exists:categories,id',
+            'package_id' => 'required|exists:banner_packages,id',
+            'payment_method' => 'required|in:contact_admin,online',
+            'placement' => 'required|in:banner,category_page',
+        ]);
+        $adminId = Auth('admin')->id();
+        // Start transaction
+        DB::beginTransaction();
+        try {
             // Handle image upload
             $imagePath = $request->file('image')->store('banner_images', 'public');
 
@@ -87,7 +87,6 @@ class BannerController extends Controller
 
             return redirect()->route('banners.index')
                 ->with('success', 'Banner created successfully! Our admin will contact you soon.');
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -131,7 +130,8 @@ class BannerController extends Controller
         $packages = BannerPackage::all();
         $packageDetailsBanners = BannerDetail::first();
         $employers = Employer::all();
-        return view('Admin.banner.create', compact('categories','packageDetailsBanners', 'packages','employers'));
+
+        return view('Admin.banner.create', compact('categories', 'packageDetailsBanners', 'packages', 'employers'));
     }
 
     /**
@@ -169,7 +169,7 @@ class BannerController extends Controller
     public function updateStatus(Request $request, Banner $banner)
     {
         // Log initial state
-        \Log::info("Before update:", [
+        Log::info("Before update:", [
             'banner_id' => $banner->id,
             'old_status' => $banner->getOriginal('status'),
             'attributes' => $banner->getAttributes(),
@@ -200,7 +200,7 @@ class BannerController extends Controller
         $saved = $banner->save();
 
         // Log the update result
-        \Log::info("After update:", [
+        Log::info("After update:", [
             'banner_id' => $banner->id,
             'new_status' => $banner->status,
             'admin_id' => $banner->admin_id,
@@ -223,25 +223,26 @@ class BannerController extends Controller
     /**
      * Remove the specified banner from storage.
      */
-   
+
 
     public function destroy($id)
-{
-    DB::beginTransaction();
-    try {
-        $banner = Banner::findOrFail($id);
+    {
+        DB::beginTransaction();
+        try {
+            $banner = Banner::findOrFail($id);
 
-        if (Storage::disk('public')->exists($banner->image)) {
-            Storage::disk('public')->delete($banner->image);
+            if (Storage::disk('public')->exists($banner->image)) {
+                Storage::disk('public')->delete($banner->image);
+            }
+
+            $banner->delete();
+            DB::commit();
+
+            return redirect()->route('banners.index')->with('success', 'Banner deleted successfully.');
+            return response()->json(['success' => true], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'An error occurred.'], 500);
         }
-
-        $banner->delete();
-        DB::commit();
-
-        return redirect()->route('banners.index')->with('success', 'Banner deleted successfully.');return response()->json(['success' => true], 200);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json(['success' => false, 'message' => 'An error occurred.'], 500);
     }
-}
 }
