@@ -439,7 +439,7 @@
                         <div class="job-title">
 
                             <h1>{{ $job->title }}</h1>
-                            <p class="company-name">{{ $job->employer->company_name }}</p>
+                            <p class="company-name">{{ $job->employer->company_name ?? '' }}</p>
                         </div>
                         <p>
                             <i class="fas fa-eye"></i> {{ $job->view_count + 1 }} Views

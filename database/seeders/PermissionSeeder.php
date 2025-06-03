@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Permission;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -10,8 +11,6 @@ class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $now = Carbon::now();
-
         $permissions = [
             ['id' => 1, 'name' => 'Admin List', 'route' => 'admin.list'],
             ['id' => 2, 'name' => 'Employer List', 'route' => 'employer.list'],
@@ -82,13 +81,16 @@ class PermissionSeeder extends Seeder
             ['id' => 67, 'name' => 'Service Gallery Edit', 'route' => 'admin.service-gallery.edit'],
         ];
 
-        // Add timestamps to each permission
-        foreach ($permissions as &$permission) {
-            $permission['created_at'] = $now;
-            $permission['updated_at'] = $now;
+        foreach ($permissions as $permission) {
+            Permission::updateOrCreate(
+                ['route' => $permission['route']], 
+                [
+                    'name' => $permission['name'],
+                    'route' => $permission['route']
+                ]
+            );
         }
 
-        // Insert all permissions
-        DB::table('permissions')->insert($permissions);
+        $this->command->info('Permissions seeded successfully!');
     }
 }
