@@ -61,6 +61,7 @@
                                             <th>Added Date</th>
                                             <th>Reviewed By</th>
                                             <th>Status</th>
+                                            <th>Total Views</th>
                                             <th>Reviewed Date</th>
                                             <th>Actions</th>
                                         </tr>
@@ -78,6 +79,7 @@
                                                         {{ ucfirst($job->status) }}
                                                     </span>
                                                 </td>
+                                                <td class="text-center">{{ $job->view_count }}</td>
                                                 <td>
                                                     @if ($job->status === 'approved')
                                                         {{ $job->approved_date ? \Carbon\Carbon::parse($job->approved_date)->format('Y-m-d') : 'N/A' }}
@@ -103,9 +105,9 @@
                                                         </a>
                                                         @endif
 
-                                                        
 
-                                                        <!-- Delete Button --> 
+
+                                                        <!-- Delete Button -->
                                                         {{-- <form
                                                             action="{{ route('employer.job_postings.post.destroy', $job->id) }}"
                                                             method="POST" class="d-inline">

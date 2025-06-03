@@ -53,7 +53,7 @@
                                 <td class="px-4 py-3 whitespace-nowrap">{{ $application->contact_number }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">{{ $application->message ?? 'N/A' }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
-                                    <a href="{{ asset('storage/app/public/' . $application->cv_path) }}" target="_blank"
+                                    <a href="{{ asset('storage/' . $application->cv_path) }}" target="_blank"
                                         class="btn btn-info btn-sm">
                                         View CV
                                     </a>

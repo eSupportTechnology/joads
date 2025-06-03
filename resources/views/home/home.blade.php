@@ -18,8 +18,7 @@
 
 
 
- <style>
-
+    <style>
         .dropdown {
             padding: 8px;
             margin: 10px 0;
@@ -39,7 +38,6 @@
             width: 100%;
             height: 220px;
             overflow: hidden;
-            /* Ensure no overflow for large images */
         }
 
         .swiper-slide {
@@ -47,15 +45,12 @@
             justify-content: center;
             align-items: center;
             height: 100%;
-            /* Ensure the slide takes full height */
         }
 
         .banner-item img {
             max-width: 75%;
             max-height: 100%;
             border-radius: 10px;
-
-            /* Adjusts how the image fits within the container */
         }
 
         .filters-form {
@@ -77,38 +72,25 @@
             font-size: 12px;
         }
 
-            .contact-table th, .contact-table td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        word-wrap: break-word;
-        width: auto;
-        text-align: left;
-    }
+        .contact-table th,
+        .contact-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            word-wrap: break-word;
+            width: auto;
+            text-align: left;
+        }
 
-            .text-input::placeholder {
-        font-size: 12px; /* Adjust the size as needed */
-    }
+        .text-input::placeholder {
+            font-size: 12px;
+        }
 
-    .table-container {
-                max-height: auto;
-                overflow-y: auto;
-                border: 1px solid #ddd;
-                margin-top: 10px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            }
-
-            @media (max-width: 1200px) {
-                .filters-form {
-                    flex-direction: column;
-                align-items: stretch;
-            }
-
-            .text-input,
-            .dropdown,
-            .view-btn {
-                width: 100%;
-                max-width: 400px;
-            }
+        .table-container {
+            max-height: auto;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .scroll-wrapper {
@@ -116,8 +98,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             margin: 12px 15px;
             padding: 0px;
-            overflow-y:visible;
-
+            overflow-y: visible;
         }
 
         .categories-container {
@@ -125,10 +106,11 @@
             scrollbar-width: none;
         }
 
-
         .job-grid {
             min-height: 50px;
             height: auto;
+            display: grid;
+            gap: 4.3px;
         }
 
         .job-listings-container {
@@ -139,14 +121,11 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-
-
         .job-card {
             padding: 3px 10px;
             font-size: 14px;
             border-bottom: 1px dotted #000;
             cursor: pointer;
-            /* Show pointer cursor on hover */
         }
 
         .main-footer {
@@ -158,47 +137,32 @@
             border-radius: 50px 0 0 0;
         }
 
-       .categories-list {
+        .categories-list {
             display: flex;
             flex-direction: column;
-            /* Keep list items vertical */
             overflow-y: auto;
-            /* Allow vertical scrolling */
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
-            /* For Firefox */
             -ms-overflow-style: none;
             max-height: calc(40px * 4.5);
-            /* Adjust as needed */
             padding: 12px 0px 12px 0px;
-
-            /* Adjust width as needed */
             scroll-behavior: smooth;
-            /* Smooth scrolling */
             margin-top: 0.5px;
-
         }
 
         .filters {
             display: flex;
             gap: 10px;
-            /* Maintain spacing between elements */
             align-items: center;
             margin: 20px 0 0 0;
             justify-content: center;
-            /* Center align filters */
             padding: 0 20px 0 20px;
             border-bottom: 4px solid #3a7ecc;
         }
 
         .job-listings-title {
             margin: 10px;
-
-        }
-
-        .job-grid {
-            gap: 5px;
         }
 
         .categories-list::-webkit-scrollbar {
@@ -207,123 +171,376 @@
 
         .category-link {
             flex: 0 0 auto;
-            /* This prevents the items from shrinking */
         }
 
+        .pagination-container {
+            text-align: center;
+        }
 
+        .pagination {
+            display: inline-flex;
+            list-style: none;
+            padding-left: 0;
+            border-radius: 0.25rem;
+            margin: 0;
+        }
 
+        .pagination li {
+            margin: 0 5px;
+        }
 
-        @media (max-width: 768px) {
+        .pagination a,
+        .pagination span {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 0;
+            line-height: 1.5;
+            text-decoration: none;
+            color: #007bff;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+        }
+
+        .pagination a:hover,
+        .pagination span:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .pagination .active a,
+        .pagination .active span {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+
+        .pagination .disabled a,
+        .pagination .disabled span {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            color: #6c757d;
+        }
+
+        .pagination .page-item:first-child a,
+        .pagination .page-item:first-child span {
+            border-radius: 0.25rem 0 0 0.25rem;
+        }
+
+        .pagination .page-item:last-child a,
+        .pagination .page-item:last-child span {
+            border-radius: 0 0.25rem 0.25rem 0;
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, #3a7ecc, #18799c);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(58, 126, 204, 0.3);
+            min-width: 50px;
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(58, 126, 204, 0.4);
+        }
+
+        /* Responsive Design */
+
+        /* Large Desktop (1200px and up) */
+        @media (min-width: 1200px) {
+            .filters {
+                background-color: rgba(0, 0, 0, 0.1);
+                padding: 2px 25px 0px 25px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .filters-form {
+                width: 70%;
+                margin: 0;
+                flex-wrap: nowrap;
+            }
+
+            .text-input,
+            .dropdown {
+                min-width: 180px;
+            }
+
+            .job-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        /* Desktop (992px to 1199px) */
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .filters {
+                background-color: rgba(0, 0, 0, 0.1);
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .filters-form {
+                width: 100%;
+                gap: 12px;
+            }
+
+            .text-input,
+            .dropdown {
+                min-width: 160px;
+            }
+
+            .job-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Tablet (768px to 991px) */
+        @media (min-width: 768px) and (max-width: 991px) {
+            .filters {
+                background-color: rgba(0, 0, 0, 0.1);
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .filters-form {
+                width: 100%;
+                gap: 12px;
+                grid-template-columns: 1fr 1fr;
+                display: grid;
+            }
+
+            .text-input,
+            .dropdown {
+                min-width: 140px;
+            }
+
+            .view-btn {
+                grid-column: span 2;
+                justify-self: center;
+                max-width: 200px;
+            }
+
+            .job-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
             .category-link {
                 width: 300px !important;
             }
         }
 
+        /* Mobile Large (576px to 767px) */
+        @media (min-width: 576px) and (max-width: 767px) {
+            .filters {
+                background-color: rgba(0, 0, 0, 0.1);
+                padding: 15px 15px;
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+                align-items: center;
+                justify-content: center;
+            }
 
+            .filters-form {
+                width: 100%;
+                max-width: 400px;
+                flex-direction: column;
+                gap: 12px;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto;
+            }
 
-            /* Custom Styles for Pagination */
-    .pagination-container {
-        text-align: center; /* Center pagination */
-    }
+            .text-input,
+            .dropdown {
+                width: 100%;
+                max-width: 350px;
+                text-align: center;
+                margin: 0 auto;
+                display: block;
+            }
 
-    .pagination {
-        display: inline-flex;
-        list-style: none;
-        padding-left: 0;
-        border-radius: 0.25rem;
-        margin: 0;
-    }
+            .view-btn {
+                width: 100%;
+                max-width: 200px;
+                margin: 0 auto;
+                display: block;
+            }
 
-    .pagination li {
-        margin: 0 5px;
-    }
+            .job-grid {
+                grid-template-columns: repeat(2, 1fr);
+                justify-items: center;
+            }
 
-    .pagination a,
-    .pagination span {
-        display: inline-block;
-        padding: 8px 16px;
-        margin: 0;
-        line-height: 1.5;
-        text-decoration: none;
-        color: #007bff;
-        background-color: #fff;
-        border: 1px solid #dee2e6;
-        border-radius: 0.25rem;
-    }
+            .jobtitle {
+                font-size: 16px;
+                text-align: center;
+                width: 100%;
+            }
 
-    .pagination a:hover,
-    .pagination span:hover {
-        background-color: #007bff;
-        color: white;
-    }
+            .job-card {
+                text-align: center;
+            }
+        }
 
-    .pagination .active a,
-    .pagination .active span {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: white;
-    }
+        /* Mobile Small (up to 575px) */
+        @media (max-width: 575px) {
+            .filters {
+                background-color: rgba(0, 0, 0, 0.1);
+                padding: 12px 10px;
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+                align-items: center;
+                justify-content: center;
+            }
 
-    .pagination .disabled a,
-    .pagination .disabled span {
-        background-color: #f8f9fa;
-        border-color: #dee2e6;
-        color: #6c757d;
-    }
+            .filters-form {
+                width: 100%;
+                max-width: 350px;
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto;
+            }
 
-    .pagination .page-item:first-child a,
-    .pagination .page-item:first-child span {
-        border-radius: 0.25rem 0 0 0.25rem; /* Rounded left side */
-    }
+            .text-input,
+            .dropdown {
+                width: 100%;
+                max-width: 300px;
+                font-size: 12px;
+                text-align: center;
+                margin: 0 auto;
+                display: block;
+            }
 
-    .pagination .page-item:last-child a,
-    .pagination .page-item:last-child span {
-        border-radius: 0 0.25rem 0.25rem 0; /* Rounded right side */
-    }
+            .text-input {
+                height: 40px;
+                padding: 8px 12px;
+            }
 
+            .dropdown {
+                height: 40px;
+                padding: 8px 12px;
+            }
 
-    .job-grid {
-    display: grid;
-    gap: 4.3px;
-}
+            .view-btn {
+                width: 100%;
+                max-width: 200px;
+                padding: 12px;
+                margin: 0 auto;
+                display: block;
+            }
 
-/* For Medium (md) and up: Limit to 5 columns */
-@media (min-width: 768px) {
-    .job-grid {
-        grid-template-columns: repeat(5, 1fr); /* 5 cards per row */
-    }
-}
+            .job-grid {
+                grid-template-columns: 1fr;
+                justify-items: center;
+            }
 
-/* For Large (lg) and up */
-@media (min-width: 992px) {
-    .job-grid {
-        grid-template-columns: repeat(5, 1fr); /* 5 cards per row */
-    }
-}
+            .jobtitle {
+                font-size: 14px;
+                text-align: center;
+                line-height: 1.4;
+                width: 100%;
+            }
 
-/* For Extra-Large (xl) and up */
-@media (min-width: 1200px) {
-    .job-grid {
-        grid-template-columns: repeat(5, 1fr); /* 5 cards per row */
-    }
-}
+            .job-card {
+                text-align: center;
+            }
 
-/* For Small (sm) screens and below */
-@media (max-width: 767px) {
-    .job-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
-    }
-}
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
 
-/* For Extra-Small (xs) screens */
-@media (max-width: 575px) {
-    .job-grid {
-        grid-template-columns: 1fr; /* 1 card per row */
-    }
-}
+            .pagination li {
+                margin: 2px;
+            }
 
+            .pagination a,
+            .pagination span {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+        }
 
-</style>
+        /* Extra Small Mobile (up to 400px) */
+        @media (max-width: 400px) {
+            .filters {
+                padding: 10px 8px;
+                gap: 10px;
+                text-align: center;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .filters-form {
+                gap: 8px;
+                align-items: center;
+                justify-content: center;
+                max-width: 280px;
+                margin: 0 auto;
+            }
+
+            .text-input,
+            .dropdown {
+                font-size: 11px;
+                height: 38px;
+                padding: 6px 10px;
+                text-align: center;
+                width: 100%;
+                max-width: 250px;
+                margin: 0 auto;
+                display: block;
+            }
+
+            .view-btn {
+                font-size: 12px;
+                padding: 10px;
+                max-width: 150px;
+                margin: 0 auto;
+                display: block;
+            }
+
+            .jobtitle {
+                font-size: 13px;
+                text-align: center;
+                width: 100%;
+            }
+
+            .job-card {
+                font-size: 12px;
+                padding: 8px;
+                text-align: center;
+            }
+        }
+
+        /* Landscape Mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .filters {
+                padding: 8px 15px;
+            }
+
+            .text-input,
+            .dropdown {
+                height: 35px;
+            }
+
+            .view-btn {
+                padding: 8px 15px;
+            }
+        }
+    </style>
 
 </head>
 
@@ -366,22 +583,22 @@
 
 
 
-<div class="scroll-wrapper">
-    <!-- Scroll buttons -->
-    <button class="scroll-btn left-scroll" id="scrollLeft">
-        <i class="fa fa-chevron-left"></i>
-    </button>
+    <div class="scroll-wrapper">
+        <!-- Scroll buttons -->
+        <button class="scroll-btn left-scroll" id="scrollLeft">
+            <i class="fa fa-chevron-left"></i>
+        </button>
 
-    <!-- Categories list -->
-    <div class="categories-list" id="categoriesList"
-         style="border-radius: 15px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">
+        <!-- Categories list -->
+        <div class="categories-list" id="categoriesList"
+            style="border-radius: 15px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">
 
-        <!-- Render "All" category first -->
-        @foreach ($categories as $category)
-            @if ($category->name == 'All')
-                <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
-                   class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
-                   style="
+            <!-- Render "All" category first -->
+            @foreach ($categories as $category)
+                @if ($category->name == 'All')
+                    <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
+                        class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
+                        style="
                         text-decoration: none;
                         background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
                         color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};
@@ -395,17 +612,17 @@
                         display: inline-block;
                         position: sticky; top: 0; z-index: 10;
                    ">
-                    {{ $category->name }}
-                </a>
-            @endif
-        @endforeach
+                        {{ $category->name }}
+                    </a>
+                @endif
+            @endforeach
 
-        <!-- Render the rest of the categories -->
-        @foreach ($categories as $category)
-            @if ($category->name != 'All')
-                <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
-                   class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
-                   style="
+            <!-- Render the rest of the categories -->
+            @foreach ($categories as $category)
+                @if ($category->name != 'All')
+                    <a href="javascript:void(0);" data-category-id="{{ $category->id }}"
+                        class="category-link {{ session('selected_category_id') == $category->id ? 'active' : '' }}"
+                        style="
                         text-decoration: none;
                         background-color: {{ session('selected_category_id') == $category->id ? '#1267e7' : '#f8f9fa' }};
                         color: {{ session('selected_category_id') == $category->id ? 'white' : 'black' }};
@@ -418,18 +635,18 @@
                         white-space: nowrap;
                         display: inline-block;
                    ">
-                    {{ $category->name }}
-                </a>
-            @endif
-        @endforeach
+                        {{ $category->name }}
+                    </a>
+                @endif
+            @endforeach
 
+        </div>
+
+        <!-- Scroll buttons -->
+        <button class="scroll-btn right-scroll" id="scrollRight">
+            <i class="fa fa-chevron-right"></i>
+        </button>
     </div>
-
-    <!-- Scroll buttons -->
-    <button class="scroll-btn right-scroll" id="scrollRight">
-        <i class="fa fa-chevron-right"></i>
-    </button>
-</div>
 
     </section>
     <!-- <div class="ads-banner">
@@ -462,137 +679,132 @@
     </div>
 
 
-<!-- Filters Section -->
-<section class="filters" style="background-color: rgba(0, 0, 0, 0.1); padding: 2px 25px 0px 25px; display: flex; justify-content: space-between; align-items: center;">
-    <p class="jobtitle" style="margin: 0;">
-        Available New Jobs : {{ $totalCount }}
-        @if (session('selected_category_id'))
-            @php
-                $selectedCategory = \App\Models\Category::find(session('selected_category_id'));
-            @endphp
-            in {{ $selectedCategory->name }}
-        @endif
-    </p>
-    <form method="GET" action="{{ route('home') }}" class="filters-form" id="searchForm" style="width: 70%; margin: 0;">
-        <!-- Category Filter -->
-        <input type="hidden" name="category_id" id="categoryInput"
-            value="{{ request('category_id') ?? session('selected_category_id') }}">
+    <!-- Filters Section -->
+     <section class="filters">
+        <p class="jobtitle">
+            Available New Jobs : {{ $totalCount }}
+            @if (session('selected_category_id'))
+                @php
+                    $selectedCategory = \App\Models\Category::find(session('selected_category_id'));
+                @endphp
+                in {{ $selectedCategory->name }}
+            @endif
+        </p>
+        <form method="GET" action="{{ route('home') }}" class="filters-form" id="searchForm">
+            <!-- Category Filter -->
+            <input type="hidden" name="category_id" id="categoryInput"
+                value="{{ request('category_id') ?? session('selected_category_id') }}">
 
-        <input class="text-input" style="height:17px" type="text" name="search"
-            placeholder="Enter Vacancy Name/Company/Job Reference" value="{{ request('search') }}">
+            <input class="text-input" style="height:17px" type="text" name="search"
+                placeholder="Enter Vacancy Name/Company/Job Reference" value="{{ request('search') }}">
 
-        <input class="text-input" style="height:17px;" type="text" name="location"
-            placeholder="Enter your Location" value="{{ request('location') }}">
+            <input class="text-input" style="height:17px;" type="text" name="location"
+                placeholder="Enter your Location" value="{{ request('location') }}">
 
-        <select name="country" class="dropdown" style="height: 43px; color: #777777">
-            <option value="">Select Country</option>
-            @foreach ($countries as $country)
-                <option value="{{ $country->id }}" {{ request('country') == $country->id ? 'selected' : '' }}>
-                    {{ $country->name }}
-                </option>
-            @endforeach
-        </select>
-
-        <button class="view-btn" type="submit">
-            <i class="fa fa-search"></i>
-        </button>
-    </form>
-</section>
-
-
-
-
-
-    <!-- Job Listings Section -->
-    <!-- Job Listings Section -->
-<section id="job-listings" class="job-listings-container">
-    <h3 class="job-listings-title">Available Jobs</h3>
-
-    @if ($jobs->isEmpty())
-        <p>No jobs found matching your criteria.</p>
-    @else
-        @php
-            // Check if category_id is set and not null, and whether it is "All"
-            $isCategorySelected = request()->has('category_id') && request()->category_id != null;
-            $isAllCategory = request()->category_id === '45';
-        @endphp
-
-        @if ($isCategorySelected && !$isAllCategory)
-            <!-- Display as Table if Specific Category (not "45") is Selected -->
-            <div>
-                <table class="job-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Reference ID</th>
-                            <th>Job Title</th>
-                            <th>Description</th>
-                            <th>Location</th>
-                            <th>Posted Date</th>
-                            <th>Closing Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($jobs as $index => $job)
-                            <tr>
-                                <td>{{ ($jobs->currentPage() - 1) * $jobs->perPage() + $index + 1 }}</td>
-                                <td>{{ $job->job_id ?? 'N/A' }}</td>
-                                <td>
-                                    <a href="{{ route('job.details', $job->id) }}" class="job-title">
-                                        {{ $job->title }}
-                                    </a>
-                                    <br>
-                                    <a href="{{ route('job.details', $job->id) }}" class="company-name">
-                                        {{ $job->employer == null ? "" : $job->employer->company_name }}
-                                    </a>
-                                </td>
-                                <td>{{ $job->description ?? 'No description provided' }}</td>
-                                <td>{{ $job->location ?? 'Not specified' }}</td>
-                                <td>{{ $job->created_at ? $job->created_at->format('Y-m-d') : 'N/A' }}</td>
-                                <td>{{ $job->closing_date ?? 'N/A' }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @else
-            <!-- Display as Cards if No Category or "All" is Selected -->
-            <div class="job-grid">
-                @foreach ($jobs as $job)
-                    <div class="job-card" style="min-height:50px;height:auto; cursor: pointer;"
-                        onclick="window.location='{{ route('job.details', $job->id) }}'">
-                        <a href="{{ route('job.details', $job->id) }}" class="job-title"
-                            style="font-size:15px; margin-bottom: 0px;">
-                            {{ $job->title }}
-                        </a>
-                        <p class="company-name"
-                            style="font-size: 14px; margin-top: 2px; margin-bottom: 0px; font-weight:600; line-height:1;">
-                            {{$job->employer == null ? "" : $job->employer->company_name }}
-                        </p>
-                        <p class="location"
-                            style="font-size: 12px; margin-top: 1px; margin-bottom: 0px; line-height:1;">
-                            {{ $job->location }}
-                        </p>
-                        <div style="display: flex; justify-content: space-between;">
-                            <p
-                                style="font-size: 14px; color:red; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
-                                {{ $job->closing_date }}
-                            </p>
-                            <p
-                                style="font-size: 14px; color:#888888; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
-                                {{ $job->job_id }}</p>
-                        </div>
-                    </div>
+            <select name="country" class="dropdown" style="height: 43px; color: #777777">
+                <option value="">Select Country</option>
+                @foreach ($countries as $country)
+                    <option value="{{ $country->id }}" {{ request('country') == $country->id ? 'selected' : '' }}>
+                        {{ $country->name }}
+                    </option>
                 @endforeach
+            </select>
+
+            <button class="view-btn" type="submit">
+                <i class="fa fa-search"></i>
+            </button>
+        </form>
+    </section>
+
+    <!-- Job Listings Section -->
+    <section id="job-listings" class="job-listings-container">
+        <h3 class="job-listings-title">Available Jobs</h3>
+
+        @if ($jobs->isEmpty())
+            <p>No jobs found matching your criteria.</p>
+        @else
+            @php
+                // Check if category_id is set and not null, and whether it is "All"
+                $isCategorySelected = request()->has('category_id') && request()->category_id != null;
+                $isAllCategory = request()->category_id === '45';
+            @endphp
+
+            @if ($isCategorySelected && !$isAllCategory)
+                <!-- Display as Table if Specific Category (not "45") is Selected -->
+                <div>
+                    <table class="job-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Reference ID</th>
+                                <th>Job Title</th>
+                                <th>Description</th>
+                                <th>Location</th>
+                                <th>Posted Date</th>
+                                <th>Closing Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($jobs as $index => $job)
+                                <tr>
+                                    <td>{{ ($jobs->currentPage() - 1) * $jobs->perPage() + $index + 1 }}</td>
+                                    <td>{{ $job->job_id ?? 'N/A' }}</td>
+                                    <td>
+                                        <a href="{{ route('job.details', $job->id) }}" class="job-title">
+                                            {{ $job->title }}
+                                        </a>
+                                        <br>
+                                        <a href="{{ route('job.details', $job->id) }}" class="company-name">
+                                            {{ $job->employer == null ? '' : $job->employer->company_name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ $job->description ?? 'No description provided' }}</td>
+                                    <td>{{ $job->location ?? 'Not specified' }}</td>
+                                    <td>{{ $job->created_at ? $job->created_at->format('Y-m-d') : 'N/A' }}</td>
+                                    <td>{{ $job->closing_date ?? 'N/A' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <!-- Display as Cards if No Category or "All" is Selected -->
+                <div class="job-grid">
+                    @foreach ($jobs as $job)
+                        <div class="job-card" style="min-height:50px;height:auto; cursor: pointer;"
+                            onclick="window.location='{{ route('job.details', $job->id) }}'">
+                            <a href="{{ route('job.details', $job->id) }}" class="job-title"
+                                style="font-size:15px; margin-bottom: 0px;">
+                                {{ $job->title }}
+                            </a>
+                            <p class="company-name"
+                                style="font-size: 14px; margin-top: 2px; margin-bottom: 0px; font-weight:600; line-height:1;">
+                                {{ $job->employer == null ? '' : $job->employer->company_name }}
+                            </p>
+                            <p class="location"
+                                style="font-size: 12px; margin-top: 1px; margin-bottom: 0px; line-height:1;">
+                                {{ $job->location }}
+                            </p>
+                            <div style="display: flex; justify-content: space-between;">
+                                <p
+                                    style="font-size: 14px; color:red; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
+                                    {{ $job->closing_date }}
+                                </p>
+                                <p
+                                    style="font-size: 14px; color:#888888; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
+                                    {{ $job->job_id }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            <!-- Pagination -->
+            <div class="pagination-container" style="margin-top: 20px;">
+                {{ $jobs->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
             </div>
         @endif
-
-        <!-- Pagination -->
-        <div class="pagination-container" style="margin-top: 20px;">
-            {{ $jobs->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
-        </div>
-    @endif
-</section>
+    </section>
 
 
 

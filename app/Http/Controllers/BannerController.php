@@ -45,61 +45,67 @@ class BannerController extends Controller
     }
 
     public function store(Request $request)
-    {
+{
+    // Validate the request
+    $validated = $request->validate([
+        'employer_id' => 'required|exists:employers,id',
+        'title' => 'required|string|max:255',
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'category_id' => 'nullable|exists:categories,id',
+        'package_id' => 'required|exists:banner_packages,id',
+        'payment_method' => 'required|in:contact_admin,online',
+        'placement' => 'required|in:banner,category_page',
+    ]);
 
-        // Validate the request
-        $validated = $request->validate([
-            'employer_id' => 'required|exists:employers,id',
-            'title' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'category_id' => 'nullable|exists:categories,id',
-            'package_id' => 'required|exists:banner_packages,id',
-            'payment_method' => 'required|in:contact_admin,online',
-            'placement' => 'required|in:banner,category_page',
+    $adminId = Auth('admin')->id();
+
+    DB::beginTransaction();
+
+    try {
+        // Get package price
+        $package = BannerPackage::findOrFail($validated['package_id']);
+        $packagePrice = $package->price_lkr;
+
+        // Handle image upload
+        $imagePath = $request->file('image')->store('banner_images', 'public');
+
+        // Create banner
+        $banner = Banner::create([
+            'title' => $validated['title'],
+            'employer_id' => $validated['employer_id'],
+            'image' => $imagePath,
+            'category_id' => $validated['category_id'],
+            'package_id' => $validated['package_id'],
+            'payment_method' => $validated['payment_method'],
+            'placement' => $validated['placement'],
+            'status' => 'pending',
+            'admin_id' => $adminId,
+            'banner_price' => $packagePrice, // ✅ store package price
         ]);
-        $adminId = Auth('admin')->id();
-        // Start transaction
-        DB::beginTransaction();
-        try {
-            // Handle image upload
-            $imagePath = $request->file('image')->store('banner_images', 'public');
 
-            // Create banner
-            $banner = Banner::create([
-                'title' => $validated['title'],
-                'employer_id' => $validated['employer_id'],
-                'image' => $imagePath,
-                'category_id' => $validated['category_id'],
-                'package_id' => $validated['package_id'],
-                'payment_method' => $validated['payment_method'],
-                'placement' => $validated['placement'],
-                'status' => 'pending',
-                'admin_id' => $adminId,
-            ]);
+        DB::commit();
 
-            DB::commit();
-
-            // Handle different payment methods
-            if ($validated['payment_method'] === 'online') {
-                session(['pending_banner_id' => $banner->id]);
-                return redirect()->route('payment.checkout');
-            }
-
-            return redirect()->route('banners.index')
-                ->with('success', 'Banner created successfully! Our admin will contact you soon.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            // Delete uploaded image if exists
-            if (isset($imagePath) && Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
-            }
-
-            return redirect()->back()
-                ->withErrors(['error' => 'An error occurred while creating the banner. Please try again.'])
-                ->withInput();
+        // Redirect based on payment method
+        if ($validated['payment_method'] === 'online') {
+            session(['pending_banner_id' => $banner->id]);
+            return redirect()->route('payment.checkout');
         }
+
+        return redirect()->route('banners.index')
+            ->with('success', 'Banner created successfully! Our admin will contact you soon.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        if (isset($imagePath) && Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
+        }
+
+        return redirect()->back()
+            ->withErrors(['error' => 'An error occurred while creating the banner. Please try again.'])
+            ->withInput();
     }
+}
+
 
     public function storeBannerData(Request $request)
     {

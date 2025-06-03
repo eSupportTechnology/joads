@@ -23,6 +23,7 @@ class Banner extends Model
         'admin_id',
         'employer_id',
         'status',
+        'banner_price',
 
     ];
 

@@ -59,29 +59,30 @@ class ApplicationController extends Controller
      * Handle form submission.
      */
     public function submitForm(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'contact_number' => 'required|regex:/^[0-9]+$/',
-            'message' => 'nullable|string',
-            'cv_path' => 'required|mimes:doc,docx,pdf,odt,rtf,jpg,jpeg,gif,png|max:2048',
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email',
+        'contact_number' => 'required|regex:/^[0-9]+$/',
+        'message' => 'nullable|string',
+        'cv_path' => 'required|mimes:doc,docx,pdf,odt,rtf,jpg,jpeg,gif,png|max:2048',
 
-            'employer_id' => 'required|exists:employers,id',
-            'user_id' => 'nullable|exists:users,id',
-            'company_mail' => 'required|email',
-            'job_posting_id' => 'required|exists:job_postings,id',
-        ]);
+        'employer_id' => 'required|exists:employers,id',
+        'user_id' => 'nullable|exists:users,id',
+        'company_mail' => 'required|email',
+        'job_posting_id' => 'required|exists:job_postings,id',
+    ]);
 
-        // Handle file upload
-        if ($request->hasFile('cv')) {
-            $validated['cv_path'] = $request->file('cv')->store('cv_uploads', 'public');
-        }
-
-        Application::create($validated);
-
-        Session::flash('success', 'Your application has been submitted successfully.');
-
-        return redirect()->back();
+    // Handle file upload
+    if ($request->hasFile('cv_path')) {
+        $validated['cv_path'] = $request->file('cv_path')->store('cv_uploads', 'public');
     }
+
+    Application::create($validated);
+
+    Session::flash('success', 'Your application has been submitted successfully.');
+
+    return redirect()->back();
+}
+
 }
