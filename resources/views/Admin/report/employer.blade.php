@@ -12,7 +12,6 @@
 @endsection
 
 
-
 @section('content')
     <div class="container mt-5">
         <div class="container mt-5">
@@ -76,14 +75,14 @@
         <table id="job-postings-table" class="table table-bordered" style="width:100%">
             <thead>
                 <tr>
-                    <th>No.</th>
-                    <th>Post Date</th>
-                    <th>Approved Date</th>
-                    <th>Company</th>
-                    <th>Post</th>
-                    <th>Views</th>
-                    <th>Paid Amount (LKR)</th>
-                    <th>Daily Earnings (LKR)</th> <!-- New column -->
+                    <th class="text-center">No.</th>
+                    <th class="text-center">Post Date</th>
+                    <th class="text-center">Approved Date</th>
+                    <th class="text-center">Company</th>
+                    <th class="text-center">Post</th>
+                    <th class="text-center">Total Views</th>
+                    <th class="text-center">Paid Amount (LKR)</th>
+                    <th class="text-center">Daily Total Earnings (LKR)</th> <!-- New column -->
                 </tr>
             </thead>
             <tbody>
@@ -93,14 +92,14 @@
                         $currentDate = \Carbon\Carbon::parse($job->created_at)->format('Y-m-d');
                     @endphp
                     <tr>
-                        <td>{{ $key + 1 }}</td>
-                        <td>{{ $currentDate }}</td>
-                        <td>{{ $job->approved_date ? \Carbon\Carbon::parse($job->approved_date)->format('Y-m-d') : 'Not Approved' }}</td>
-                        <td>{{ $job->company_name ?? 'N/A' }}</td>
-                        <td>{{ $job->title }}</td>
-                        <td>{{ $job->view_count }}</td>
-                        <td>{{ number_format($job->lkr_price, 2) }}</td>
-                        <td>
+                        <td class="text-left">{{ $key + 1 }}</td>
+                        <td class="text-left">{{ $currentDate }}</td>
+                        <td class="text-left">{{ $job->approved_date ? \Carbon\Carbon::parse($job->approved_date)->format('Y-m-d') : 'Not Approved' }}</td>
+                        <td class="text-left">{{ $job->company_name ?? 'N/A' }}</td>
+                        <td class="text-left">{{ $job->title }}</td>
+                        <td class="text-left">{{ $job->view_count }}</td>
+                        <td class="text-right" style="text-align: right">{{ number_format($job->lkr_price, 2) }}</td>
+                        <td class="text-right" style="text-align: right">
                             @if ($lastDate !== $currentDate)
                                 {{ number_format($dailyTotals->get($currentDate, 0), 2) }}
                             @endif
@@ -136,7 +135,7 @@
             $('#job-postings-table').DataTable({
                 dom: 'Bfrtip',
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                pageLength: 10,
+                pageLength: 50,
                 ordering: true,
                 responsive: true
             });

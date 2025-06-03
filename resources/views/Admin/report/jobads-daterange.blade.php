@@ -83,12 +83,12 @@
                                 <tbody>
                                     @foreach ($jobsInRange as $job)
                                         <tr>
-                                            <td>{{ $job->created_at }}</td>
-                                            <td>{{ $job->title }}</td>
-                                            <td>{{ $job->company_name }}</td>
-                                            <td>{{ number_format($job->lkr_price, 2) }}</td>
-                                            <td>{{ $job->payment_method }}</td>
-                                            <td>{{ $job->admin_name ?? 'N/A' }}</td>
+                                            <td class="text-left" style="text-align: left">{{ $job->created_at }}</td>
+                                            <td class="text-left" style="text-align: left">{{ $job->title }}</td>
+                                            <td class="text-left" style="text-align: left">{{ $job->company_name }}</td>
+                                            <td class="text-right" style="text-align: right">{{ number_format($job->lkr_price, 2) }}</td>
+                                            <td class="text-left" style="text-align: left">{{ $job->payment_method }}</td>
+                                            <td class="text-left" style="text-align: left">{{ $job->admin_name ?? 'N/A' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

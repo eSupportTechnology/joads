@@ -18,7 +18,6 @@
             font-family: 'Arial', sans-serif;
             text-align: left;
             color: #333;
-            border-spacing: 10px;
         }
         .styled-table th,
         .styled-table td {
@@ -98,31 +97,38 @@
                         <table class="display styled-table" id="daily-apps-table">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Applications Count</th>
-                                    <th>User Name</th>
-                                    <th>Job Title</th>
+                                    <th class="text-center">No.</th> 
+                                    <th class="text-center">Date</th>
+                                    <th class="text-center">Applications Count</th>
+                                    <th class="text-center">User Name</th>
+                                    <th class="text-center">User Email</th>
+                                    <th class="text-center">Job Title</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $serialNumber = 1; @endphp <!-- Initialize serial number -->
                                 @foreach ($dailyApplicationsData as $daily)
                                     @php
                                         $rowSpan = count($daily['applications'] ?? []) ?: 1;
                                     @endphp
                                     <tr>
+                                        <td rowspan="{{ $rowSpan }}">{{ $serialNumber }}</td> <!-- Add serial number -->
                                         <td rowspan="{{ $rowSpan }}">{{ $daily['date'] }}</td>
                                         <td rowspan="{{ $rowSpan }}">{{ $daily['count'] }}</td>
                                         @if (!empty($daily['applications']))
                                             <td>{{ $daily['applications'][0]['user_name'] ?? 'N/A' }}</td>
+                                            <td>{{ $daily['applications'][0]['user_email'] ?? 'N/A' }}</td>
                                             <td>{{ $daily['applications'][0]['job_title'] ?? 'N/A' }}</td>
                                         @else
-                                            <td colspan="2">No Applications</td>
+                                            <td colspan="3">No Applications</td>
                                         @endif
                                     </tr>
+                                    @php $serialNumber++; @endphp <!-- Increment for next main row -->
                                     @foreach ($daily['applications'] ?? [] as $index => $application)
                                         @if ($index > 0)
                                             <tr>
                                                 <td>{{ $application['user_name'] ?? 'N/A' }}</td>
+                                                <td>{{ $application['user_email'] ?? 'N/A' }}</td>
                                                 <td>{{ $application['job_title'] ?? 'N/A' }}</td>
                                             </tr>
                                         @endif

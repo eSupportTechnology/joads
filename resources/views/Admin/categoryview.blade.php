@@ -49,6 +49,7 @@
                                         <th>Parent</th>
                                         <th>NO. of Posts</th>
                                         <th>NO. of Views</th>
+                                        <th>Today Views</th> {{-- Added column --}}
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -61,6 +62,7 @@
                                             <td>{{ $category->parent ? $category->parent->name : 'Main Category' }}</td>
                                             <td>{{ $category->approved_job_postings_count }}</td>
                                             <td>{{ $category->approved_view_count ?? 0 }}</td>
+                                            <td>{{ $category->today_views ?? 0 }}</td> {{-- Show today views --}}
                                             <td>{{ ucfirst($category->status) }}</td>
                                             <td>
                                                 <a href="{{ route('admin.categories.edit', $category->id) }}"
@@ -81,6 +83,7 @@
                                                     <td>-- {{ $sub->name }}</td>
                                                     <td>{{ $category->name }}</td>
                                                     <td>{{ ucfirst($sub->status) }}</td>
+                                                    <td colspan="4"></td> {{-- Adjust colspan if needed --}}
                                                     <td>
                                                         <a href="{{ route('admin.categories.edit', $sub->id) }}"
                                                             class="btn btn-warning btn-sm">Edit</a>

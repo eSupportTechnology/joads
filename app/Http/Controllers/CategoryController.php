@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Subcategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class CategoryController extends Controller
 {
     // Display a listing of categories
-   public function index()
+
+public function index()
 {
+    $today = Carbon::today()->toDateString();
+
     $categories = Category::with('subcategories')
         ->withCount([
             'jobPostings as approved_job_postings_count' => function ($query) {
@@ -22,11 +27,20 @@ class CategoryController extends Controller
                 $query->where('status', 'approved');
             }
         ], 'view_count')
-        ->get();
+        ->get()
+        ->map(function ($category) use ($today) {
+            // Get today's views for approved job postings in this category
+            $category->today_views = DB::table('job_postings')
+                ->where('status', 'approved')
+                ->where('category_id', $category->id)
+                ->whereDate('updated_at', $today)
+                ->sum('view_count');
+
+            return $category;
+        });
 
     return view('Admin.categoryview', compact('categories'));
 }
-
 
 
     // Show the form for creating a new category

@@ -31,7 +31,7 @@
         /* Table data alignment */
         #daily-table tbody td {
             vertical-align: middle;
-            text-align: center;
+            text-align: left;
             padding: 15px;
         }
 
@@ -41,34 +41,9 @@
             cursor: pointer;
         }
 
-        /* Card header styles */
-        .card-header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #e3e6f0;
-        }
-
-        /* Print button styles */
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            border-color: #545b62;
-        }
-
         /* Responsive table container */
         .table-responsive {
             overflow-x: auto;
-        }
-
-        /* Adjust for smaller screens */
-        @media (max-width: 768px) {
-            #daily-table tbody td {
-                font-size: 0.875rem;
-                padding: 10px;
-            }
         }
     </style>
 @endsection
@@ -121,82 +96,55 @@
             </div>
         </div>
 
-        <!-- Date Range Report -->
-        <div class="col-12 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Date Range Report</h6>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('admin.job.report.daterange') }}" method="GET" class="mb-4">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Start Date</label>
-                                    <input type="date" name="start_date" class="form-control" required>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>End Date</label>
-                                    <input type="date" name="end_date" class="form-control" required>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label> </label>
-                                    <button type="submit" class="btn btn-primary btn-block mt-4">Generate Report</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
         <!-- Detailed Reports: Daily -->
         <div class="col-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Detailed Daily Reports</h6>
-                    <button class="btn btn-secondary btn-sm" onclick="printTable()">Print</button>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive" id="table-container">
+                    <div class="table-responsive">
                         <table class="display" id="daily-table">
                             <thead>
                                 <tr>
+                                    <th>No.</th>
                                     <th>Date</th>
                                     <th>Count</th>
                                     <th>Title</th>
                                     <th>Company</th>
                                     <th>Approved By</th>
-                                    <th>Earnings (LKR)</th>
+                                    <th>Views</th>
+                                    <th>Amount (LKR)</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $serialNumber = 1; @endphp
                                 @foreach ($dailyCount as $daily)
                                     @if ($daily->jobs->isEmpty())
                                         <tr>
+                                            <td>{{ $serialNumber++ }}</td>
                                             <td>{{ $daily->date }}</td>
                                             <td>{{ $daily->count }}</td>
                                             <td>-</td>
                                             <td>-</td>
                                             <td>-</td>
-                                            <td>{{ number_format($daily->earnings, 2) }}</td>
+                                            <td>0</td>
+                                            <td style="text-align: right">{{ number_format($daily->earnings, 2) }}</td>
                                         </tr>
                                     @else
                                         @foreach ($daily->jobs as $index => $job)
                                             <tr>
                                                 @if ($index == 0)
+                                                    <td rowspan="{{ count($daily->jobs) }}">{{ $serialNumber++ }}</td>
                                                     <td rowspan="{{ count($daily->jobs) }}">{{ $daily->date }}</td>
                                                     <td rowspan="{{ count($daily->jobs) }}">{{ $daily->count }}</td>
                                                 @endif
                                                 <td>{{ $job->title }}</td>
                                                 <td>{{ $job->company_name }}</td>
                                                 <td>{{ $job->approved_by }}</td>
+                                                <td>{{ $job->views_count }}</td>
                                                 @if ($index == 0)
-                                                    <td rowspan="{{ count($daily->jobs) }}">{{ number_format($daily->earnings, 2) }}</td>
+                                                    <td rowspan="{{ count($daily->jobs) }}" style="text-align: right">{{ number_format($daily->earnings, 2) }}</td>
                                                 @endif
                                             </tr>
                                         @endforeach
@@ -208,31 +156,20 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 @endsection
 
 @section('script')
     <script>
-        function printTable() {
-            const printContent = document.getElementById('table-container').innerHTML;
-            const style = `
-                <style>
-                    table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 1rem; }
-                    table, th, td { border: 1px solid black; text-align: center; padding: 15px; }
-                    th { background-color: #007bff; color: white; text-transform: uppercase; }
-                    td { background-color: #f9f9f9; }
-                    tr:nth-child(even) td { background-color: #f8f9fa; }
-                    tr:hover td { background-color: #e9ecef; cursor: default; }
-                </style>
-            `;
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write('<html><head><title>Print Job Ads Report</title>' + style + '</head><body>' + printContent + '</body></html>');
-            printWindow.document.close();
-            printWindow.focus();
-            printWindow.print();
-            printWindow.close();
-        }
+        $(document).ready(function() {
+            $('#daily-table').DataTable({
+                responsive: true,
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true
+            });
+        });
     </script>
 @endsection
