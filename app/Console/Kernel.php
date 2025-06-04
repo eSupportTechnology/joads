@@ -27,8 +27,9 @@ class Kernel extends ConsoleKernel
      */
         protected function schedule(Schedule $schedule)
         {
-            $schedule->command('reset:update-count')->daily();
+            $schedule->command('reset:update-count')->dailyAt('00:00');
         }
+
 
     /**
      * The commands to be registered.
