@@ -2,11 +2,11 @@
 @section('title', 'Job Ads Report')
 
 @section('css')
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatable-extension.css') }}">
 @endsection
 
 @section('style')
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatable-extension.css') }}">
     <style>
         /* Style the table headers */
         #daily-table thead th {
@@ -101,6 +101,7 @@
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Detailed Daily Reports</h6>
+                    <button onclick="printTable()" class="btn btn-primary">Print Table</button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -161,6 +162,8 @@
 @endsection
 
 @section('script')
+    <script src="{{ asset('assets/js/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables/dataTables.bootstrap4.min.js') }}"></script>
     <script>
         $(document).ready(function() {
             $('#daily-table').DataTable({
@@ -171,5 +174,37 @@
                 info: true
             });
         });
+
+        function printTable() {
+            // Get the table element
+            const table = document.getElementById('daily-table');
+
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Job Ads Report</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            table { width: 100%; border-collapse: collapse; }
+                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                            th { background-color: #c6d9ee9f; font-weight: bold; text-align: center; }
+                            tr:nth-child(even) { background-color: #f8f9fa; }
+                            tr:hover { background-color: #e9ecef; }
+                            h3 { text-align: center; color: #333; }
+                        </style>
+                    </head>
+                    <body>
+                        <h3>Job Ads Report</h3>
+                        ${table.outerHTML}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+        }
     </script>
 @endsection
