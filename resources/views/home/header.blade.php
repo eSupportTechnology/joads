@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us Popup</title>
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
-    
+
     <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -183,7 +183,7 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
         margin-top: 20px;
         justify-content: center;
     }
-    
+
     /* Show social icons inside nav when menu is toggled */
     .unique-nav-links.show .social-icons {
         display: flex;
@@ -206,7 +206,7 @@ php </style>
         <button class="menu-toggle" aria-label="Toggle Navigation">
             ☰
         </button>
-        <nav class="nav-links unique-nav-links" style="margin-left:100px;margin-top:11px;height:225px ;z-index: 100; ">
+        <nav class="nav-links unique-nav-links" style="margin-left:100px;margin-top:11px;height:100px ;z-index: 100; ">
             <!-- "Post Your Vacancy" as a button -->
             <a href="{{ route('user.postvacancy') }}"
                 style="background: linear-gradient(to bottom, #28adce, #18799c); color: white;transition: color 0.3s ease,
@@ -262,10 +262,10 @@ php </style>
                 <a href="https://www.tiktok.com/@jobads.lk" target="_blank" style="color:#18799c;">
                 <img src="{{ asset('tiktok.jpeg') }}" style="width:25px ;height:auto">
                 </a>
-            </div>        
+            </div>
         </nav>
         </div>
-    
+
 
 
         <div class="menu">

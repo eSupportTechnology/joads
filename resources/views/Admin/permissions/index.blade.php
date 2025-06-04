@@ -38,14 +38,14 @@
                     {{-- Admin Select --}}
                     <form method="GET" action="{{ route('superadmin.show.permissions') }}" class="mb-4">
                         <div class="row align-items-end">
-                            <div class="col-md-4">
+                            <div class="col-md-8">
                                 <label for="admin" class="form-label">Select Admin:</label>
                                 <select name="admin_id" onchange="this.form.submit()" class="form-select">
                                     <option value="">-- Select Admin --</option>
                                     @foreach ($admins as $admin)
                                         <option value="{{ $admin->id }}"
                                             {{ isset($selectedAdmin) && $selectedAdmin->id == $admin->id ? 'selected' : '' }}>
-                                            {{ $admin->name }}
+                                            {{ $admin->name }} - {{ $admin->email }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -61,16 +61,22 @@
 
                             <div class="mb-3">
                                 <h6 class="mb-3">Available Permissions:</h6>
+
+                                <!-- Select All Checkbox -->
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" id="select_all" class="form-check-input">
+                                    <label for="select_all" class="form-check-label fw-bold">Select All</label>
+                                </div>
+
                                 <div class="row">
                                     @foreach ($permissions as $permission)
                                         <div class="col-md-3 mb-2">
                                             <div class="form-check">
                                                 <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
-                                                    class="form-check-input" id="perm_{{ $permission->id }}"
+                                                    class="form-check-input permission-checkbox" id="perm_{{ $permission->id }}"
                                                     {{ $selectedAdmin->permissions->contains('id', $permission->id) ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="perm_{{ $permission->id }}">
                                                     {{ $permission->name }}
-                                                    {{-- <small class="text-muted">({{ $permission->route }})</small> --}}
                                                 </label>
                                             </div>
                                         </div>
@@ -86,4 +92,34 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectAllCheckbox = document.getElementById('select_all');
+        const permissionCheckboxes = document.querySelectorAll('.permission-checkbox');
+
+        // Set "Select All" checked if all permissions are already checked
+        function updateSelectAllCheckbox() {
+            const allChecked = Array.from(permissionCheckboxes).every(cb => cb.checked);
+            selectAllCheckbox.checked = allChecked;
+        }
+
+        // Initial check on page load
+        updateSelectAllCheckbox();
+
+        // "Select All" click toggles all
+        selectAllCheckbox.addEventListener('change', function () {
+            permissionCheckboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        // Individual checkbox toggle updates "Select All"
+        permissionCheckboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                updateSelectAllCheckbox();
+            });
+        });
+    });
+</script>
 @endsection

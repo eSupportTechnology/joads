@@ -202,10 +202,10 @@ class AdminAuthController extends Controller
 
             // Get total banner earnings
             if (Schema::hasTable('banners')) {
-                $totalBannerEarnings = Banner::join('banner_packages', 'banners.package_id', '=', 'banner_packages.id')
-                    ->where('banners.status', 'published')
-                    ->sum('banner_packages.price_lkr');
+                $totalBannerEarnings = Banner::where('status', 'published')
+                    ->sum('banner_price');
             }
+
 
             // Get total active jobseekers
             if (Schema::hasTable('users')) {
@@ -219,7 +219,7 @@ class AdminAuthController extends Controller
 
             // Get total admins
             if (Schema::hasTable('admins')) {
-                $totalAdmins = Admin::count();
+                $totalAdmins = Admin::where('role', 'admin')->count();
             }
 
             // Get total super admins
