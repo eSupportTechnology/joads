@@ -55,18 +55,24 @@
                             </a>
                         </div>
                         <div class="login-main">
-                            <form action="{{ route('admin.password.email') }}" method="POST">
+                            <h2>Reset Your Password</h2>
+                            <form action="{{ route('employee.password.update') }}" method="POST">
                                 @csrf
-                                <h4>Reset Password</h4>
-                                <p>Enter your email for reset password</p>
+                                <input type="hidden" name="token" value="{{ $token }}">
+                                <input type="hidden" name="email" value="{{ $email }}">
 
                                 <div class="form-group">
-                                    <label for="email" class="col-form-label">Email Address</label>
-                                    <input class="form-control" type="email" name="email" required
-                                        placeholder="example@gmail.com">
+                                    <label for="password" class="col-form-label">New Password</label>
+                                    <input type="password" name="password" class="form-control" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="password_confirmation"class="col-form-label">Confirm Password</label>
+                                    <input type="password" name="password_confirmation" class="form-control" required>
                                 </div>
                                 <br>
-                                <button class="btn btn-primary btn-block" type="submit">Send Password Reset Link</button>
+                                <button type="submit"class="btn btn-primary btn-block">Reset Password
+                                </button>
                             </form>
                         </div>
                     </div>

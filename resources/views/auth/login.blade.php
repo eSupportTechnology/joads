@@ -39,14 +39,14 @@
                                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
                                 </div>
 
-                           
+
                                 <!-- Remember Me and Forgot Password -->
                                 <div class="form-group mb-0">
                                     <div class="checkbox p-0">
                                         <input id="checkbox1" class="checkbox" type="checkbox" name="remember">
                                         <label class="text-muted" for="checkbox1">Remember password</label>
                                     </div>
-                                    <a class="link" href="{{ route('password.request') }}">Forgot password?</a>
+                                    <a class="link" href="{{ route('jobseeker.password.request') }}">Forgot password?</a>
                                 </div>
 
                                 <!-- Submit Button -->

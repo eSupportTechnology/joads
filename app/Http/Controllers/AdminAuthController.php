@@ -146,7 +146,7 @@ class AdminAuthController extends Controller
                     ->whereDate('closing_date', '>=', $today)
                     // ->whereHas('package.duration', function ($query) use ($today) {
                     //     $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
-                    
+
                     ->count();
 
                 // Calculate total views
@@ -368,45 +368,46 @@ class AdminAuthController extends Controller
         return view('Admin.profile', compact('admin'));
     }
 
-    // Handle profile update
-    public function updateProfile(Request $request)
-    {
-        $admin = Auth::guard('admin')->user();
 
-        // Validate the incoming request
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => [
-                'required',
-                'email',
-                Rule::unique('admins', 'email')->ignore($admin->id),
-            ],
-            'contact' => 'nullable|string|max:20',
-            'current_password' => 'nullable|required_with:new_password',
-            'new_password' => 'nullable|min:8|confirmed',
-        ]);
+public function updateProfile(Request $request)
+{
+    $admin = Auth::guard('admin')->user();
 
-        // Update fields
-        $admin->name = $request->name;
-        $admin->email = $request->email;
-        $admin->contact = $request->contact;
+    // Validate the incoming request
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => [
+            'required',
+            'email',
+            Rule::unique('admins', 'email')->ignore($admin->id),
+        ],
+        'contact' => 'nullable|string|max:20',
+        'current_password' => 'nullable|required_with:new_password',
+        'new_password' => 'nullable|min:8|confirmed',
+    ]);
 
-        // Handle password change
-        if ($request->filled('new_password')) {
-            if (!Hash::check($request->current_password, $admin->password)) {
-                return back()->withErrors(['current_password' => 'Current password is incorrect']);
-            }
-            $admin->password = Hash::make($request->new_password);
+    // Update fields
+    $admin->name = $request->name;
+    $admin->email = $request->email;
+    $admin->contact = $request->contact;
+
+    // Handle password change
+    if ($request->filled('new_password')) {
+        if (!Hash::check($request->current_password, $admin->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect']);
         }
-
-        // Save the admin
-        try {
-            $admin->db::save();
-            return redirect()->route('admin.profile')->with('success', 'Profile updated successfully');
-        } catch (\Exception $e) {
-            return back()->withErrors(['save_error' => 'An error occurred while saving your profile.']);
-        }
+        $admin->password = Hash::make($request->new_password);
     }
+
+    // Save the admin
+    try {
+        $admin->save();
+        return redirect()->route('admin.profile')->with('success', 'Profile updated successfully');
+    } catch (\Exception $e) {
+        return back()->withErrors(['save_error' => 'An error occurred while saving your profile.']);
+    }
+}
+
 
 
     public function showPermissionForm(Request $request)

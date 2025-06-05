@@ -49,13 +49,29 @@
             <div class="col-12 p-0">
                 <div class="login-card">
                     <div>
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        @endif
+                        @if (session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        @endif
+
+
                         <div>
                             <a class="logo" href="{{ route('home') }}">
                                 <x-application-logo />
                             </a>
                         </div>
                         <div class="login-main">
-                            <form action="{{ route('admin.password.email') }}" method="POST">
+                            <form action="{{ route('employee.password.email') }}" method="POST">
                                 @csrf
                                 <h4>Reset Password</h4>
                                 <p>Enter your email for reset password</p>
@@ -66,7 +82,8 @@
                                         placeholder="example@gmail.com">
                                 </div>
                                 <br>
-                                <button class="btn btn-primary btn-block" type="submit">Send Password Reset Link</button>
+                                <button class="btn btn-primary btn-block" type="submit">Send Password Reset
+                                    Link</button>
                             </form>
                         </div>
                     </div>

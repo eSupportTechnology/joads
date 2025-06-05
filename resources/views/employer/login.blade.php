@@ -46,15 +46,19 @@
 
                                 <!-- Remember Me and Forgot Password -->
                                 <div class="form-group mb-0">
-                                    <div class="checkbox p-0">
-                                        <input id="checkbox1" class="checkbox" type="checkbox" name="remember">
-                                        <label class="text-muted" for="checkbox1">Remember password</label>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="form-check m-0">
+                                            <input id="checkbox1" class="form-check-input" type="checkbox" name="remember">
+                                            <label class="form-check-label text-muted" for="checkbox1">Remember
+                                                password</label>
+                                        </div>
+                                        <a class="link" href="{{ route('employee.password.request') }}">Forgot
+                                            password?</a>
                                     </div>
-                                    <a class="link" href="#">Forgot password?</a>
-                                </div>
 
-                                <!-- Submit Button -->
-                                <button class="btn btn-primary btn-block mt-3" type="submit">Sign in</button>
+                                    <!-- Submit Button -->
+                                    <button class="btn btn-primary btn-block mt-3" type="submit">Sign in</button>
+                                </div>
 
 
 
