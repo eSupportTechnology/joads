@@ -14,6 +14,7 @@ class Package extends Model
 
     // Specify the fillable fields to allow mass assignment
     protected $fillable = [
+        'package_type',
         'package_size',
         'duration_id',
         'lkr_price',

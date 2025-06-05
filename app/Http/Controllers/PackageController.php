@@ -31,9 +31,11 @@ class PackageController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request);
         $request->validate([
+            'package_type' => 'required|String',
             'package_size' => 'required|integer',
-            'duration_id' => 'required|in:1,2',
+            'duration_id' => 'required|numeric',
             'lkr_price' => 'required|numeric',
             'usd_price' => 'required|numeric',
         ]);
@@ -68,8 +70,9 @@ class PackageController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
+            'package_type' => 'required|String',
             'package_size' => 'required|integer',
-            'duration_id' => 'required|in:1,2',
+            'duration_id' => 'required|numeric',
             'lkr_price' => 'required|numeric',
             'usd_price' => 'required|numeric',
         ]);

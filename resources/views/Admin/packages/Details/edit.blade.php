@@ -34,6 +34,13 @@
                         @method('PUT')
                         <div class="row">
                             <div class="form-group mb-3 col-md-6">
+                                <label for="package_type">Package Type:</label>
+                                <select name="package_type" id="package_type" class="form-control" required>
+                                    <option value="Custom" {{ (old('package_type', $package->package_type ?? '') == 'Custom') ? 'selected' : '' }}>Custom</option>
+                                    <option value="Standard" {{ (old('package_type', $package->package_type ?? '') == 'Standard') ? 'selected' : '' }}>Standard</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-3 col-md-6">
                                 <label for="package_size">Package Size (Number of Posts):</label>
                                 <input type="number" name="package_size" id="package_size" class="form-control"
                                     value="{{ $package->package_size }}" required>

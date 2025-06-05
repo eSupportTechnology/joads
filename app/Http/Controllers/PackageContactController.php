@@ -32,17 +32,17 @@ class PackageContactController extends Controller
             $post->update([
                 'email' => $request->email,
                 'effective_date' => $request->effective_date,
-                'description_one' => $request->description_one,  
-                'description_two' => $request->description_two,  
-                'description_three' => $request->description_three,  
+                'description_one' => $request->description_one,
+                'description_two' => $request->description_two,
+                'description_three' => $request->description_three,
             ]);
         } else {
             $post = PackageContact::create([
                 'email' => $request->email,
                 'effective_date' => $request->effective_date,
-                'description_one' => $request->description_one,  
-                'description_two' => $request->description_two,  
-                'description_three' => $request->description_three,  
+                'description_one' => $request->description_one,
+                'description_two' => $request->description_two,
+                'description_three' => $request->description_three,
             ]);
         }
 
@@ -58,7 +58,7 @@ class PackageContactController extends Controller
         $packageDetails = PackageContact::first();
         $contacts = ContactUs::all();
         $contactsList = Contact::all();
-        $packages = Package::all();
+        $packages = Package::where('package_type', 'Standard')->get();
         $localBanks = BankAccount::where('localorforeign', 'local')->get();
         $foreignBanks = BankAccount::where('localorforeign', 'foreign')->get();
 
@@ -79,9 +79,9 @@ class PackageContactController extends Controller
             'durations'
         ));
     }
-    
-    
-    
+
+
+
     public function create()
     {
         $post = PackageContact::first();

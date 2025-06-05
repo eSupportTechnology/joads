@@ -50,7 +50,7 @@
                             <table class="display" id="keytable">
                                 <thead>
                                     <tr>
-                                        
+                                        <th>Package Type</th>
                                         <th>Package Size</th>
                                         <th>Duration (Days)</th>
                                         <th>LKR Price</th>
@@ -61,7 +61,7 @@
                                 <tbody>
                                     @foreach ($packages as $package)
                                         <tr>
-                                           
+                                            <td>{{ $package->package_type }}</td>
                                             <td>{{ $package->package_size }}</td>
                                             <td>{{ $package->duration->duration }}</td>
                                             <td>{{ $package->lkr_price }}</td>

@@ -56,7 +56,7 @@
                                             <td>{{ $employer->contact_details ?? 'N/A' }}</td>
                                             <td>{{ Str::limit($employer->business_info, 50) }}</td>
                                             <td>{{ $employer->is_active ? 'Active' : 'Inactive' }}</td>
-                                            <td>
+                                            <td class="d-flex gap-2 align-items-center">
                                                 <form action="{{ route('employer.toggleStatus', $employer->id) }}"
                                                     method="POST" style="display:inline;">
                                                     @csrf
