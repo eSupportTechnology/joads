@@ -136,7 +136,7 @@
                             @foreach ($packages as $package)
                                 <option value="{{ $package->id }}" data-max-jobs="{{ $package->package_size }}">
                                     {{ $package->package_size }} ads - Rs.
-                                    {{ $package->lkr_price }}/{{ $package->usd_price }} USD ({{ $package->duration_days }}
+                                    {{ $package->lkr_price }}/{{ $package->usd_price }} USD ({{ $package->duration->duration }}
                                     days)
                                 </option>
                             @endforeach

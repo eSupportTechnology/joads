@@ -878,6 +878,10 @@ Route::middleware(['auth:admin'])->group(function () {
         ->name('banner_packages.destroy');
 
     //package duration management
+    Route::get('/admin/durations/create', [DurationController::class, 'create'])
+        ->name('durations.create')->middleware('check.permission:durations.create');
+    Route::post('/admin/durations/store', [DurationController::class, 'store'])
+        ->name('durations.store');
     Route::get('/admin/durations', [DurationController::class, 'index'])
         ->name('durations.index')->middleware('check.permission:durations.index');
     Route::get('/admin/durations/edit/{duration}', [DurationController::class, 'edit'])

@@ -38,6 +38,7 @@ class AdminEmailTemplateController extends Controller
 
     public function update(Request $request, EmailTemplate $emailTemplate)
     {
+        dd($request);
         $request->validate([
             'subject' => 'required',
             'body' => 'required',

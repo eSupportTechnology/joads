@@ -395,9 +395,10 @@
                         <div class="swiper-wrapper">
                             @forelse ($banners as $banner)
                                 <div class="swiper-slide banner-item">
-                                    <img src="{{ asset('storage/' . $banner->image) }}"
-                                        alt="{{ $banner->title }}">
+                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}"
+                                        style="width: 100%; height: 500px; border-radius: 8px;">
                                 </div>
+
                             @empty
                                 <div class="swiper-slide ">
                                     <p>No banners available.</p>

@@ -46,33 +46,38 @@ class BannerController extends Controller
 
     public function store(Request $request)
 {
-    // Validate the request
+    // Basic validation allowing 0 (Admin) as employer_id
     $validated = $request->validate([
-        'employer_id' => 'required|exists:employers,id',
+        'employer_id' => 'required|integer|min:0',
         'title' => 'required|string|max:255',
         'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         'category_id' => 'nullable|exists:categories,id',
         'package_id' => 'required|exists:banner_packages,id',
-        'payment_method' => 'required|in:contact_admin,online',
+        'payment_method' => 'required|in:admin,contact_admin,online',
         'placement' => 'required|in:banner,category_page',
     ]);
+
+    $employerId = (int) $validated['employer_id'];
+
+if ($employerId !== 0 && !\App\Models\Employer::where('id', $employerId)->exists()) {
+    return redirect()->back()
+        ->withErrors(['employer_id' => 'Selected employer does not exist.'])
+        ->withInput();
+}
+
 
     $adminId = Auth('admin')->id();
 
     DB::beginTransaction();
 
     try {
-        // Get package price
         $package = BannerPackage::findOrFail($validated['package_id']);
         $packagePrice = $package->price_lkr;
-
-        // Handle image upload
         $imagePath = $request->file('image')->store('banner_images', 'public');
 
-        // Create banner
         $banner = Banner::create([
             'title' => $validated['title'],
-            'employer_id' => $validated['employer_id'],
+            'employer_id' => $employerId === 0 ? null : $employerId,
             'image' => $imagePath,
             'category_id' => $validated['category_id'],
             'package_id' => $validated['package_id'],
@@ -80,12 +85,11 @@ class BannerController extends Controller
             'placement' => $validated['placement'],
             'status' => 'pending',
             'admin_id' => $adminId,
-            'banner_price' => $packagePrice, // ✅ store package price
+            'banner_price' => $packagePrice,
         ]);
 
         DB::commit();
 
-        // Redirect based on payment method
         if ($validated['payment_method'] === 'online') {
             session(['pending_banner_id' => $banner->id]);
             return redirect()->route('payment.checkout');
@@ -95,16 +99,15 @@ class BannerController extends Controller
             ->with('success', 'Banner created successfully! Our admin will contact you soon.');
     } catch (\Exception $e) {
         DB::rollBack();
-
-        if (isset($imagePath) && Storage::disk('public')->exists($imagePath)) {
+        if (isset($imagePath)) {
             Storage::disk('public')->delete($imagePath);
         }
-
         return redirect()->back()
             ->withErrors(['error' => 'An error occurred while creating the banner. Please try again.'])
             ->withInput();
     }
 }
+
 
 
     public function storeBannerData(Request $request)

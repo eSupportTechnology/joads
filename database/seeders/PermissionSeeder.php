@@ -79,11 +79,12 @@ class PermissionSeeder extends Seeder
             ['id' => 65, 'name' => 'Service Gallery index', 'route' => 'admin.service-gallery.index'],
             ['id' => 66, 'name' => 'Service Gallery Create', 'route' => 'admin.service-gallery.create'],
             ['id' => 67, 'name' => 'Service Gallery Edit', 'route' => 'admin.service-gallery.edit'],
+            ['id' => 68, 'name' => 'Durations Create', 'route' => 'durations.create'],
         ];
 
         foreach ($permissions as $permission) {
             Permission::updateOrCreate(
-                ['route' => $permission['route']], 
+                ['route' => $permission['route']],
                 [
                     'name' => $permission['name'],
                     'route' => $permission['route']

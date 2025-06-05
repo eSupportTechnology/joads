@@ -143,9 +143,10 @@ class AdminAuthController extends Controller
             if (Schema::hasTable('job_postings')) {
                 $totalJobsPosted = JobPosting::where('status', 'approved')
                     ->where('is_active', true)
-                    ->whereHas('package.duration', function ($query) use ($today) {
-                        $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
-                    })
+                    ->whereDate('closing_date', '>=', $today)
+                    // ->whereHas('package.duration', function ($query) use ($today) {
+                    //     $query->whereRaw("DATE_ADD(job_postings.approved_date, INTERVAL duration.duration DAY) >= ?", [$today]);
+                    
                     ->count();
 
                 // Calculate total views
@@ -304,8 +305,6 @@ class AdminAuthController extends Controller
         }
     }
 
-
-
     public function companyStat()
     {
         try {
@@ -360,7 +359,6 @@ class AdminAuthController extends Controller
                     'created_at' => $application->created_at,
                 ];
             });
-
         return view('Admin.dashboard', compact('statistics', 'recentApplications', 'companyStats'));
     }
 
@@ -423,8 +421,6 @@ class AdminAuthController extends Controller
 
         return view('Admin.permissions.index', compact('admins', 'permissions', 'selectedAdmin'));
     }
-
-
 
     public function assignPermissions(Request $request)
     {

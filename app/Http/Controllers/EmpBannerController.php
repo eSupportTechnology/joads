@@ -31,34 +31,37 @@ class EmpBannerController extends Controller
 
     public function store(Request $request)
     {
-        
-            // Validate the request
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'category_id' => 'nullable|exists:categories,id',
-                'package_id' => 'required|exists:banner_packages,id',
-                'payment_method' => 'required|in:contact_admin,online',
-                'placement' => 'required|in:banner,category_page',
-            ]);
-            $empId = Auth('employer')->id();
-            // Start transaction
-            DB::beginTransaction();
-            try {
+
+        // Validate the request
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'category_id' => 'nullable|exists:categories,id',
+            'package_id' => 'required|exists:banner_packages,id',
+            'payment_method' => 'required|in:contact_admin,online',
+            'placement' => 'required|in:banner,category_page',
+        ]);
+        $empId = Auth('employer')->id();
+        // Start transaction
+        DB::beginTransaction();
+        try {
             // Handle image upload
             $imagePath = $request->file('image')->store('banner_images', 'public');
 
-            // Create banner
-            $banner = Banner::create([
-                'title' => $validated['title'],
-                'employer_id' => $empId,
-                'image' => $imagePath,
-                'category_id' => $validated['category_id'],
-                'package_id' => $validated['package_id'],
-                'payment_method' => $validated['payment_method'],
-                'placement' => $validated['placement'],
-                'status' => 'pending',
-            ]);
+           $package = BannerPackage::findOrFail($validated['package_id']);
+$packagePrice = $package->price_lkr;
+
+$banner = Banner::create([
+    'title' => $validated['title'],
+    'employer_id' => $empId,
+    'image' => $imagePath,
+    'category_id' => $validated['category_id'],
+    'package_id' => $validated['package_id'],
+    'payment_method' => $validated['payment_method'],
+    'placement' => $validated['placement'],
+    'status' => 'pending',
+    'banner_price' => $packagePrice,
+]);
 
             DB::commit();
 
@@ -70,7 +73,6 @@ class EmpBannerController extends Controller
 
             return redirect()->route('empbanners.index')
                 ->with('success', 'Banner created successfully! Our admin will contact you soon.');
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -111,9 +113,12 @@ class EmpBannerController extends Controller
     public function create()
     {
         $categories = Category::all();
-        $packages = BannerPackage::all();
+        $packages = BannerPackage::whereHas('duration', function ($query) {
+            $query->where('duration', '!=', 0)
+                ->orwhere('type', '!=', 'banner');
+        })->get();
         $packageDetailsBanners = BannerDetail::first();
-        return view('employer.banner.create', compact('categories', 'packages','packageDetailsBanners'));
+        return view('employer.banner.create', compact('categories', 'packages', 'packageDetailsBanners'));
     }
 
     /**
@@ -128,49 +133,49 @@ class EmpBannerController extends Controller
         $categories = Category::all();
         $packages = BannerPackage::all();
         $packageDetailsBanners = BannerDetail::first();
-        return view('employer.banner.edit', compact('banner','packageDetailsBanners', 'categories', 'packages'));
+        return view('employer.banner.edit', compact('banner', 'packageDetailsBanners', 'categories', 'packages'));
     }
 
     /**
      * Update the specified banner in storage.
      */
     public function update(Request $request, $id)
-{
-    // Validate the request
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'category_id' => 'nullable|exists:categories,id',
-        'placement' => 'required|in:banner,category_page',
-    ]);
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'category_id' => 'nullable|exists:categories,id',
+            'placement' => 'required|in:banner,category_page',
+        ]);
 
-    $banner = Banner::findOrFail($id);
+        $banner = Banner::findOrFail($id);
 
-    DB::beginTransaction();
-    try {
-        // Update image if a new one is uploaded
-        if ($request->hasFile('image')) {
-            if (Storage::disk('public')->exists($banner->image)) {
-                Storage::disk('public')->delete($banner->image);
+        DB::beginTransaction();
+        try {
+            // Update image if a new one is uploaded
+            if ($request->hasFile('image')) {
+                if (Storage::disk('public')->exists($banner->image)) {
+                    Storage::disk('public')->delete($banner->image);
+                }
+                $validated['image'] = $request->file('image')->store('banner_images', 'public');
             }
-            $validated['image'] = $request->file('image')->store('banner_images', 'public');
+
+            // Update the banner
+            $banner->update($validated);
+
+            DB::commit();
+
+            return redirect()->route('empbanners.index')
+                ->with('success', 'Banner updated successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()
+                ->withErrors(['error' => 'An error occurred while updating the banner. Please try again.'])
+                ->withInput();
         }
-
-        // Update the banner
-        $banner->update($validated);
-
-        DB::commit();
-
-        return redirect()->route('empbanners.index')
-            ->with('success', 'Banner updated successfully!');
-    } catch (\Exception $e) {
-        DB::rollBack();
-
-        return redirect()->back()
-            ->withErrors(['error' => 'An error occurred while updating the banner. Please try again.'])
-            ->withInput();
     }
-}
 
     // Controller function
     public function updateStatus(Request $request, Banner $banner)

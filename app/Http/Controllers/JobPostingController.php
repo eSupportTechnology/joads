@@ -87,119 +87,119 @@ class JobPostingController extends Controller
         return view('User.topemployerjob', compact('employer', 'jobs', 'contacts'));
     }
 
-public function generateJobAdsReport(Request $request)
-{
-    // 1) Summary data per date: total count + earnings per day (only approved jobs)
-    $dailyCount = DB::table('job_postings')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->select(
-            DB::raw('DATE(job_postings.created_at) as date'),
-            DB::raw('COUNT(*) as count'),
-            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-        )
-        ->groupBy('date')
-        ->orderBy('date', 'desc')
-        ->get();
-
-    // 2) Get job details per date (title, company, approved_by, views_count)
-    $jobDetailsByDate = DB::table('job_postings')
-        ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-        ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
-        ->where('job_postings.status', 'approved')
-        ->select(
-            DB::raw('DATE(job_postings.created_at) as date'),
-            'job_postings.title',
-            'employers.company_name',
-            DB::raw('COALESCE(job_postings.view_count, 0) as views_count'),
-            DB::raw('COALESCE(admins.name, "N/A") as approved_by')
-        )
-        ->orderBy('job_postings.created_at', 'desc')
-        ->get()
-        ->groupBy('date');
-
-    // 3) Attach job list to each daily summary item
-    $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
-        $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
-        return $item;
-    });
-
-    // Totals for today
-    $today = Carbon::today();
-    $dailyTotalData = DB::table('job_postings')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->whereDate('job_postings.created_at', $today)
-        ->select(
-            DB::raw('COUNT(*) as count'),
-            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-        )
-        ->first();
-
-    // Totals for this week
-    $startOfWeek = Carbon::now()->startOfWeek();
-    $weeklyTotalData = DB::table('job_postings')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->whereBetween('job_postings.created_at', [$startOfWeek, Carbon::now()])
-        ->select(
-            DB::raw('COUNT(*) as count'),
-            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-        )
-        ->first();
-
-    // Prepare variables for filtered date range if requested
-    $totalJobs = 0;
-    $totalEarnings = 0;
-    $jobsInRange = collect();
-
-    if ($request->filled('start_date') && $request->filled('end_date')) {
-        $startDate = Carbon::parse($request->start_date)->startOfDay();
-        $endDate = Carbon::parse($request->end_date)->endOfDay();
-
-        // Total jobs and earnings in range
-        $totals = DB::table('job_postings')
+    public function generateJobAdsReport(Request $request)
+    {
+        // 1) Summary data per date: total count + earnings per day (only approved jobs)
+        $dailyCount = DB::table('job_postings')
             ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
             ->where('job_postings.status', 'approved')
-            ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw('DATE(job_postings.created_at) as date'),
+                DB::raw('COUNT(*) as count'),
+                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+            )
+            ->groupBy('date')
+            ->orderBy('date', 'desc')
+            ->get();
+
+        // 2) Get job details per date (title, company, approved_by, views_count)
+        $jobDetailsByDate = DB::table('job_postings')
+            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+            ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+            ->where('job_postings.status', 'approved')
+            ->select(
+                DB::raw('DATE(job_postings.created_at) as date'),
+                'job_postings.title',
+                'employers.company_name',
+                DB::raw('COALESCE(job_postings.view_count, 0) as views_count'),
+                DB::raw('COALESCE(admins.name, "N/A") as approved_by')
+            )
+            ->orderBy('job_postings.created_at', 'desc')
+            ->get()
+            ->groupBy('date');
+
+        // 3) Attach job list to each daily summary item
+        $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
+            $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
+            return $item;
+        });
+
+        // Totals for today
+        $today = Carbon::today();
+        $dailyTotalData = DB::table('job_postings')
+            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+            ->where('job_postings.status', 'approved')
+            ->whereDate('job_postings.created_at', $today)
             ->select(
                 DB::raw('COUNT(*) as count'),
                 DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
             )
             ->first();
 
-        $totalJobs = $totals->count ?? 0;
-        $totalEarnings = $totals->earnings ?? 0;
-
-        // Get jobs details in range with views count
-        $jobsInRange = DB::table('job_postings')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-            ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+        // Totals for this week
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $weeklyTotalData = DB::table('job_postings')
             ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
             ->where('job_postings.status', 'approved')
-            ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+            ->whereBetween('job_postings.created_at', [$startOfWeek, Carbon::now()])
             ->select(
-                'job_postings.created_at',
-                'job_postings.title',
-                'employers.company_name',
-                DB::raw('COALESCE(job_postings.views, 0) as views_count'),
-                DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price'),
-                'job_postings.payment_method',
-                DB::raw('COALESCE(admins.name, "N/A") as approved_by')
+                DB::raw('COUNT(*) as count'),
+                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
             )
-            ->orderBy('job_postings.created_at', 'desc')
-            ->get();
-    }
+            ->first();
 
-    return view('Admin.report.jobads', [
-        'dailyCount' => $dailyCount,
-        'dailyTotal' => $dailyTotalData->count ?? 0,
-        'weeklyTotal' => $weeklyTotalData->count ?? 0,
-        'totalJobs' => $totalJobs,
-        'totalEarnings' => $totalEarnings,
-        'jobsInRange' => $jobsInRange,
-    ]);
-}
+        // Prepare variables for filtered date range if requested
+        $totalJobs = 0;
+        $totalEarnings = 0;
+        $jobsInRange = collect();
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+            // Total jobs and earnings in range
+            $totals = DB::table('job_postings')
+                ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+                ->where('job_postings.status', 'approved')
+                ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+                ->select(
+                    DB::raw('COUNT(*) as count'),
+                    DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+                )
+                ->first();
+
+            $totalJobs = $totals->count ?? 0;
+            $totalEarnings = $totals->earnings ?? 0;
+
+            // Get jobs details in range with views count
+            $jobsInRange = DB::table('job_postings')
+                ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+                ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+                ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+                ->where('job_postings.status', 'approved')
+                ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+                ->select(
+                    'job_postings.created_at',
+                    'job_postings.title',
+                    'employers.company_name',
+                    DB::raw('COALESCE(job_postings.views, 0) as views_count'),
+                    DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price'),
+                    'job_postings.payment_method',
+                    DB::raw('COALESCE(admins.name, "N/A") as approved_by')
+                )
+                ->orderBy('job_postings.created_at', 'desc')
+                ->get();
+        }
+
+        return view('Admin.report.jobads', [
+            'dailyCount' => $dailyCount,
+            'dailyTotal' => $dailyTotalData->count ?? 0,
+            'weeklyTotal' => $weeklyTotalData->count ?? 0,
+            'totalJobs' => $totalJobs,
+            'totalEarnings' => $totalEarnings,
+            'jobsInRange' => $jobsInRange,
+        ]);
+    }
 
 
     public function home(Request $request)
@@ -282,7 +282,10 @@ public function generateJobAdsReport(Request $request)
             ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
             ->where('banners.status', 'published')
             ->where('banners.placement', 'banner')
-            ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$today])
+            ->where(function ($query) use ($today) {
+                $query->where('duration.duration', 0)
+                    ->orWhereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$today]);
+            })
             ->select('banners.*', 'duration.duration')
             ->get();
         return view('home.home', compact('categories', 'totalCount', 'jobs', 'contacts', 'countries', 'banners'))
@@ -347,7 +350,10 @@ public function generateJobAdsReport(Request $request)
             ->join('duration', 'banner_packages.duration_id', '=', 'duration.id')
             ->where('banners.status', 'published')
             ->where('banners.placement', 'category_page')
-            ->whereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now])
+            ->where(function ($query) use ($now) {
+                $query->where('duration.duration', 0)
+                    ->orWhereRaw('DATE_ADD(banners.updated_at, INTERVAL duration.duration DAY) >= ?', [$now]);
+            })
             ->select('banners.*', 'duration.duration')
             ->get();
 
@@ -412,200 +418,200 @@ public function generateJobAdsReport(Request $request)
         return response()->json($jobs);
     }
 
-public function generateCustomerReport()
-{
-    // Get current date and relevant date ranges
-    $today = now()->format('Y-m-d');
-    $startOfWeek = now()->startOfWeek()->format('Y-m-d');
-    $endOfWeek = now()->endOfWeek()->format('Y-m-d');
-    $startOfMonth = now()->startOfMonth()->format('Y-m-d');
-    $endOfMonth = now()->endOfMonth()->format('Y-m-d');
+    public function generateCustomerReport()
+    {
+        // Get current date and relevant date ranges
+        $today = now()->format('Y-m-d');
+        $startOfWeek = now()->startOfWeek()->format('Y-m-d');
+        $endOfWeek = now()->endOfWeek()->format('Y-m-d');
+        $startOfMonth = now()->startOfMonth()->format('Y-m-d');
+        $endOfMonth = now()->endOfMonth()->format('Y-m-d');
 
-    // Get base queries
-    $users = User::query();
-    $applications = Application::with('user', 'job');
+        // Get base queries
+        $users = User::query();
+        $applications = Application::with('user', 'job');
 
-    // Daily Statistics
-    $dailyApplications = $applications->whereDate('created_at', $today)->count();
-    $dailyUsers = $users->whereDate('created_at', $today)->count();
+        // Daily Statistics
+        $dailyApplications = $applications->whereDate('created_at', $today)->count();
+        $dailyUsers = $users->whereDate('created_at', $today)->count();
 
-    // Daily Applications Data
-    $dailyApplicationsData = Application::with(['user', 'job'])
-        ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
-        ->groupBy('date')
-        ->orderBy('date', 'desc')
-        ->limit(30)
-        ->get()
-        ->map(function ($day) {
-            $applications = Application::with(['user', 'job'])
-                ->whereDate('created_at', $day->date)
-                ->limit(5)
-                ->get()
-                ->map(function ($app) {
-                    return [
-                        'user_name' => optional($app->user)->name ?? 'Unknown User',
-                        'user_email' => optional($app->user)->email ?? 'Unknown Email',
-                        'job_title' => optional($app->job)->title ?? 'Unknown Job',
-                    ];
-                });
+        // Daily Applications Data
+        $dailyApplicationsData = Application::with(['user', 'job'])
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
+            ->groupBy('date')
+            ->orderBy('date', 'desc')
+            ->limit(30)
+            ->get()
+            ->map(function ($day) {
+                $applications = Application::with(['user', 'job'])
+                    ->whereDate('created_at', $day->date)
+                    ->limit(5)
+                    ->get()
+                    ->map(function ($app) {
+                        return [
+                            'user_name' => optional($app->user)->name ?? 'Unknown User',
+                            'user_email' => optional($app->user)->email ?? 'Unknown Email',
+                            'job_title' => optional($app->job)->title ?? 'Unknown Job',
+                        ];
+                    });
 
-            return [
-                'date' => $day->date,
-                'count' => $day->count,
-                'applications' => $applications,
-            ];
-        });
+                return [
+                    'date' => $day->date,
+                    'count' => $day->count,
+                    'applications' => $applications,
+                ];
+            });
 
-    // Weekly Applications Data
-    $weeklyApplicationsData = Application::select(
-        DB::raw('YEARWEEK(created_at) as yearweek'),
-        DB::raw('MIN(created_at) as start_date'),
-        DB::raw('MAX(created_at) as end_date'),
-        DB::raw('COUNT(*) as count')
-    )
-        ->groupBy('yearweek')
-        ->orderBy('yearweek', 'desc')
-        ->limit(12)
-        ->get()
-        ->map(function ($week) {
-            $summary = Application::with(['user', 'job'])
-                ->whereBetween('created_at', [$week->start_date, $week->end_date])
-                ->limit(5)
-                ->get()
-                ->map(function ($app) {
-                    $userName = optional($app->user)->name ?? 'Unknown User';
-                    $userEmail = optional($app->user)->email ?? 'Unknown Email';
-                    $jobTitle = optional($app->job)->title ?? 'Unknown Job';
+        // Weekly Applications Data
+        $weeklyApplicationsData = Application::select(
+            DB::raw('YEARWEEK(created_at) as yearweek'),
+            DB::raw('MIN(created_at) as start_date'),
+            DB::raw('MAX(created_at) as end_date'),
+            DB::raw('COUNT(*) as count')
+        )
+            ->groupBy('yearweek')
+            ->orderBy('yearweek', 'desc')
+            ->limit(12)
+            ->get()
+            ->map(function ($week) {
+                $summary = Application::with(['user', 'job'])
+                    ->whereBetween('created_at', [$week->start_date, $week->end_date])
+                    ->limit(5)
+                    ->get()
+                    ->map(function ($app) {
+                        $userName = optional($app->user)->name ?? 'Unknown User';
+                        $userEmail = optional($app->user)->email ?? 'Unknown Email';
+                        $jobTitle = optional($app->job)->title ?? 'Unknown Job';
 
-                    return "$userName ($userEmail) applied for $jobTitle";
-                });
+                        return "$userName ($userEmail) applied for $jobTitle";
+                    });
 
-            return [
-                'week' => Carbon::parse($week->start_date)->format('W'),
-                'start_date' => Carbon::parse($week->start_date)->format('Y-m-d'),
-                'end_date' => Carbon::parse($week->end_date)->format('Y-m-d'),
-                'count' => $week->count,
-                'summary' => $summary,
-            ];
-        });
+                return [
+                    'week' => Carbon::parse($week->start_date)->format('W'),
+                    'start_date' => Carbon::parse($week->start_date)->format('Y-m-d'),
+                    'end_date' => Carbon::parse($week->end_date)->format('Y-m-d'),
+                    'count' => $week->count,
+                    'summary' => $summary,
+                ];
+            });
 
-    // Monthly Applications Data
-    $monthlyApplicationsData = Application::select(
-        DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
-        DB::raw('COUNT(*) as count')
-    )
-        ->groupBy('month')
-        ->orderBy('month', 'desc')
-        ->limit(12)
-        ->get()
-        ->map(function ($month) {
-            $summary = Application::with(['user', 'job'])
-                ->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$month->month])
-                ->limit(5)
-                ->get()
-                ->map(function ($app) {
-                    $userName = optional($app->user)->name ?? 'Unknown User';
-                    $userEmail = optional($app->user)->email ?? 'Unknown Email';
-                    $jobTitle = optional($app->job)->title ?? 'Unknown Job';
+        // Monthly Applications Data
+        $monthlyApplicationsData = Application::select(
+            DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
+            DB::raw('COUNT(*) as count')
+        )
+            ->groupBy('month')
+            ->orderBy('month', 'desc')
+            ->limit(12)
+            ->get()
+            ->map(function ($month) {
+                $summary = Application::with(['user', 'job'])
+                    ->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$month->month])
+                    ->limit(5)
+                    ->get()
+                    ->map(function ($app) {
+                        $userName = optional($app->user)->name ?? 'Unknown User';
+                        $userEmail = optional($app->user)->email ?? 'Unknown Email';
+                        $jobTitle = optional($app->job)->title ?? 'Unknown Job';
 
-                    return "$userName ($userEmail) - $jobTitle";
-                });
+                        return "$userName ($userEmail) - $jobTitle";
+                    });
 
-            return [
-                'month' => Carbon::parse($month->month . '-01')->format('F Y'),
-                'count' => $month->count,
-                'summary' => $summary,
-            ];
-        });
+                return [
+                    'month' => Carbon::parse($month->month . '-01')->format('F Y'),
+                    'count' => $month->count,
+                    'summary' => $summary,
+                ];
+            });
 
-    // Daily Users Data (New Registrations)
-    $dailyUsersData = User::select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
-        ->groupBy('date')
-        ->orderBy('date', 'desc')
-        ->limit(30)
-        ->get()
-        ->map(function ($day) {
-            $users = User::whereDate('created_at', $day->date)
-                ->select('name', 'email', 'created_at')
-                ->limit(5)
-                ->get();
+        // Daily Users Data (New Registrations)
+        $dailyUsersData = User::select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
+            ->groupBy('date')
+            ->orderBy('date', 'desc')
+            ->limit(30)
+            ->get()
+            ->map(function ($day) {
+                $users = User::whereDate('created_at', $day->date)
+                    ->select('name', 'email', 'created_at')
+                    ->limit(5)
+                    ->get();
 
-            return [
-                'date' => $day->date,
-                'count' => $day->count,
-                'users' => $users,
-            ];
-        });
+                return [
+                    'date' => $day->date,
+                    'count' => $day->count,
+                    'users' => $users,
+                ];
+            });
 
-    // Weekly Users Data
-    $weeklyUsersData = User::select(
-        DB::raw('YEARWEEK(created_at) as yearweek'),
-        DB::raw('MIN(created_at) as start_date'),
-        DB::raw('MAX(created_at) as end_date'),
-        DB::raw('COUNT(*) as count')
-    )
-        ->groupBy('yearweek')
-        ->orderBy('yearweek', 'desc')
-        ->limit(12)
-        ->get()
-        ->map(function ($week) {
-            $users = User::whereBetween('created_at', [$week->start_date, $week->end_date])
-                ->select('name', 'email', 'created_at')
-                ->limit(5)
-                ->get();
+        // Weekly Users Data
+        $weeklyUsersData = User::select(
+            DB::raw('YEARWEEK(created_at) as yearweek'),
+            DB::raw('MIN(created_at) as start_date'),
+            DB::raw('MAX(created_at) as end_date'),
+            DB::raw('COUNT(*) as count')
+        )
+            ->groupBy('yearweek')
+            ->orderBy('yearweek', 'desc')
+            ->limit(12)
+            ->get()
+            ->map(function ($week) {
+                $users = User::whereBetween('created_at', [$week->start_date, $week->end_date])
+                    ->select('name', 'email', 'created_at')
+                    ->limit(5)
+                    ->get();
 
-            return [
-                'week' => Carbon::parse($week->start_date)->format('W'),
-                'start_date' => Carbon::parse($week->start_date)->format('Y-m-d'),
-                'end_date' => Carbon::parse($week->end_date)->format('Y-m-d'),
-                'count' => $week->count,
-                'users' => $users,
-            ];
-        });
+                return [
+                    'week' => Carbon::parse($week->start_date)->format('W'),
+                    'start_date' => Carbon::parse($week->start_date)->format('Y-m-d'),
+                    'end_date' => Carbon::parse($week->end_date)->format('Y-m-d'),
+                    'count' => $week->count,
+                    'users' => $users,
+                ];
+            });
 
-    // Monthly Users Data
-    $monthlyUsersData = User::select(
-        DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
-        DB::raw('COUNT(*) as count')
-    )
-        ->groupBy('month')
-        ->orderBy('month', 'desc')
-        ->limit(12)
-        ->get()
-        ->map(function ($month) {
-            $summary = User::whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$month->month])
-                ->select('name', 'email', 'created_at')
-                ->limit(5)
-                ->get()
-                ->map(function ($user) {
-                    return "{$user->name} ({$user->email})";
-                });
+        // Monthly Users Data
+        $monthlyUsersData = User::select(
+            DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
+            DB::raw('COUNT(*) as count')
+        )
+            ->groupBy('month')
+            ->orderBy('month', 'desc')
+            ->limit(12)
+            ->get()
+            ->map(function ($month) {
+                $summary = User::whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$month->month])
+                    ->select('name', 'email', 'created_at')
+                    ->limit(5)
+                    ->get()
+                    ->map(function ($user) {
+                        return "{$user->name} ({$user->email})";
+                    });
 
-            return [
-                'month' => Carbon::parse($month->month . '-01')->format('F Y'),
-                'count' => $month->count,
-                'summary' => $summary,
-            ];
-        });
+                return [
+                    'month' => Carbon::parse($month->month . '-01')->format('F Y'),
+                    'count' => $month->count,
+                    'summary' => $summary,
+                ];
+            });
 
-    return view('Admin.report.application', compact(
-        'dailyApplications',
-        'dailyUsers',
-        'dailyApplicationsData',
-        'weeklyApplicationsData',
-        'monthlyApplicationsData',
-        'dailyUsersData',
-        'weeklyUsersData',
-        'monthlyUsersData'
-    ));
-}
+        return view('Admin.report.application', compact(
+            'dailyApplications',
+            'dailyUsers',
+            'dailyApplicationsData',
+            'weeklyApplicationsData',
+            'monthlyApplicationsData',
+            'dailyUsersData',
+            'weeklyUsersData',
+            'monthlyUsersData'
+        ));
+    }
 
     public function create()
     {
         $categories = Category::all();
         $subcategories = Subcategory::all();
         $employerId = auth('employer')->user()->id;
-        $packages = Package::all();
+        $packages = Package::where('package_type', 'Standard')->get();
         $countries = Country::all(); // Add this line
 
         return view('employer.jobcreate', compact('categories', 'subcategories', 'employerId', 'packages', 'countries'));

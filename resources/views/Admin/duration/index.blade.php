@@ -60,7 +60,7 @@
             border-color: #bd2130;
         }
 
-       
+
     </style>
 @endsection
 
@@ -84,7 +84,14 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5>Durations</h5>
-                        
+                        <div class="col-md-2 mb-4">
+                                <div>
+                                    <a href="{{ route('durations.create') }}"
+                                        class="btn btn-primary btn-sm rounded">Create
+                                        new</a>
+                                </div>
+                            </div>
+
                     </div>
                     <div class="card-body">
                         <div class="dt-ext table-responsive">
@@ -108,7 +115,7 @@
                                                     class="btn custom-btn custom-btn-warning">
                                                     <i class="icon-pencil-alt icon-fixed-size"></i> Edit
                                                 </a>
-                                                
+
                                             </td>
                                         </tr>
                                     @endforeach

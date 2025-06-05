@@ -94,23 +94,25 @@
                             @csrf
 
                             <div class="mb-3">
-                                <label for="employer_id_0" class="form-label">Employer</label>
-                                <select name="employer_id" id="employer_id" class="form-control"
-                                    required>
+                                <label for="employer_id" class="form-label">Employer</label>
+                                <select name="employer_id" id="employer_id" class="form-control" required>
                                     <option value="">Select an employer</option>
+                                    <option value="0">Admin</option>
                                     @foreach ($employers as $employer)
                                         <option value="{{ $employer->id }}">{{ $employer->company_name }}</option>
                                     @endforeach
                                 </select>
                             </div>
 
+
                             <div class="mb-3">
                                 <label for="package_id" class="form-label">Package</label>
                                 <select name="package_id" class="form-control">
-                                <option value="">Select Package</option>
+                                    <option value="">Select Package</option>
                                     @foreach ($packages as $package)
                                         <option value="{{ $package->id }}">
-                                            {{ ucfirst($package->duration->duration) }} Days - LKR {{ $package->price_lkr }} / USD
+                                            {{ ucfirst($package->duration->duration) }} Days - LKR {{ $package->price_lkr }}
+                                            / USD
                                             {{ $package->price_usd }}
                                         </option>
                                     @endforeach
@@ -127,8 +129,10 @@
                             <div class="mb-3">
                                 <label for="placement" class="form-label">Banner Placement</label>
                                 <select name="placement" id="placement" class="form-control" required>
-                                    <option value="banner">Main Banner (Image size: {{$packageDetailsBanners->mbsize}})</option>
-                                    <option value="category_page">Category Page (Image size: {{$packageDetailsBanners->cbsize}})</option>
+                                    <option value="banner">Main Banner (Image size: {{ $packageDetailsBanners->mbsize }})
+                                    </option>
+                                    <option value="category_page">Category Page (Image size:
+                                        {{ $packageDetailsBanners->cbsize }})</option>
                                 </select>
                             </div>
 
@@ -173,6 +177,13 @@
                 </div>
                 <div class="modal-body">
                     <div class="payment-methods">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="Admin"
+                                value="admin">
+                            <label class="form-check-label" for="Admin">
+                                 Admin
+                            </label>
+                        </div>
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="radio" name="paymentMethod" id="contactAdmin"
                                 value="contact_admin">
@@ -243,7 +254,7 @@
                 paymentMethodInput.value = selectedPaymentMethod.value;
                 form.appendChild(paymentMethodInput);
 
-                if (selectedPaymentMethod.value === 'contact_admin') {
+                if (selectedPaymentMethod.value === 'contact_admin'|| selectedPaymentMethod.value === 'admin') {
                     // Submit form directly for admin contact
                     paymentModal.hide();
                     form.submit();
@@ -281,8 +292,8 @@
             // Function to toggle category field
             function toggleCategoryField() {
                 if (placementSelect.value === 'category_page') {
-                   // categorySection.style.display = 'block';
-                   // categorySelect.required = true;
+                    // categorySection.style.display = 'block';
+                    // categorySelect.required = true;
                 } else {
                     categorySection.style.display = 'none';
                     categorySelect.required = false;
