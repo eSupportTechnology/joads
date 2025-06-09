@@ -717,94 +717,99 @@
     </section>
 
     <!-- Job Listings Section -->
-    <section id="job-listings" class="job-listings-container">
-        <h3 class="job-listings-title">Available Jobs</h3>
+    <section id="job-listings" class="job-listings-container w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <h3 class="job-listings-title text-2xl font-bold text-gray-800 mb-6 text-center sm:text-left">Available Jobs</h3>
 
-        @if ($jobs->isEmpty())
-            <p>No jobs found matching your criteria.</p>
-        @else
-            @php
-                // Check if category_id is set and not null, and whether it is "All"
-                $isCategorySelected = request()->has('category_id') && request()->category_id != null;
-                $isAllCategory = request()->category_id === '45';
-            @endphp
+    @if ($jobs->isEmpty())
+        <div class="text-center py-12">
+            <p class="text-gray-600 text-lg">No jobs found matching your criteria.</p>
+        </div>
+    @else
+        @php
+            // Check if category_id is set and not null, and whether it is "All"
+            $isCategorySelected = request()->has('category_id') && request()->category_id != null;
+            $isAllCategory = request()->category_id === '45';
+        @endphp
 
-            @if ($isCategorySelected && !$isAllCategory)
-                <!-- Display as Table if Specific Category (not "45") is Selected -->
-                <div>
-                    <table class="job-table">
-                        <thead>
+        @if ($isCategorySelected && !$isAllCategory)
+            <!-- Display as Table if Specific Category (not "45") is Selected -->
+            <div class="overflow-x-auto">
+                <table class="job-table w-full min-w-full">
+                    <thead>
+                        <tr>
+                            <th class="px-2 py-2 text-left text-xs sm:text-sm">#</th>
+                            <th class="px-2 py-2 text-left text-xs sm:text-sm">Reference ID</th>
+                            <th class="px-2 py-2 text-left text-xs sm:text-sm">Job Title</th>
+                            <th class="px-2 py-2 text-left text-xs sm:text-sm hidden md:table-cell">Description</th>
+                            <th class="px-2 py-2 text-left text-xs sm:text-sm">Location</th>
+                            <th class="px-2 py-2 text-left text-xs sm:text-sm hidden sm:table-cell">Posted Date</th>
+                            <th class="px-2 py-2 text-left text-xs sm:text-sm">Closing Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($jobs as $index => $job)
                             <tr>
-                                <th>#</th>
-                                <th>Reference ID</th>
-                                <th>Job Title</th>
-                                <th>Description</th>
-                                <th>Location</th>
-                                <th>Posted Date</th>
-                                <th>Closing Date</th>
+                                <td class="px-2 py-2 text-xs sm:text-sm">{{ ($jobs->currentPage() - 1) * $jobs->perPage() + $index + 1 }}</td>
+                                <td class="px-2 py-2 text-xs sm:text-sm">{{ $job->job_id ?? 'N/A' }}</td>
+                                <td class="px-2 py-2">
+                                    <a href="{{ route('job.details', $job->id) }}" class="job-title block text-xs sm:text-sm">
+                                        {{ $job->title }}
+                                    </a>
+                                    <br>
+                                    <a href="{{ route('job.details', $job->id) }}" class="company-name text-xs sm:text-sm">
+                                        {{ $job->employer == null ? '' : $job->employer->company_name }}
+                                    </a>
+                                </td>
+                                <td class="px-2 py-2 text-xs sm:text-sm hidden md:table-cell">{{ $job->description ?? 'No description provided' }}</td>
+                                <td class="px-2 py-2 text-xs sm:text-sm">{{ $job->location ?? 'Not specified' }}</td>
+                                <td class="px-2 py-2 text-xs sm:text-sm hidden sm:table-cell">{{ $job->created_at ? $job->created_at->format('Y-m-d') : 'N/A' }}</td>
+                                <td class="px-2 py-2 text-xs sm:text-sm">{{ $job->closing_date ?? 'N/A' }}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($jobs as $index => $job)
-                                <tr>
-                                    <td>{{ ($jobs->currentPage() - 1) * $jobs->perPage() + $index + 1 }}</td>
-                                    <td>{{ $job->job_id ?? 'N/A' }}</td>
-                                    <td>
-                                        <a href="{{ route('job.details', $job->id) }}" class="job-title">
-                                            {{ $job->title }}
-                                        </a>
-                                        <br>
-                                        <a href="{{ route('job.details', $job->id) }}" class="company-name">
-                                            {{ $job->employer == null ? '' : $job->employer->company_name }}
-                                        </a>
-                                    </td>
-                                    <td>{{ $job->description ?? 'No description provided' }}</td>
-                                    <td>{{ $job->location ?? 'Not specified' }}</td>
-                                    <td>{{ $job->created_at ? $job->created_at->format('Y-m-d') : 'N/A' }}</td>
-                                    <td>{{ $job->closing_date ?? 'N/A' }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <!-- Display as Cards if No Category or "All" is Selected -->
-                <div class="job-grid">
-                    @foreach ($jobs as $job)
-                        <div class="job-card" style="min-height:50px;height:auto; cursor: pointer;"
-                            onclick="window.location='{{ route('job.details', $job->id) }}'">
-                            <a href="{{ route('job.details', $job->id) }}" class="job-title"
-                                style="font-size:15px; margin-bottom: 0px;">
-                                {{ $job->title }}
-                            </a>
-                            <p class="company-name"
-                                style="font-size: 14px; margin-top: 2px; margin-bottom: 0px; font-weight:600; line-height:1;">
-                                {{ $job->employer == null ? '' : $job->employer->company_name }}
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <!-- Display as Cards if No Category or "All" is Selected -->
+            <div class="job-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                @foreach ($jobs as $job)
+                    <div class="job-card bg-white border border-gray-200 rounded p-4 min-w-0 w-full cursor-pointer hover:shadow-md transition-shadow duration-200"
+                         style="min-height:50px;height:auto;"
+                         onclick="window.location='{{ route('job.details', $job->id) }}'">
+                        <a href="{{ route('job.details', $job->id) }}" class="job-title block text-gray-900 hover:text-blue-600 transition-colors duration-150"
+                           style="font-size:15px; margin-bottom: 0px;">
+                            {{ $job->title }}
+                        </a>
+                        <p class="company-name text-gray-700"
+                           style="font-size: 14px; margin-top: 2px; margin-bottom: 0px; font-weight:600; line-height:1;">
+                            {{ $job->employer == null ? '' : $job->employer->company_name }}
+                        </p>
+                        <p class="location text-gray-600"
+                           style="font-size: 12px; margin-top: 1px; margin-bottom: 0px; line-height:1;">
+                            {{ $job->location }}
+                        </p>
+                        <div class="flex justify-between items-end mt-2" style="display: flex; justify-content: space-between;">
+                            <p class="text-red-600"
+                               style="font-size: 14px; color:red; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
+                                {{ $job->closing_date }}
                             </p>
-                            <p class="location"
-                                style="font-size: 12px; margin-top: 1px; margin-bottom: 0px; line-height:1;">
-                                {{ $job->location }}
-                            </p>
-                            <div style="display: flex; justify-content: space-between;">
-                                <p
-                                    style="font-size: 14px; color:red; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
-                                    {{ $job->closing_date }}
-                                </p>
-                                <p
-                                    style="font-size: 14px; color:#888888; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
-                                    {{ $job->job_id }}</p>
-                            </div>
+                            <p class="text-gray-500"
+                               style="font-size: 14px; color:#888888; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
+                                {{ $job->job_id }}</p>
                         </div>
-                    @endforeach
-                </div>
-            @endif
-
-            <!-- Pagination -->
-            <div class="pagination-container" style="margin-top: 20px;">
-                {{ $jobs->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
+                    </div>
+                @endforeach
             </div>
         @endif
-    </section>
+
+        <!-- Pagination -->
+        <div class="pagination-container flex justify-center mt-8" style="margin-top: 20px;">
+            <div class="w-full max-w-md">
+                {{ $jobs->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
+            </div>
+        </div>
+    @endif
+</section>
 
 
 

@@ -26,6 +26,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h5>Create New Banner Package</h5>
+                        <h6>If it's your own banner, the fields should be zero.</h6>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('banner_packages.store') }}" method="POST">
