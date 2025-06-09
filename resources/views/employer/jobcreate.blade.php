@@ -208,186 +208,201 @@
                             enctype="multipart/form-data" id="jobPostingForm">
                             @csrf
                             <div id="contacts-container">
-                                <div class="mb-3">
-                                    <label for="package_id" class="form-label">Package *</label>
-                                    <select name="package_id" id="package_id" class="form-control" required>
-                                        <option value="">Select a package</option>
-                                        @foreach ($packages as $package)
-                                            <option value="{{ $package->id }}">
-                                                {{ $package->package_size }} ads - ({{ $package->duration->duration }} days)
-                                                - Rs. {{ $package->lkr_price }}/{{ $package->usd_price }} USD
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                <!-- Package Selection -->
+                                <div id="contacts-container">
+    <!-- Package Selection -->
+    <div class="mb-3">
+        <label for="package_id" class="form-label">Package *</label>
+        <select name="package_id" id="package_id" class="form-control" required>
+            <option value="">Select a package</option>
+            @foreach ($packages as $package)
+                <option value="{{ $package->id }}" data-price="{{ $package->lkr_price }}">
+                    {{ $package->package_size }} ads - ({{ $package->duration->duration }} days)
+                    - Rs. {{ $package->lkr_price }}
+                </option>
+            @endforeach
+        </select>
+    </div>
 
-                                    <div class="mb-3">
-                                        <label for="title_0" class="form-label">Job Title *</label>
-                                        <input type="text" name="job_postings[0][title]" id="title_0"
-                                            class="form-control" required>
-                                    </div>
+    <!-- Example Job Posting (repeatable block) -->
+    @foreach ($jobPostings as $index => $job)
+        <div class="job-posting">
+            <!-- Custom Price Field -->
+            <div class="mb-3">
+                <label for="custom_price_{{ $index }}" class="form-label">Custom Price (LKR)</label>
+                <input type="number" step="0.01" name="job_postings[{{ $index }}][custom_price]"
+                    id="custom_price_{{ $index }}" class="form-control"
+                    placeholder="Enter price or leave blank for default">
+            </div>
+            <!-- Other fields like title, category_ids, etc. go here -->
+        </div>
+    @endforeach
+</div>
 
-                                    <div class="mb-3">
-                                        <label for="description_0" class="form-label">Description</label>
-                                        <textarea name="job_postings[0][description]" id="description_0" class="form-control" rows="4"></textarea>
-                                    </div>
 
-                                    <!-- Categories -->
-                                    <div class="mb-3">
-                                        <label for="category_id_0" class="form-label">Categories *</label>
-                                        <select id="category_id_0" class="form-control"
-                                            onchange="handleCategorySelect(this, 0)">
-                                            <option value="">Select a category</option>
-                                            @foreach ($categories as $category)
-                                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <div id="selected_categories_0" class="tag-container mt-2"></div>
-                                        <div id="hidden_category_inputs_0"></div>
-                                    </div>
-
-                                    <!-- Subcategories -->
-                                    <div class="mb-3">
-                                        <label for="subcategory_id_0" class="form-label">Subcategories *</label>
-                                        <select id="subcategory_id_0" class="form-control"
-                                            onchange="handleSubcategorySelect(this, 0)" disabled>
-                                            <option value="">Select subcategory</option>
-                                            {{-- Options will be loaded dynamically --}}
-                                        </select>
-                                        <div id="selected_subcategories_0" class="tag-container mt-2"></div>
-                                        <div id="hidden_subcategory_inputs_0"></div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="location_0" class="form-label">Location *</label>
-                                        <input type="text" name="job_postings[0][location]" id="location_0"
-                                            class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="country_0" class="form-label">Country *</label>
-                                        <select name="job_postings[0][country_id]" id="country_0" class="form-control"
-                                            required>
-                                            <option value="">Select a country</option>
-                                            @foreach ($countries as $country)
-                                                <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="salary_range_0" class="form-label">Salary Range</label>
-                                        <input type="text" name="job_postings[0][salary_range]" id="salary_range_0"
-                                            class="form-control">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="image_0" class="form-label">Image</label>
-                                        <input type="file" name="job_postings[0][image]" id="image_0"
-                                            class="form-control image-input" accept="image/*">
-                                        <div class="image-preview-container mt-3">
-                                            <img class="image-preview" src="" alt="Image Preview"
-                                                style="max-width: 100%; display: none;">
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="requirements_0" class="form-label">Requirements</label>
-                                        <textarea name="job_postings[0][requirements]" id="requirements_0" class="form-control" rows="4"></textarea>
-                                    </div>
-
-                                    <div class="mb-3 col-md-3">
-                                        <label for="closing_date_0" class="form-label">Closing Date *</label>
-                                        <input type="date" name="job_postings[0][closing_date]" id="closing_date_0"
-                                            class="form-control" required>
-                                    </div>
-
-                                    <input type="hidden" name="job_postings[0][status]" value="pending">
-
+                            <div class="mb-3">
+                                <label for="title_0" class="form-label">Job Title *</label>
+                                <input type="text" name="job_postings[0][title]" id="title_0" class="form-control"
+                                    required>
                             </div>
 
-                            <button type="button" id="addContact" class="btn btn-success">Add Another Job</button>
-                            <button type="submit" class="btn btn-primary">Create Jobs</button>
+                            <div class="mb-3">
+                                <label for="description_0" class="form-label">Description</label>
+                                <textarea name="job_postings[0][description]" id="description_0" class="form-control" rows="4"></textarea>
+                            </div>
 
-                            <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel"
-                                aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="paymentModalLabel">Select Payment Method</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="payment-methods">
-                                                <div class="form-check mb-3">
-                                                    <input class="form-check-input" type="radio" name="paymentMethod"
-                                                        id="onlinePayment" value="online">
-                                                    <label class="form-check-label" for="onlinePayment">
-                                                        Online Payment
-                                                    </label>
-                                                </div>
-                                                <div class="form-check mb-3">
-                                                    <input class="form-check-input" type="radio" name="paymentMethod"
-                                                        id="contactAdmin" value="admin">
-                                                    <label class="form-check-label" for="contactAdmin">
-                                                        Contact Admin
-                                                    </label>
-                                                </div>
-                                            </div>
+                            <!-- Categories -->
+                            <div class="mb-3">
+                                <label for="category_id_0" class="form-label">Categories *</label>
+                                <select id="category_id_0" class="form-control" onchange="handleCategorySelect(this, 0)">
+                                    <option value="">Select a category</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                                <div id="selected_categories_0" class="tag-container mt-2"></div>
+                                <div id="hidden_category_inputs_0"></div>
+                            </div>
 
-                                            <div id="adminContactInfo" style="display: none;">
-                                                <div class="alert alert-info">
-                                                    <h6>Your Job ID: <span id="jobIdDisplay"></span></h6>
-                                                    <hr>
-                                                    <h6>Admin Contact Details:</h6>
-                                                    <p>Phone: +94 XX XXX XXXX</p>
-                                                    <p>Email: admin@example.com</p>
-                                                    <p>Please quote your Job ID when contacting the admin.</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Close</button>
-                                            <button type="button" class="btn btn-primary"
-                                                id="confirmPayment">Confirm</button>
-                                        </div>
-                                    </div>
+                            <!-- Subcategories -->
+                            <div class="mb-3">
+                                <label for="subcategory_id_0" class="form-label">Subcategories *</label>
+                                <select id="subcategory_id_0" class="form-control"
+                                    onchange="handleSubcategorySelect(this, 0)" disabled>
+                                    <option value="">Select subcategory</option>
+                                    {{-- Options will be loaded dynamically --}}
+                                </select>
+                                <div id="selected_subcategories_0" class="tag-container mt-2"></div>
+                                <div id="hidden_subcategory_inputs_0"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="location_0" class="form-label">Location *</label>
+                                <input type="text" name="job_postings[0][location]" id="location_0" class="form-control"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="country_0" class="form-label">Country *</label>
+                                <select name="job_postings[0][country_id]" id="country_0" class="form-control" required>
+                                    <option value="">Select a country</option>
+                                    @foreach ($countries as $country)
+                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="salary_range_0" class="form-label">Salary Range</label>
+                                <input type="text" name="job_postings[0][salary_range]" id="salary_range_0"
+                                    class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="image_0" class="form-label">Image</label>
+                                <input type="file" name="job_postings[0][image]" id="image_0"
+                                    class="form-control image-input" accept="image/*">
+                                <div class="image-preview-container mt-3">
+                                    <img class="image-preview" src="" alt="Image Preview"
+                                        style="max-width: 100%; display: none;">
                                 </div>
                             </div>
 
-                        </form>
-                        <div class="modal fade" id="paymentMethodModal" tabindex="-1"
-                            aria-labelledby="paymentMethodModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="paymentMethodModalLabel">Select Payment Method</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="requirements_0" class="form-label">Requirements</label>
+                                <textarea name="job_postings[0][requirements]" id="requirements_0" class="form-control" rows="4"></textarea>
+                            </div>
+
+                            <div class="mb-3 col-md-3">
+                                <label for="closing_date_0" class="form-label">Closing Date *</label>
+                                <input type="date" name="job_postings[0][closing_date]" id="closing_date_0"
+                                    class="form-control" required>
+                            </div>
+
+                            <input type="hidden" name="job_postings[0][status]" value="pending">
+
+                    </div>
+
+                    <button type="button" id="addContact" class="btn btn-success">Add Another Job</button>
+                    <button type="submit" class="btn btn-primary">Create Jobs</button>
+
+                    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="paymentModalLabel">Select Payment Method</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="payment-methods">
                                         <div class="form-check mb-3">
-                                            <input class="form-check-input" type="radio" name="paymentMethod"
-                                                id="contactContributor" value="contact_contributor">
-                                            <label class="form-check-label" for="contactContributor">
-                                                Contact Contributor
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
                                             <input class="form-check-input" type="radio" name="paymentMethod"
                                                 id="onlinePayment" value="online">
                                             <label class="form-check-label" for="onlinePayment">
                                                 Online Payment
                                             </label>
                                         </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="paymentMethod"
+                                                id="contactAdmin" value="admin">
+                                            <label class="form-check-label" for="contactAdmin">
+                                                Contact Admin
+                                            </label>
+                                        </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary"
-                                            id="confirmPaymentMethod">Confirm</button>
+
+                                    <div id="adminContactInfo" style="display: none;">
+                                        <div class="alert alert-info">
+                                            <h6>Your Job ID: <span id="jobIdDisplay"></span></h6>
+                                            <hr>
+                                            <h6>Admin Contact Details:</h6>
+                                            <p>Phone: +94 XX XXX XXXX</p>
+                                            <p>Email: admin@example.com</p>
+                                            <p>Please quote your Job ID when contacting the admin.</p>
+                                        </div>
                                     </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" id="confirmPayment">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    </form>
+                    <div class="modal fade" id="paymentMethodModal" tabindex="-1"
+                        aria-labelledby="paymentMethodModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="paymentMethodModalLabel">Select Payment Method</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="paymentMethod"
+                                            id="contactContributor" value="contact_contributor">
+                                        <label class="form-check-label" for="contactContributor">
+                                            Contact Contributor
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="paymentMethod"
+                                            id="onlinePayment" value="online">
+                                        <label class="form-check-label" for="onlinePayment">
+                                            Online Payment
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary"
+                                        id="confirmPaymentMethod">Confirm</button>
                                 </div>
                             </div>
                         </div>
@@ -396,8 +411,15 @@
             </div>
         </div>
     </div>
+    </div>
 
     <script>
+        document.getElementById('package_id').addEventListener('change', function () {
+    const price = this.options[this.selectedIndex].getAttribute('data-price');
+    document.querySelectorAll('[id^="custom_price_"]').forEach(input => {
+        if (!input.value) input.value = price;
+    });
+});
 
         const selectedCategories = new Map();
         const selectedSubcategories = new Map();
@@ -726,55 +748,57 @@
                 paymentModal.show();
             });
 
-            document.getElementById('confirmPaymentMethod').addEventListener('click', function () {
-    const selectedPaymentMethodRadio = document.querySelector('input[name="paymentMethod"]:checked');
+            document.getElementById('confirmPaymentMethod').addEventListener('click', function() {
+                const selectedPaymentMethodRadio = document.querySelector(
+                    'input[name="paymentMethod"]:checked');
 
-    if (!selectedPaymentMethodRadio) {
-        alert('Please select a payment method');
-        return;
-    }
+                if (!selectedPaymentMethodRadio) {
+                    alert('Please select a payment method');
+                    return;
+                }
 
-    const selectedPaymentMethod = selectedPaymentMethodRadio.value;
+                const selectedPaymentMethod = selectedPaymentMethodRadio.value;
 
-    // Avoid duplicate input
-    let existingInput = document.querySelector('input[name="payment_method"]');
-    if (!existingInput) {
-        const mainPaymentMethodInput = document.createElement('input');
-        mainPaymentMethodInput.type = 'hidden';
-        mainPaymentMethodInput.name = 'payment_method';
-        mainPaymentMethodInput.value = selectedPaymentMethod;
-        form.appendChild(mainPaymentMethodInput);
-    } else {
-        existingInput.value = selectedPaymentMethod;
-    }
+                // Avoid duplicate input
+                let existingInput = document.querySelector('input[name="payment_method"]');
+                if (!existingInput) {
+                    const mainPaymentMethodInput = document.createElement('input');
+                    mainPaymentMethodInput.type = 'hidden';
+                    mainPaymentMethodInput.name = 'payment_method';
+                    mainPaymentMethodInput.value = selectedPaymentMethod;
+                    form.appendChild(mainPaymentMethodInput);
+                } else {
+                    existingInput.value = selectedPaymentMethod;
+                }
 
-    if (selectedPaymentMethod === 'contact_contributor') {
-        paymentModal.hide();
-        form.submit();
-    } else if (selectedPaymentMethod === 'online') {
-        const formData = new FormData(form);
+                if (selectedPaymentMethod === 'contact_contributor') {
+                    paymentModal.hide();
+                    form.submit();
+                } else if (selectedPaymentMethod === 'online') {
+                    const formData = new FormData(form);
 
-        fetch('/store-form-data', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = '/payment/checkout';
-            } else {
-                alert(data.message || 'Error processing form data');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        });
-    }
-});
+                    fetch('/store-form-data', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.href = '/payment/checkout';
+                            } else {
+                                alert(data.message || 'Error processing form data');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred. Please try again.');
+                        });
+                }
+            });
 
 
             // Form validation function

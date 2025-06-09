@@ -138,6 +138,12 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                        <div class="detail-item mb-3 border-bottom pb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-map-marker-alt me-2"></i>Payment Price
+                                            </h6>
+                                            <input type="text" name="package_price" class="form-control"
+                                                value="{{ old('package_price', $job->package_price) }}" readonly>
+                                        </div>
 
                                         <button type="submit" class="btn btn-primary mt-3">Update Job</button>
                                     </form>

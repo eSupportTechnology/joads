@@ -44,14 +44,40 @@
         @csrf
         @method('patch')
 
-        <div class="mb-3 mt-3">
-            <label for="package_id" class="form-label">Package *</label>
-            <select name="package_id" id="package_id" class="form-control" disabled>
-                <option value="">
-                    {{ $jobPosting->package->package_size }} ads - ({{ $jobPosting->package->duration->duration }} days) - Rs. {{ $jobPosting->package->lkr_price }}/{{ $jobPosting->package->usd_price }} USD
+        <!-- Package Selection -->
+    <div class="mb-3">
+        <label for="package_id" class="form-label">Package *</label>
+        <select name="package_id" id="package_id" class="form-control @error('package_id') is-invalid @enderror" required>
+            <option value="">Select a package</option>
+            @foreach ($packages as $package)
+                <option value="{{ $package->id }}"
+                    data-price="{{ $package->lkr_price }}"
+                    {{ old('package_id', $jobPosting->package_id) == $package->id ? 'selected' : '' }}>
+                    {{ $package->package_size }} ads - ({{ $package->duration->duration }} days) - Rs. {{ $package->lkr_price }}
                 </option>
-            </select>
-        </div>
+            @endforeach
+        </select>
+        @error('package_id')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <!-- Custom Price -->
+    <div class="mb-3">
+        <label for="custom_price" class="form-label">Custom Price (LKR)</label>
+        <input
+            type="number"
+            step="0.01"
+            name="custom_price"
+            id="custom_price"
+            class="form-control @error('custom_price') is-invalid @enderror"
+            placeholder="Enter price or leave blank to use default"
+            value="{{ old('custom_price', $jobPosting->package_price) }}"
+        >
+        @error('custom_price')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
         <div class="mb-3">
             <label for="title" class="form-label">Job Title</label>
             <input type="text" name="title" id="title" class="form-control"

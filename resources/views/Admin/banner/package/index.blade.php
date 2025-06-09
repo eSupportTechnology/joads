@@ -97,7 +97,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5>Banner Packages</h5>
                         <a href="{{ route('banner_packages.create') }}" class="btn btn-primary custom-btn">
-                            <i class="fa fa-plus icon-fixed-size"></i> Create New
+                             Create New
                         </a>
                     </div>
                     <div class="card-body">
