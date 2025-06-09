@@ -31,19 +31,20 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 20px 30px;
+            padding: 15px 30px;
             background-color: #ffffff;
             border-bottom: 3px solid #cccbcb;
             position: sticky;
             top: 0;
-            height: 45px;
+            min-height: 70px;
             z-index: 1000;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
         /* Logo */
         .unique-header .logo img {
-            max-width: 150px;
+            max-height: 60px;
+            width: auto;
         }
 
         /* Menu Toggle Button */
@@ -55,158 +56,262 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
             cursor: pointer;
             position: relative;
             z-index: 1100;
-            /* Ensures the toggle button is above other elements */
+            padding: 5px;
+            order: 2;
         }
 
         .menu-toggle.open::before {
-            content: "✖";
-            /* Close icon */
-            font-size: 24px;
+            font-size: 20px;
             color: #333;
-            position: absolute;
-            top: 0;
-            left: 0;
-            transition: all 0.3s ease-in-out;
         }
 
         .menu-toggle:not(.open)::before {
-            content: "";
-            /* Hamburger menu icon */
             font-size: 24px;
             color: #333;
-            position: absolute;
-            top: 0;
-            left: 0;
-            transition: all 0.3s ease-in-out;
         }
 
         /* Navigation Links */
         .unique-nav-links {
             display: flex;
             gap: 20px;
-            margin-left: 5%;
+            align-items: center;
+            flex: 1;
+            margin-left: 100px;
+            margin-top: 11px;
+            z-index: 100;
         }
 
         .unique-nav-links a {
             text-decoration: none;
-            color: #1267e7;
-            font-size: 17px;
+            color: black;
+            font-size: 16px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .unique-nav-links a:hover {
+            color: black;
+            transform: translateY(-2px);
+        }
+
+        /* Social Icons */
+        .social-icons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .social-icons a {
+            text-decoration: none;
+            color: #18799c;
+            transition: transform 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            transform: scale(1.1);
+        }
+
+        .social-icons img {
+            width: 25px;
+            height: auto;
+        }
+
+        /* Profile Section */
+        .menu {
+            display: flex;
+            align-items: center;
+            order: 3;
+        }
+
+        .profile-dropdown {
+            position: relative;
+        }
+
+        .profile-letter-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 30px;
+            background-color: #28adce;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .profile-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            padding: 10px 0;
+            z-index: 1001;
+        }
+
+        .profile-dropdown:hover .profile-dropdown-content {
+            display: block;
+        }
+
+        .profile-dropdown-content a {
+            color: black;
+            padding: 8px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .profile-dropdown-content a:hover {
+            background-color: #f1f1f1;
         }
 
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
-            .menu-toggle {
-                display: block;
-                /* Show the menu toggle on mobile */
-                margin-left: 300px;
-                margin-top: -30px;
-
-
+            .unique-header {
+                flex-wrap: wrap;
+                padding: 10px 15px;
+                min-height: 60px;
             }
 
-            .profile-dropdown-content {
-                margin-left: -50px;
-                margin-top: 40px;
-                width: auto;
+            .logo {
+                order: 1;
+            }
+
+            .logo img {
+                max-height: 45px;
+                margin-left: 0 !important;
+            }
+
+            .menu-toggle {
+                display: block;
+                order: 2;
+                margin-left: auto;
+                margin-right: 15px;
+            }
+
+            .menu {
+                order: 3;
+                margin-left: 0;
+            }
+
+            .profile-letter-circle {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+                margin-right: 15px;
             }
 
             .unique-nav-links {
                 display: none;
-                /* Hide navigation by default */
+                order: 4;
                 flex-direction: column;
-                gap: 10px;
+                width: 100%;
+                margin: 0;
+                height: auto;
                 background-color: #ffffff;
                 position: absolute;
-                top: 60px;
-                /* Adjust based on header height */
+                top: 100%;
                 left: 0;
                 right: 0;
-                padding: 10px 20px;
+                padding: 20px;
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 z-index: 999;
+                gap: 15px;
             }
 
             .unique-nav-links.show {
                 display: flex;
-                /* Show navigation when toggled */
             }
 
-            .profile-dropdown {
-                margin-left: 280px;
-                margin-top: -35px;
+            .unique-nav-links a {
+                padding: 12px 0;
+                border-bottom: 1px solid #eee;
+                text-align: center;
+                width: 100%;
+                margin: 0;
+            }
+
+            .unique-nav-links a[href*="postvacancy"],
+            .unique-nav-links a[href*="profile.personal"] {
                 border-radius: 5px;
+                border-bottom: none;
+                margin: 5px 0;
+            }
 
+            .social-icons {
+                justify-content: center;
+                padding: 15px 0;
+                border-top: 1px solid #eee;
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            .social-icons img {
+                width: 30px;
+                height: 30px;
+            }
+
+            .profile-dropdown-content {
                 right: 0;
-                /* Align dropdown to the right */
+                top: 100%;
+                min-width: 140px;
             }
         }
 
-        .profile-letter-circle {
-            margin-top: 5px;
-        }
+        @media (max-width: 480px) {
+            .unique-header {
+                padding: 8px 10px;
+            }
 
-        @media screen and (max-width: 768px) {
+            .logo img {
+                max-height: 40px;
+            }
+
             .profile-letter-circle {
-                margin-top: -50px;
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+                margin-right: 10px;
+            }
+
+            .unique-nav-links a {
+                font-size: 14px;
+                padding: 10px 0;
+            }
+
+            .social-icons img {
+                width: 25px;
+                height: 25px;
             }
         }
-.social-icons {
-    display: flex;
-    gap: 20px;
-    position: absolute;
-    top: 35px;
-    right: 25px;
-}
 
-.social-icons a {
-    text-decoration: none;
-    color: #333; /* Default color for icons/links */
-    transition: transform 0.3s ease, color 0.3s ease;
-}
-
-.social-icons a:hover {
-    transform: scale(1.2); /* Slightly increase size on hover */
-}
-
-.social-icons a:active {
-    transform: scale(1); /* Reset size on click */
-}
-
-
-/* Hide social icons on small screens */
-@media (max-width: 1177px) {
-    .social-icons {
-        display: none;
-        position: relative; /* reset absolute to avoid layout issues */
-        top: auto;
-        right: auto;
-        margin-top: 20px;
-        justify-content: center;
-    }
-
-    /* Show social icons inside nav when menu is toggled */
-    .unique-nav-links.show .social-icons {
-        display: flex;
-    }
-}
-php </style>
+        /* Desktop - hide menu toggle */
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
 
 </head>
 
 <body>
-    <header class="unique-header" style=" border-bottom: 3px solid #cccbcb;  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);">
-
+    <header class="unique-header">
         <div class="logo">
             <a href="/">
                 <img src="{{ asset('Jobads.png') }}" alt="Logo" class="unique-logo"
                     style="max-height: 60px; margin-left: 20px;">
             </a>
-
         </div>
+
         <button class="menu-toggle" aria-label="Toggle Navigation">
             ☰
         </button>
-        <nav class="nav-links unique-nav-links" style="margin-left:100px;margin-top:11px;height:100px ;z-index: 100; ">
+
+        <nav class="nav-links unique-nav-links">
             <!-- "Post Your Vacancy" as a button -->
             <a href="{{ route('user.postvacancy') }}"
                 style="background: linear-gradient(to bottom, #28adce, #18799c); color: white;transition: color 0.3s ease,
@@ -228,13 +333,12 @@ php </style>
                 Create Free CV
             </a>
 
-
             <!-- Other navigation links -->
             <a href="{{ route('ourservices') }}"
                 style="text-decoration: none; color: black; font-size: 16px; transition: color 0.3s ease, transform 0.3s ease;"
                 onmouseover="this.style.color='black'; this.style.transform='translateY(-2px)';"
                 onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
-                Direct recruitment
+                Direct Recruitment
             </a>
             <a href="/topemployees"
                 style="text-decoration: none;color: black;font-size: 16px;  transition: color 0.3s ease, transform 0.3s ease;"
@@ -248,38 +352,32 @@ php </style>
                 onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
                 Contact Us
             </a>
-            <!-- Move social-icons here -->
-            <div class="social-icons" style="display: flex; gap: 20px;">
-                <a href="https://www.linkedin.com/company/jobads-lk/?viewAsMember=true" target="_blank" style="color:#18799c;">
-                <img src="{{ asset('linkedin.jpeg') }}" style="width:25px ;height:auto">
+
+            <!-- Social icons -->
+            <div class="social-icons">
+                <a href="https://www.linkedin.com/company/jobads-lk/?viewAsMember=true" target="_blank">
+                    <img src="{{ asset('linkedin.jpeg') }}" alt="LinkedIn">
                 </a>
-                <a href="https://www.facebook.com/jobads.lkJSG" target="_blank" style="color: #18799c;">
-                <img src="{{ asset('facebook.jpeg') }}" style="width:25px ;height:auto">
+                <a href="https://www.facebook.com/jobads.lkJSG" target="_blank">
+                    <img src="{{ asset('facebook.jpeg') }}" alt="Facebook">
                 </a>
-                <a href="https://www.instagram.com/jobadslk/" target="_blank" style="color: #18799c;">
-                <img src="{{ asset('Instagram.jpeg') }}" style="width:25px ;height:auto">
+                <a href="https://www.instagram.com/jobadslk/" target="_blank">
+                    <img src="{{ asset('Instagram.jpeg') }}" alt="Instagram">
                 </a>
-                <a href="https://www.tiktok.com/@jobads.lk" target="_blank" style="color:#18799c;">
-                <img src="{{ asset('tiktok.jpeg') }}" style="width:25px ;height:auto">
+                <a href="https://www.tiktok.com/@jobads.lk" target="_blank">
+                    <img src="{{ asset('tiktok.jpeg') }}" alt="TikTok">
                 </a>
             </div>
         </nav>
-        </div>
-
-
 
         <div class="menu">
             @auth
                 <!-- For authenticated users -->
                 <div class="profile-dropdown">
                     <!-- Display First Letter of User's Name in a Circle -->
-                    <div class="profile-letter-circle"
-                        style="width: 40px; height: 40px; border-radius: 50%; margin-right:30px;
-                background-color: #28adce; color: white; display: flex; align-items: center; justify-content:
-                center; font-size: 18px; font-weight: bold;">
+                    <div class="profile-letter-circle">
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                     </div>
-                    </span> <!-- Display user name -->
                     <div class="profile-dropdown-content">
                         <a href="{{ route('profile.edit') }}">My Profile</a>
                         <form method="POST" action="{{ route('logout') }}">
@@ -300,8 +398,6 @@ php </style>
                 <a href="{{ route('register') }}" class="signup-btn">Sign Up</a>
             @endguest --}}
         </div>
-        <!-- Profile Dropdown -->
-
     </header>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -332,14 +428,34 @@ php </style>
     </script>
 
     <script>
-        // Select menu toggle button and navigation links
-        const menuToggle = document.querySelector('.menu-toggle');
-        const navLinks = document.querySelector('.unique-nav-links');
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.unique-nav-links');
 
-        // Add click event listener to the menu toggle button
-        menuToggle.addEventListener('click', () => {
-            // Toggle the "show" class on the navigation links
-            navLinks.classList.toggle('show');
+            if (menuToggle && navLinks) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('show');
+                    menuToggle.classList.toggle('open');
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!menuToggle.contains(event.target) && !navLinks.contains(event.target)) {
+                        navLinks.classList.remove('show');
+                        menuToggle.classList.remove('open');
+                    }
+                });
+
+                // Close menu when clicking on a navigation link
+                const navLinksItems = navLinks.querySelectorAll('a');
+                navLinksItems.forEach(link => {
+                    link.addEventListener('click', function() {
+                        navLinks.classList.remove('show');
+                        menuToggle.classList.remove('open');
+                    });
+                });
+            }
         });
     </script>
 
@@ -350,32 +466,39 @@ php </style>
 
         // Function to show the input bar
         function showInputBar() {
-            clearTimeout(hideTimeout); // Clear any previous hide timeout
-            searchInput.classList.add('visible');
+            clearTimeout(hideTimeout);
+            if (searchInput) {
+                searchInput.classList.add('visible');
+            }
         }
 
         // Function to hide the input bar
         function hideInputBar() {
             hideTimeout = setTimeout(() => {
-                searchInput.classList.remove('visible');
-            }, 10000); // Hide after 10 seconds
+                if (searchInput) {
+                    searchInput.classList.remove('visible');
+                }
+            }, 10000);
         }
 
         // Event listeners for the search button
-
-
-        searchButton.addEventListener('mouseout', () => {
-            hideInputBar();
-        });
+        if (searchButton) {
+            searchButton.addEventListener('mouseout', () => {
+                hideInputBar();
+            });
+        }
 
         // Reset timer when the input is hovered over
-        searchInput.addEventListener('mouseover', () => {
-            clearTimeout(hideTimeout);
-        });
+        if (searchInput) {
+            searchInput.addEventListener('mouseover', () => {
+                clearTimeout(hideTimeout);
+            });
 
-        searchInput.addEventListener('mouseout', () => {
-            hideInputBar();
-        });
+            searchInput.addEventListener('mouseout', () => {
+                hideInputBar();
+            });
+        }
+
         $(document).ready(function() {
             $('#login-button').on('click', function() {
                 window.location.href = '/login';
@@ -386,7 +509,6 @@ php </style>
             });
         });
     </script>
-
 
 </body>
 

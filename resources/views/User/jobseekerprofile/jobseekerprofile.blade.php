@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
     <link rel="stylesheet" href="{{ asset('css/employeeprofile.css') }}">
-   
+
 
 </head>
 <body>
@@ -16,8 +16,8 @@
     <!--update profile-->
 <div class = "profile-body">
     <div class="profile-container">
-   @include('User.jobseekerprofile.updateprofile')     
-   
+   @include('User.jobseekerprofile.updateprofile')
+
     </div>
 
 </div>

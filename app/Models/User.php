@@ -3,9 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Notifications\JobSeekerResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use PHPUnit\Util\PHP\Job;
 
 class User extends Authenticatable
 {
@@ -88,6 +91,10 @@ class User extends Authenticatable
     public function feedback()
     {
         return $this->hasMany(Feedback::class);
+    }
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new JobSeekerResetPasswordNotification($token));
     }
 
 }

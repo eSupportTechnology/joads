@@ -29,6 +29,13 @@
                 @if (session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
 
                 <form action="{{ route('employer.updateProfile') }}" method="POST">
                     @csrf
@@ -60,12 +67,12 @@
                     <h6>Change Password (Optional)</h6>
                     <div class="mb-3">
                         <label for="current_password" class="form-label">Current Password</label>
-                        <input type="password" id="current_password" name="current_password" class="form-control">
+                        <input type="password" id="current_password" name="current_password" class="form-control @error('current_password') is-invalid @enderror">
                     </div>
 
                     <div class="mb-3">
                         <label for="new_password" class="form-label">New Password</label>
-                        <input type="password" id="new_password" name="new_password" class="form-control">
+                        <input type="password" id="new_password" name="new_password" class="form-control @error('new_password') is-invalid @enderror">
                     </div>
 
                     <div class="mb-3">

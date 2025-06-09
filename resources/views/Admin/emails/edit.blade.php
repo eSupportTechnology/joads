@@ -4,14 +4,14 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- Quill.js CSS -->
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <!-- Quill.js CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
-<style>
-    .ql-editor {
-        min-height: 200px;
-    }
-</style>
+    <style>
+        .ql-editor {
+            min-height: 200px;
+        }
+    </style>
 @section('breadcrumb-title')
     <h3>Edit Email Template</h3>
 @endsection
@@ -55,8 +55,8 @@
 
                             <div class="mb-3">
                                 <label for="body" class="form-label">Body</label>
-                                <div id="editor">{!! old('body', $emailTemplate->body ?? '') !!}</div>
-                                <input type="hidden" id="body-input" name="body"
+                                <div id="editor-one" style="height: 200px;"></div>
+                                <input type="hidden" id="hidden-input-one" name="body"
                                     value="{{ old('body', $emailTemplate->body ?? '') }}">
 
                             </div>
@@ -70,7 +70,7 @@
         </div>
     </div>
 
-    {{-- Quill JS --}}
+   <!-- jQuery (If Needed) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
     <!-- Bootstrap 5 JS -->
@@ -78,25 +78,38 @@
 
     <!-- Quill.js -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const quill = new Quill('#editor', {
-                theme: 'snow',
-                modules: {
-                    toolbar: [ /* toolbar options */ ]
-                }
-            });
+        $(document).ready(function () {
+    var toolbarOptions = [
+        [{ 'font': [] }],
+        [{ 'size': ['small', false, 'large', 'huge'] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'script': 'sub' }, { 'script': 'super' }],
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [{ 'align': [] }],
+        ['blockquote', 'code-block'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        [{ 'indent': '-1' }, { 'indent': '+1' }],
+        ['link', 'image', 'video'],
+        ['clean']
+    ];
 
-            // Set initial content from the hidden input
-            const initialValue = document.getElementById('body-input').value;
-            quill.root.innerHTML = initialValue;
+    // Initialize only editor-one
+    var quill = new Quill('#editor-one', {
+        theme: 'snow',
+        modules: { toolbar: toolbarOptions }
+    });
 
-            // On form submit, set the hidden input value
-            document.querySelector('form').addEventListener('submit', function() {
-                const content = quill.root.innerHTML.trim();
-                document.getElementById('body-input').value = content;
-            });
-        });
+    // Preload content if editing
+    quill.root.innerHTML = @json(old('body', $emailTemplate->body ?? ''));
+
+    // Save content on submit
+    $('form').on('submit', function () {
+        $('#hidden-input-one').val(quill.root.innerHTML.trim());
+    });
+});
+
     </script>
-
 @endsection

@@ -104,17 +104,21 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
-            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,
         ],
-    ],
-    'passwords' => [
-        'admins' => [
-            'provider' => 'admins',
-            'table' => 'password_resets',
-            'expire' => 60, // Reset link expiration in minutes
-            'throttle' => 60, // Prevent frequent reset attempts
+        'employers' => [ // Add this
+            'provider' => 'employers', // Ensure you have 'customers' provider below
+            'table' => 'employee_password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'admins' => [ // Add this
+            'provider' => 'admins', // Ensure you have 'admins' provider
+            'table' => 'admin_password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
         ],
     ],
 
