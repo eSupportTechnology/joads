@@ -102,6 +102,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Name</th>
+                                        <th>Total Views</th>
                                         <th class="actions-column">Actions</th>
                                     </tr>
                                 </thead>
@@ -110,6 +111,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $country->name }}</td>
+                                            <td>{{ $country->total_view_count ?? 0 }}</td>
                                             <td class="actions-column">
                                                 <a href="{{ route('countries.edit', $country) }}"
                                                     class="btn custom-btn custom-btn-warning">
@@ -161,7 +163,7 @@
         $(document).ready(function() {
             $('#countries-table').DataTable({
                 responsive: true,
-                pageLength: 10,
+                pageLength: 25,
                 order: [
                     [0, 'asc']
                 ],

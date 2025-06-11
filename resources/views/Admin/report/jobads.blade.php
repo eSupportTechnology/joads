@@ -45,6 +45,21 @@
         .table-responsive {
             overflow-x: auto;
         }
+
+        /* Align amount column right */
+        #daily-table tbody td.amount-col {
+            text-align: right;
+             vertical-align: bottom;
+            
+        }
+
+        /* Export buttons styling */
+        .export-buttons {
+            margin-bottom: 1rem;
+        }
+        .export-buttons button {
+            margin-right: 10px;
+        }
     </style>
 @endsection
 
@@ -58,6 +73,7 @@
 
 @section('content')
 <div class="container-fluid">
+
     <div class="row">
         <!-- Summary Cards -->
         <div class="col-xl-3 col-md-6 mb-4">
@@ -96,26 +112,53 @@
             </div>
         </div>
 
+        {{-- Date filter form --}}
+        <form method="GET" action="{{ route('reports.job-ads') }}" class="mb-4 row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="start_date" class="col-form-label">Start Date:</label>
+            </div>
+            <div class="col-auto">
+                <input type="date" id="start_date" name="start_date" class="form-control"
+                    value="{{ old('start_date', $startDate) }}">
+            </div>
+            <div class="col-auto">
+                <label for="end_date" class="col-form-label">End Date:</label>
+            </div>
+            <div class="col-auto">
+                <input type="date" id="end_date" name="end_date" class="form-control"
+                    value="{{ old('end_date', $endDate) }}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a href="{{ route('reports.job-ads') }}" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+
+        <!-- Export buttons -->
+        <div class="col-12 export-buttons">
+            <button class="btn btn-success" onclick="exportTableToExcel()">Excel</button>
+            <button class="btn btn-danger" onclick="exportTableToPDF()">PDF</button>
+            <button class="btn btn-primary" onclick="printTable()">Print</button>
+        </div>
+
         <!-- Detailed Reports: Daily -->
         <div class="col-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Detailed Daily Reports</h6>
-                    <button onclick="printTable()" class="btn btn-primary">Print Table</button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="display" id="daily-table">
+                        <table class="display" id="daily-table" style="width:100%">
                             <thead>
                                 <tr>
-                                    <th>No.</th>
-                                    <th>Date</th>
-                                    <th>Count</th>
+                                    <th>No</th>
+                                    <th  style="width: 120px">Date</th>
                                     <th>Title</th>
                                     <th>Company</th>
                                     <th>Approved By</th>
-                                    <th>Views</th>
-                                    <th>Amount (LKR)</th>
+                                    <th>Total Views</th>
+                                    <th>Total Amount (LKR)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -125,27 +168,27 @@
                                         <tr>
                                             <td>{{ $serialNumber++ }}</td>
                                             <td>{{ $daily->date }}</td>
-                                            <td>{{ $daily->count }}</td>
                                             <td>-</td>
                                             <td>-</td>
                                             <td>-</td>
                                             <td>0</td>
-                                            <td style="text-align: right">{{ number_format($daily->earnings, 2) }}</td>
+                                            <td class="amount-col">{{ number_format($daily->earnings, 2) }}</td>
                                         </tr>
                                     @else
-                                        @foreach ($daily->jobs as $index => $job)
+                                        @php $firstJob = true; @endphp
+                                        @foreach ($daily->jobs as $job)
                                             <tr>
-                                                @if ($index == 0)
-                                                    <td rowspan="{{ count($daily->jobs) }}">{{ $serialNumber++ }}</td>
-                                                    <td rowspan="{{ count($daily->jobs) }}">{{ $daily->date }}</td>
-                                                    <td rowspan="{{ count($daily->jobs) }}">{{ $daily->count }}</td>
-                                                @endif
+                                                <td>{{ $serialNumber++ }}</td>
+                                                <td>{{ $daily->date }}</td>
                                                 <td>{{ $job->title }}</td>
                                                 <td>{{ $job->company_name }}</td>
                                                 <td>{{ $job->approved_by }}</td>
                                                 <td>{{ $job->views_count }}</td>
-                                                @if ($index == 0)
-                                                    <td rowspan="{{ count($daily->jobs) }}" style="text-align: right">{{ number_format($daily->earnings, 2) }}</td>
+                                                @if ($firstJob)
+                                                    <td class="amount-col" rowspan="{{ $daily->jobs->count() }}">
+                                                        {{ number_format($daily->earnings, 2) }}
+                                                    </td>
+                                                    @php $firstJob = false; @endphp
                                                 @endif
                                             </tr>
                                         @endforeach
@@ -162,8 +205,17 @@
 @endsection
 
 @section('script')
+    <!-- DataTables -->
     <script src="{{ asset('assets/js/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatables/dataTables.bootstrap4.min.js') }}"></script>
+
+    <!-- SheetJS for Excel export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- jsPDF and jsPDF-AutoTable for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
     <script>
         $(document).ready(function() {
             $('#daily-table').DataTable({
@@ -171,15 +223,13 @@
                 paging: true,
                 searching: true,
                 ordering: true,
-                info: true
+                info: true,
+                order: [[1, 'desc']] // Order by date descending by default
             });
         });
 
         function printTable() {
-            // Get the table element
             const table = document.getElementById('daily-table');
-
-            // Create a new window for printing
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
                 <html>
@@ -193,6 +243,7 @@
                             tr:nth-child(even) { background-color: #f8f9fa; }
                             tr:hover { background-color: #e9ecef; }
                             h3 { text-align: center; color: #333; }
+                            td.amount-col { text-align: right;   vertical-align: bottom;}
                         </style>
                     </head>
                     <body>
@@ -205,6 +256,33 @@
             printWindow.focus();
             printWindow.print();
             printWindow.close();
+        }
+
+        function exportTableToExcel(filename = 'job-ads-report.xlsx') {
+            let table = document.getElementById('daily-table');
+            let workbook = XLSX.utils.book_new();
+            let worksheet = XLSX.utils.table_to_sheet(table);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Job Ads");
+            XLSX.writeFile(workbook, filename);
+        }
+
+        function exportTableToPDF(filename = 'job-ads-report.pdf') {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'pt', 'A4');
+
+            doc.setFontSize(18);
+            doc.text("Job Ads Report", 40, 40);
+
+            doc.autoTable({
+                html: '#daily-table',
+                startY: 60,
+                styles: { fontSize: 10 },
+                headStyles: { fillColor: [198, 217, 238] },
+                alternateRowStyles: { fillColor: [248, 249, 250] },
+                margin: { left: 40, right: 40 },
+            });
+
+            doc.save(filename);
         }
     </script>
 @endsection

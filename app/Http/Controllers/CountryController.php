@@ -7,11 +7,18 @@ use Illuminate\Http\Request;
 
 class CountryController extends Controller
 {
+
     public function index()
     {
-        $countries = Country::all();
+        $countries = Country::select('countries.id', 'countries.name')
+            ->leftJoin('job_postings', 'countries.id', '=', 'job_postings.country_id')
+            ->selectRaw('SUM(job_postings.view_count) as total_view_count')
+            ->groupBy('countries.id', 'countries.name')
+            ->get();
+
         return view('Admin.country.index', compact('countries'));
     }
+
 
     public function create()
     {
