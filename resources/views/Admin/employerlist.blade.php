@@ -114,4 +114,16 @@
     <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.rowReorder.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.scroller.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatable-extension/custom.js') }}"></script>
+
+
+        <script>
+        $(document).ready(function() {
+            if ($.fn.DataTable.isDataTable('#keytable')) {
+                $('#keytable').DataTable().destroy();
+            }
+            $('#keytable').DataTable({
+                pageLength: 100
+            });
+        });
+    </script>
 @endsection

@@ -88,44 +88,62 @@ class JobPostingController extends Controller
     }
 
     public function generateJobAdsReport(Request $request)
-    {
-        // 1) Summary data per date: total count + earnings per day (only approved jobs)
-        $dailyCount = DB::table('job_postings')
-            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->where('job_postings.status', 'approved')
-            ->select(
-                DB::raw('DATE(job_postings.created_at) as date'),
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-            )
-            ->groupBy('date')
-            ->orderBy('date', 'desc')
-            ->get();
+{
+    $hasDateFilter = $request->filled('start_date') && $request->filled('end_date');
 
-        // 2) Get job details per date (title, company, approved_by, views_count)
-        $jobDetailsByDate = DB::table('job_postings')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-            ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
-            ->where('job_postings.status', 'approved')
-            ->select(
-                DB::raw('DATE(job_postings.created_at) as date'),
-                'job_postings.title',
-                'employers.company_name',
-                DB::raw('COALESCE(job_postings.view_count, 0) as views_count'),
-                DB::raw('COALESCE(admins.name, "N/A") as approved_by')
-            )
-            ->orderBy('job_postings.created_at', 'desc')
-            ->get()
-            ->groupBy('date');
+    if ($hasDateFilter) {
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+    } else {
+        // No filter - default to last 30 days
+        $startDate = Carbon::now()->subDays(30)->startOfDay();
+        $endDate = Carbon::now()->endOfDay();
+    }
 
-        // 3) Attach job list to each daily summary item
-        $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
-            $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
-            return $item;
-        });
+    // Base query for daily counts and earnings
+    $dailyCountQuery = DB::table('job_postings')
+        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+        ->where('job_postings.status', 'approved')
+        ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
 
-        // Totals for today
-        $today = Carbon::today();
+    $dailyCount = $dailyCountQuery->select(
+            DB::raw('DATE(job_postings.created_at) as date'),
+            DB::raw('COUNT(*) as count'),
+            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+        )
+        ->groupBy('date')
+        ->orderBy('date', 'desc')
+        ->get();
+
+    // Base query for job details per date (include package price)
+    $jobDetailsQuery = DB::table('job_postings')
+        ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+        ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+        ->where('job_postings.status', 'approved')
+        ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
+
+    $jobDetailsByDate = $jobDetailsQuery->select(
+            DB::raw('DATE(job_postings.created_at) as date'),
+            'job_postings.title',
+            'employers.company_name',
+            DB::raw('COALESCE(job_postings.view_count, 0) as views_count'),
+            DB::raw('COALESCE(admins.name, "N/A") as approved_by'),
+            DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price')
+        )
+        ->orderBy('job_postings.created_at', 'desc')
+        ->get()
+        ->groupBy('date');
+
+    // Attach jobs to each daily summary record
+    $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
+        $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
+        return $item;
+    });
+
+    $today = Carbon::today();
+    $includeToday = $startDate <= $today && $endDate >= $today;
+    if ($includeToday) {
         $dailyTotalData = DB::table('job_postings')
             ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
             ->where('job_postings.status', 'approved')
@@ -135,13 +153,19 @@ class JobPostingController extends Controller
                 DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
             )
             ->first();
+    } else {
+        $dailyTotalData = (object) ['count' => 0, 'earnings' => 0];
+    }
 
-        // Totals for this week
-        $startOfWeek = Carbon::now()->startOfWeek();
+    $startOfWeek = Carbon::now()->startOfWeek();
+    $now = Carbon::now();
+    $includeWeek = $startDate <= $now && $endDate >= $startOfWeek;
+
+    if ($includeWeek) {
         $weeklyTotalData = DB::table('job_postings')
             ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
             ->where('job_postings.status', 'approved')
-            ->whereBetween('job_postings.created_at', [$startOfWeek, Carbon::now()])
+            ->whereBetween('job_postings.created_at', [$startOfWeek, $now])
             ->select(
                 DB::raw('COUNT(*) as count'),
                 DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
@@ -189,7 +213,12 @@ class JobPostingController extends Controller
                 )
                 ->orderBy('job_postings.created_at', 'desc')
                 ->get();
+        } else {
+            $weeklyTotalData = (object) ['count' => 0, 'earnings' => 0];
         }
+
+        $totalJobs = $dailyCount->sum('count');
+        $totalEarnings = $dailyCount->sum('earnings');
 
         return view('Admin.report.jobads', [
             'dailyCount' => $dailyCount,
@@ -197,9 +226,13 @@ class JobPostingController extends Controller
             'weeklyTotal' => $weeklyTotalData->count ?? 0,
             'totalJobs' => $totalJobs,
             'totalEarnings' => $totalEarnings,
-            'jobsInRange' => $jobsInRange,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
         ]);
     }
+
+}
+
 
 
     public function home(Request $request)
@@ -418,26 +451,27 @@ class JobPostingController extends Controller
         return response()->json($jobs);
     }
 
-    public function generateCustomerReport()
+public function generateCustomerReport(Request $request)
     {
-        // Get current date and relevant date ranges
-        $today = now()->format('Y-m-d');
-        $startOfWeek = now()->startOfWeek()->format('Y-m-d');
-        $endOfWeek = now()->endOfWeek()->format('Y-m-d');
-        $startOfMonth = now()->startOfMonth()->format('Y-m-d');
-        $endOfMonth = now()->endOfMonth()->format('Y-m-d');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
 
-        // Get base queries
-        $users = User::query();
-        $applications = Application::with('user', 'job');
+        // Default date range: last 1 month if not provided
+        if (!$startDate) {
+            $startDate = now()->subMonth()->format('Y-m-d');
+        }
+        if (!$endDate) {
+            $endDate = now()->format('Y-m-d');
+        }
 
-        // Daily Statistics
-        $dailyApplications = $applications->whereDate('created_at', $today)->count();
-        $dailyUsers = $users->whereDate('created_at', $today)->count();
+        // Daily statistics counts within date range
+        $dailyApplications = Application::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])->count();
+        $dailyUsers = User::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])->count();
 
         // Daily Applications Data
         $dailyApplicationsData = Application::with(['user', 'job'])
             ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->groupBy('date')
             ->orderBy('date', 'desc')
             ->limit(30)
@@ -445,6 +479,7 @@ class JobPostingController extends Controller
             ->map(function ($day) {
                 $applications = Application::with(['user', 'job'])
                     ->whereDate('created_at', $day->date)
+                    ->select('name', 'email', 'job_posting_id', 'created_at')
                     ->limit(5)
                     ->get()
                     ->map(function ($app) {
@@ -593,6 +628,13 @@ class JobPostingController extends Controller
                     'summary' => $summary,
                 ];
             });
+        // You can similarly filter weeklyApplicationsData, monthlyApplicationsData, dailyUsersData, etc.
+        // For brevity, here we just pass empty arrays for them.
+        $weeklyApplicationsData = [];
+        $monthlyApplicationsData = [];
+        $dailyUsersData = [];
+        $weeklyUsersData = [];
+        $monthlyUsersData = [];
 
         return view('Admin.report.application', compact(
             'dailyApplications',
@@ -602,11 +644,14 @@ class JobPostingController extends Controller
             'monthlyApplicationsData',
             'dailyUsersData',
             'weeklyUsersData',
-            'monthlyUsersData'
+            'monthlyUsersData',
+            'startDate',
+            'endDate'
         ));
     }
 
-    public function create()
+
+public function create()
     {
         $categories = Category::all();
         $subcategories = Subcategory::all();

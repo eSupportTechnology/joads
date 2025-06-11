@@ -14,8 +14,10 @@ class CategoryController extends Controller
 {
     // Display a listing of categories
 
-public function index()
+public function index(Request $request)
 {
+    $startDate = $request->query('start_date');
+    $endDate = $request->query('end_date');
     $today = Carbon::today()->toDateString();
 
     $categories = Category::with('subcategories')
@@ -30,13 +32,19 @@ public function index()
             }
         ], 'view_count')
         ->get()
-        ->map(function ($category) use ($today) {
-            // Get today's views for approved job postings in this category
-            $category->today_views = DB::table('job_postings')
+        ->map(function ($category) use ($today, $startDate, $endDate) {
+            $query = DB::table('job_postings')
                 ->where('status', 'approved')
-                ->where('category_id', $category->id)
-                ->whereDate('updated_at', $today)
-                ->sum('view_count');
+                ->where('category_id', $category->id);
+
+            if ($startDate) {
+                $query->whereDate('updated_at', '>=', $startDate);
+            }
+            if ($endDate) {
+                $query->whereDate('updated_at', '<=', $endDate);
+            }
+
+            $category->today_views = $query->sum('update_count');
 
             return $category;
         });

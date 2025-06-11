@@ -104,6 +104,7 @@ public function getFilteredJobPostings(Request $request)
             'job_postings.created_at',
             'employers.company_name',
             'job_postings.view_count',
+            'job_postings.update_count',
             'packages.lkr_price'
         );
 
@@ -118,10 +119,17 @@ public function getFilteredJobPostings(Request $request)
     $totalLkr = $results->sum('lkr_price');
 
     // Group by created_at date and sum lkr_price per date
-    $dailyTotals = $results->groupBy(function($item) {
+    $dailyTotals = $results->groupBy(function ($item) {
         return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
-    })->map(function($group) {
+    })->map(function ($group) {
         return $group->sum('lkr_price');
+    });
+
+    // Group by created_at date and sum view_count per date (Daily Views)
+    $dailyViews = $results->groupBy(function ($item) {
+        return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
+    })->map(function ($group) {
+        return $group->sum('view_count');
     });
 
     // Get today's and weekly employer counts
@@ -136,6 +144,7 @@ public function getFilteredJobPostings(Request $request)
         'jobPostings' => $results,
         'totalEarningsLkr' => $totalLkr,
         'dailyTotals' => $dailyTotals,
+        'dailyViews' => $dailyViews,
         'startDate' => $request->start_date,
         'endDate' => $request->end_date,
         'dailyEmployerCount' => $dailyEmployerCount,
