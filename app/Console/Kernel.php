@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
      */
         protected function schedule(Schedule $schedule)
         {
+            $schedule->command('app:post-history-update')->dailyAt('23:59');
             $schedule->command('reset:update-count')->dailyAt('00:00');
         }
 

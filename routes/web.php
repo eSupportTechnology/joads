@@ -49,7 +49,7 @@ use App\Http\Controllers\DurationController;
 use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\VissionMissionController;
-
+use App\Http\Controllers\PerformanceReportController;
 
 
 //Breeze routes
@@ -958,6 +958,8 @@ Route::middleware(['auth:admin'])->group(function () {
 
     Route::get('/reports/customers', [JobPostingController::class, 'generateCustomerReport'])
         ->name('reports.customers')->middleware('check.permission:reports.customers');
+    
+    Route::get('/reports/performance',[PerformanceReportController::class, 'index'])->name('reports.performance')->middleware('check.permission:reports.performance');
 
     //settings management
     Route::get('/contactus/{contactus}/edit', [ContactUsController::class, 'edit'])

@@ -425,9 +425,10 @@ public function updateProfile(Request $request)
 
     public function assignPermissions(Request $request)
     {
+        
         $admin = Admin::findOrFail($request->admin_id);
+       
         $admin->permissions()->sync($request->permissions ?? []);
-
         return redirect()->route('superadmin.show.permissions', ['admin_id' => $admin->id])
             ->with('success', 'Permissions updated.');
     }

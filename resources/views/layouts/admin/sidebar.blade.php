@@ -226,6 +226,7 @@
                             <li><a href="{{ route('reports.job-ads') }}">Jobs </a></li>
                             <li><a href="{{ route('admin.employer.stats') }}">Employer</a></li>
                             <li><a href="{{ route('reports.customers') }}">Jobseeker </a></li>
+                            <li><a href="{{ route('reports.performance') }}">Performance </a></li>
                         </ul>
                     </li>
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title"

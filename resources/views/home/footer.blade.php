@@ -96,7 +96,8 @@
         style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
         <p style="font-size: 14px; color: #f4f4f4; margin: 0;">
             <footer>
-                All Rights Reserved. &copy; {{ date('Y') }} jobads.lk.
+                <p>All Rights Reserved. © {{ date('Y') }} jobads.lk.</p>
+                <p style="font-size: 13px">Powered By eSupport&reg;</p>
             </footer>
         </p>
     </div>
