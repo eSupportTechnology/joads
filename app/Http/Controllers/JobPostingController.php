@@ -613,21 +613,21 @@ class JobPostingController extends Controller
         $employerId = auth('employer')->user()->id;
         $packages = Package::where('package_type', 'Standard')->get();
         $jobPostings = [
-        [
-            'title' => '',
-            'description' => '',
-            'category_ids' => [],
-            'subcategory_ids' => [],
-            'location' => '',
-            'country_id' => '',
-            'salary_range' => '',
-            'requirements' => '',
-            'closing_date' => '',
-            'status' => 'pending',
-            'custom_price' => '',
-            'image' => null,
-        ]
-    ];
+            [
+                'title' => '',
+                'description' => '',
+                'category_ids' => [],
+                'subcategory_ids' => [],
+                'location' => '',
+                'country_id' => '',
+                'salary_range' => '',
+                'requirements' => '',
+                'closing_date' => '',
+                'status' => 'pending',
+                'custom_price' => '',
+                'image' => null,
+            ]
+        ];
         $countries = Country::all(); // Add this line
 
         return view('employer.jobcreate', compact('jobPostings', 'categories', 'subcategories', 'employerId', 'packages', 'countries'));
@@ -644,212 +644,244 @@ class JobPostingController extends Controller
     }
 
     public function store(Request $request)
-{
-    try {
-        $request->validate([
-            'package_id' => 'required|exists:packages,id',
-            'payment_method' => 'required|in:contact_contributor,online',
-        ]);
-
-        $employerId = auth('employer')->id();
-        $packageId = $request->input('package_id');
-        $jobPostings = $request->input('job_postings', []);
-        $paymentMethod = $request->input('payment_method');
-
-        if (!is_array($jobPostings) || empty($jobPostings)) {
-            return redirect()->back()->withErrors(['job_postings' => 'No job postings provided.'])->withInput();
-        }
-
-        $package = \App\Models\Package::findOrFail($packageId);
-
-        DB::beginTransaction();
-
-        foreach ($jobPostings as $index => $jobData) {
+    {
+        try {
             $request->validate([
-                "job_postings.{$index}.title" => 'required|string|max:255',
-                "job_postings.{$index}.description" => 'nullable|string',
-                "job_postings.{$index}.category_ids" => 'required|array|min:1',
-                "job_postings.{$index}.category_ids.*" => 'exists:categories,id',
-                "job_postings.{$index}.subcategory_ids" => 'required|array|min:1',
-                "job_postings.{$index}.subcategory_ids.*" => 'exists:subcategories,id',
-                "job_postings.{$index}.location" => 'required|string|max:255',
-                "job_postings.{$index}.country_id" => 'required|exists:countries,id',
-                "job_postings.{$index}.salary_range" => 'nullable|string',
-                "job_postings.{$index}.requirements" => 'nullable|string',
-                "job_postings.{$index}.closing_date" => 'required|date',
-                "job_postings.{$index}.status" => 'required|in:pending,reject,approved',
-                "job_postings.{$index}.image" => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
-                "job_postings.{$index}.custom_price" => 'nullable|numeric|min:0',
+                'package_id' => 'required|exists:packages,id',
+                'payment_method' => 'required|in:contact_contributor,online',
+                'lkr_usd' => 'required|in:Local,Foreign',
             ]);
 
-            $categoryIds = $jobData['category_ids'];
-            $subcategoryIds = $jobData['subcategory_ids'];
+            $employerId = auth('employer')->id();
+            $packageId = $request->input('package_id');
+            $jobPostings = $request->input('job_postings', []);
+            $paymentMethod = $request->input('payment_method');
+            $currencyType = $request->input('lkr_usd');
 
-            foreach ($categoryIds as $catId) {
-                foreach ($subcategoryIds as $subId) {
-                    // Generate unique job_id
-                    $latestJob = JobPosting::where('job_id', 'like', 'J%')
-                        ->lockForUpdate()
-                        ->orderByRaw('CAST(SUBSTRING(job_id, 2) AS UNSIGNED) DESC')
-                        ->first();
+            if (!is_array($jobPostings) || empty($jobPostings)) {
+                return redirect()->back()->withErrors(['job_postings' => 'No job postings provided.'])->withInput();
+            }
 
-                    $jobId = $latestJob
-                        ? 'J' . str_pad((int) substr($latestJob->job_id, 1) + 1, 6, '0', STR_PAD_LEFT)
-                        : 'J000001';
+            $package = Package::findOrFail($packageId);
 
-                    // Use custom price if set, otherwise default
-                    $finalPrice = isset($jobData['custom_price']) && $jobData['custom_price'] !== ''
-                        ? floatval($jobData['custom_price'])
-                        : $package->lkr_price;
+            DB::beginTransaction();
 
-                    $jobPostingData = [
-                        'job_id' => $jobId,
-                        'employer_id' => $employerId,
-                        'package_id' => $packageId,
-                        'package_price' => $finalPrice,
-                        'title' => $jobData['title'],
-                        'description' => $jobData['description'] ?? 'No Description',
-                        'category_id' => $catId,
-                        'subcategory_id' => $subId,
-                        'location' => $jobData['location'],
-                        'country_id' => $jobData['country_id'],
-                        'salary_range' => $jobData['salary_range'] ?? null,
-                        'requirements' => $jobData['requirements'],
-                        'closing_date' => $jobData['closing_date'],
-                        'status' => $jobData['status'],
-                        'payment_method' => $paymentMethod,
-                    ];
+            foreach ($jobPostings as $index => $jobData) {
+                $request->validate([
+                    "job_postings.{$index}.title" => 'required|string|max:255',
+                    "job_postings.{$index}.description" => 'nullable|string',
+                    "job_postings.{$index}.category_ids" => 'required|array|min:1',
+                    "job_postings.{$index}.category_ids.*" => 'exists:categories,id',
+                    "job_postings.{$index}.subcategory_ids" => 'required|array|min:1',
+                    "job_postings.{$index}.subcategory_ids.*" => 'exists:subcategories,id',
+                    "job_postings.{$index}.location" => 'required|string|max:255',
+                    "job_postings.{$index}.country_id" => 'required|exists:countries,id',
+                    "job_postings.{$index}.salary_range" => 'nullable|string',
+                    "job_postings.{$index}.requirements" => 'nullable|string',
+                    "job_postings.{$index}.closing_date" => 'required|date',
+                    "job_postings.{$index}.status" => 'required|in:pending,reject,approved',
+                    "job_postings.{$index}.image" => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
+                    "job_postings.{$index}.custom_price" => 'nullable|numeric|min:0',
+                ]);
 
-                    $posting = JobPosting::create($jobPostingData);
+                $categoryIds = $jobData['category_ids'];
+                $subcategoryIds = $jobData['subcategory_ids'];
 
-                    if ($request->hasFile("job_postings.{$index}.image")) {
-                        $imagePath = $request->file("job_postings.{$index}.image")->store('job_images', 'public');
-                        $posting->image = $imagePath;
-                        $posting->save();
+                foreach ($categoryIds as $catId) {
+                    foreach ($subcategoryIds as $subId) {
+                       
+                        $latestJob = JobPosting::where('job_id', 'like', 'J%')
+                            ->lockForUpdate()
+                            ->orderByRaw('CAST(SUBSTRING(job_id, 2) AS UNSIGNED) DESC')
+                            ->first();
+
+                        $jobId = $latestJob
+                            ? 'J' . str_pad((int) substr($latestJob->job_id, 1) + 1, 6, '0', STR_PAD_LEFT)
+                            : 'J000001';
+
+                        // Use custom price if set, otherwise default
+                        if ($currencyType === 'Foreign' && isset($jobData['custom_price']) && $jobData['custom_price'] !== '') {
+
+                            $latestConversion = \App\Models\Conversion::latest()->first();
+
+                            if (!$latestConversion) {
+                                throw new \Exception('No exchange rate found. Please update the conversion table.');
+                            }
+
+                            $usd = floatval($jobData['custom_price']);
+                            $finalPrice = $usd * $latestConversion->exchange_rate;
+                        } else {
+                            $finalPrice = isset($jobData['custom_price']) && $jobData['custom_price'] !== ''
+                                ? floatval($jobData['custom_price'])
+                                : ($currencyType === 'Local' ? $package->lkr_price : $package->usd_price);
+                        }
+
+                        $jobPostingData = [
+                            'job_id' => $jobId,
+                            'employer_id' => $employerId,
+                            'package_id' => $packageId,
+                            'package_price' => $finalPrice,
+                            'title' => $jobData['title'],
+                            'description' => $jobData['description'] ?? 'No Description',
+                            'category_id' => $catId,
+                            'subcategory_id' => $subId,
+                            'location' => $jobData['location'],
+                            'country_id' => $jobData['country_id'],
+                            'salary_range' => $jobData['salary_range'] ?? null,
+                            'requirements' => $jobData['requirements'],
+                            'closing_date' => $jobData['closing_date'],
+                            'status' => $jobData['status'],
+                            'payment_method' => $paymentMethod,
+                            'currency_type' => $currencyType
+                        ];
+
+                        $posting = JobPosting::create($jobPostingData);
+
+                        if ($request->hasFile("job_postings.{$index}.image")) {
+                            $imagePath = $request->file("job_postings.{$index}.image")->store('job_images', 'public');
+                            $posting->image = $imagePath;
+                            $posting->save();
+                        }
                     }
                 }
+            }
+
+            DB::commit();
+
+            return $paymentMethod === 'contact_contributor'
+                ? redirect()->route('employer.job_postings.post.create')->with('success', 'Job postings created successfully!')
+                : response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+            return redirect()->back()->withErrors(['error' => $e->getMessage()])->withInput();
+        }
+    }
+
+
+    public function storeForAdmin(Request $request)
+{
+    $validatedData = $request->validate([
+        'package_id' => 'required|exists:packages,id',
+        'payment_method' => 'required|in:contact_contributor,online',
+        'lkr_usd' => 'required|in:Local,Foreign',
+        'job_postings.*.title' => 'required|string|max:255',
+        'job_postings.*.description' => 'nullable|string',
+        'job_postings.*.category_ids' => 'required|array|min:1',
+        'job_postings.*.category_ids.*' => 'exists:categories,id',
+        'job_postings.*.subcategory_ids' => 'required|array|min:1',
+        'job_postings.*.subcategory_ids.*' => 'exists:subcategories,id',
+        'job_postings.*.location' => 'required|string|max:255',
+        'job_postings.*.country_id' => 'required|exists:countries,id',
+        'job_postings.*.salary_range' => 'nullable|string|max:255',
+        'job_postings.*.image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
+        'job_postings.*.requirements' => 'nullable|string',
+        'job_postings.*.closing_date' => 'required|date',
+        'job_postings.*.status' => 'required|in:pending,reject,approved',
+        'job_postings.*.employer_id' => 'required|exists:employers,id',
+        'job_postings.*.custom_price' => 'nullable|numeric|min:0',
+    ]);
+
+    $adminId = auth('admin')->id();
+    $packageId = $request->input('package_id');
+    $jobPostings = $request->input('job_postings', []);
+    $paymentMethod = $request->input('payment_method');
+    $currencyType = $request->input('lkr_usd');
+
+    DB::beginTransaction();
+    $package = Package::findOrFail($packageId);
+
+    try {
+        $storedPostings = [];
+        foreach ($jobPostings as $index => $jobData) {
+            $categoryIds = $jobData['category_ids'] ?? [];
+            $subcategoryIds = $jobData['subcategory_ids'] ?? [];
+
+            if (empty($categoryIds) || empty($subcategoryIds)) {
+                continue;
+            }
+
+            $subcategories = Subcategory::whereIn('id', $subcategoryIds)->get();
+
+            foreach ($subcategories as $subcategory) {
+                if (!in_array($subcategory->category_id, $categoryIds)) {
+                    continue;
+                }
+
+                $latestJob = JobPosting::where('job_id', 'like', 'J%')
+                    ->lockForUpdate()
+                    ->orderByRaw('CAST(SUBSTRING(job_id, 2, 6) AS UNSIGNED) DESC')
+                    ->first();
+
+                $latestId = $latestJob ? (int) substr($latestJob->job_id, 1) : 0;
+                $jobId = 'J' . str_pad($latestId + 1, 6, '0', STR_PAD_LEFT);
+
+                if ($currencyType === 'Foreign' && isset($jobData['custom_price']) && $jobData['custom_price'] !== '') {
+
+                    $latestConversion = \App\Models\Conversion::latest()->first();
+
+                    if (!$latestConversion) {
+                        throw new \Exception('No exchange rate found. Please update the conversion table.');
+                    }
+
+                    $usd = floatval($jobData['custom_price']);
+                    $finalPrice = $usd * $latestConversion->exchange_rate;
+                } else {
+                    $finalPrice = isset($jobData['custom_price']) && $jobData['custom_price'] !== ''
+                        ? floatval($jobData['custom_price'])
+                        : ($currencyType === 'Local' ? $package->lkr_price : $package->usd_price);
+                }
+
+                $jobPostingData = [
+                    'job_id' => $jobId,
+                    'creator_id' => $adminId,
+                    'admin_id' => $adminId,
+                    'package_id' => $packageId,
+                    'employer_id' => $jobData['employer_id'],
+                    'title' => $jobData['title'],
+                    'description' => $jobData['description'] ?? 'No Description',
+                    'category_id' => $subcategory->category_id,
+                    'subcategory_id' => $subcategory->id,
+                    'location' => $jobData['location'],
+                    'country_id' => $jobData['country_id'],
+                    'salary_range' => $jobData['salary_range'] ?? null,
+                    'requirements' => $jobData['requirements'],
+                    'closing_date' => $jobData['closing_date'],
+                    'status' => $jobData['status'],
+                    'payment_method' => $paymentMethod,
+                    'is_active' => true,
+                    'package_price' => $finalPrice,
+                    'currency_type' => $currencyType,
+                ];
+
+                if ($request->hasFile("job_postings.$index.image")) {
+                    $jobPostingData['image'] = $request->file("job_postings.$index.image")
+                        ->store('job_images', 'public');
+                }
+
+                $storedPostings[] = JobPosting::create($jobPostingData);
             }
         }
 
         DB::commit();
 
-        return $paymentMethod === 'contact_contributor'
-            ? redirect()->route('employer.job_postings.post.create')->with('success', 'Job postings created successfully!')
-            : response()->json(['success' => true]);
+        if ($paymentMethod === 'online') {
+            session(['pending_job_postings' => collect($storedPostings)->pluck('id')]);
+            return redirect()->route('admin.payment.checkout');
+        }
 
+        return redirect()->route('job_postings.index')
+            ->with('success', 'Job postings created successfully!');
     } catch (\Exception $e) {
         DB::rollBack();
-        if ($request->expectsJson()) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
-        return redirect()->back()->withErrors(['error' => $e->getMessage()])->withInput();
+        return redirect()->back()
+            ->withErrors(['error' => 'An error occurred while creating job postings: ' . $e->getMessage()])
+            ->withInput();
     }
 }
 
-
-    public function storeForAdmin(Request $request)
-    {
-        $validatedData = $request->validate([
-            'package_id' => 'required|exists:packages,id',
-            'payment_method' => 'required|in:contact_contributor,online',
-            'job_postings.*.title' => 'required|string|max:255',
-            'job_postings.*.description' => 'nullable|string',
-            'job_postings.*.category_ids' => 'required|array|min:1',
-            'job_postings.*.category_ids.*' => 'exists:categories,id',
-            'job_postings.*.subcategory_ids' => 'required|array|min:1',
-            'job_postings.*.subcategory_ids.*' => 'exists:subcategories,id',
-            'job_postings.*.location' => 'required|string|max:255',
-            'job_postings.*.country_id' => 'required|exists:countries,id',
-            'job_postings.*.salary_range' => 'nullable|string|max:255',
-            'job_postings.*.image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
-            'job_postings.*.requirements' => 'nullable|string',
-            'job_postings.*.closing_date' => 'required|date',
-            'job_postings.*.status' => 'required|in:pending,reject,approved',
-            'job_postings.*.employer_id' => 'required|exists:employers,id',
-        ]);
-
-        $adminId = auth('admin')->id();
-        $packageId = $request->input('package_id');
-        $jobPostings = $request->input('job_postings', []);
-        $paymentMethod = $request->input('payment_method');
-
-        DB::beginTransaction();
-        $package = \App\Models\Package::findOrFail($packageId); // Get current package details
-
-        try {
-            $storedPostings = [];
-            foreach ($jobPostings as $index => $jobData) {
-                $categoryIds = $jobData['category_ids'] ?? [];
-                $subcategoryIds = $jobData['subcategory_ids'] ?? [];
-
-                if (empty($categoryIds) || empty($subcategoryIds)) {
-                    continue;
-                }
-
-                // Fetch subcategories with their category_id
-                $subcategories = \App\Models\Subcategory::whereIn('id', $subcategoryIds)->get();
-
-                foreach ($subcategories as $subcategory) {
-                    if (!in_array($subcategory->category_id, $categoryIds)) {
-                        continue; // Skip if subcategory doesn't belong to selected categories
-                    }
-
-                    // Generate new job ID
-                    $latestJob = JobPosting::where('job_id', 'like', 'J%')
-                        ->lockForUpdate()
-                        ->orderByRaw('CAST(SUBSTRING(job_id, 2, 6) AS UNSIGNED) DESC')
-                        ->first();
-
-                    $latestId = $latestJob ? (int) substr($latestJob->job_id, 1) : 0;
-                    $jobId = 'J' . str_pad($latestId + 1, 6, '0', STR_PAD_LEFT);
-
-                    $jobPostingData = [
-                        'job_id' => $jobId,
-                        'creator_id' => $adminId,
-                        'admin_id' => $adminId,
-                        'package_id' => $packageId,
-                        'employer_id' => $jobData['employer_id'],
-                        'title' => $jobData['title'],
-                        'description' => $jobData['description'] ?? 'No Description',
-                        'category_id' => $subcategory->category_id,
-                        'subcategory_id' => $subcategory->id,
-                        'location' => $jobData['location'],
-                        'country_id' => $jobData['country_id'],
-                        'salary_range' => $jobData['salary_range'] ?? null,
-                        'requirements' => $jobData['requirements'],
-                        'closing_date' => $jobData['closing_date'],
-                        'status' => $jobData['status'],
-                        'payment_method' => $paymentMethod,
-                        'is_active' => true,
-                        'package_price' => $package->lkr_price,
-                    ];
-
-                    if ($request->hasFile("job_postings.$index.image")) {
-                        $jobPostingData['image'] = $request->file("job_postings.$index.image")
-                            ->store('job_images', 'public');
-                    }
-
-                    $storedPostings[] = JobPosting::create($jobPostingData);
-                }
-            }
-
-
-            DB::commit();
-
-            if ($paymentMethod === 'online') {
-                session(['pending_job_postings' => collect($storedPostings)->pluck('id')]);
-                return redirect()->route('admin.payment.checkout');
-            }
-
-            return redirect()->route('job_postings.index')
-                ->with('success', 'Job postings created successfully!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()
-                ->withErrors(['error' => 'An error occurred while creating job postings: ' . $e->getMessage()])
-                ->withInput();
-        }
-    }
 
 
     public function getSubcategories($categoryId)
@@ -862,7 +894,7 @@ class JobPostingController extends Controller
     {
         $categories = Category::all(); // Assuming you have a Category model
         $countries = Country::all();
-        $packages = Package::all();
+        $packages = Package::where('package_type', 'Standard')->get();
         $subcategories = Subcategory::where('category_id', $jobPosting->category_id)->get(); // Assuming you have a Subcategory model
         return view('employer.jobupdate', compact('packages', 'countries', 'jobPosting', 'categories', 'subcategories'));
     }
@@ -873,10 +905,26 @@ class JobPostingController extends Controller
         $categories = Category::all(); // Fetch all categories
         $subcategories = Subcategory::all(); // Fetch all subcategories
         $employers = Employer::all(); // Fetch all employers
-        $packages = Package::all(); // Fetch all packages
+        $packages = Package::all();
         $countries = Country::all();
+         $jobPostings = [
+            [
+                'title' => '',
+                'description' => '',
+                'category_ids' => [],
+                'subcategory_ids' => [],
+                'location' => '',
+                'country_id' => '',
+                'salary_range' => '',
+                'requirements' => '',
+                'closing_date' => '',
+                'status' => 'pending',
+                'custom_price' => '',
+                'image' => null,
+            ]
+        ];
 
-        return view('Admin.jobcreate', compact('categories', 'subcategories', 'employers', 'packages', 'countries'));
+        return view('Admin.jobcreate', compact('jobPostings','categories', 'subcategories', 'employers', 'packages', 'countries'));
     }
 
     public function updatepost(Request $request, $id)
@@ -922,37 +970,49 @@ class JobPostingController extends Controller
     public function update(Request $request, JobPosting $jobPosting)
 {
     try {
-        // Validate inputs including package_id and optional custom_price
         $validated = $request->validate([
             'package_id' => 'required|exists:packages,id',
             'custom_price' => 'nullable|numeric|min:0',
+            'lkr_usd' => 'required|in:Local,Foreign',  // Add currency type validation
             'title' => 'required|string|max:255',
-            'description' => 'required',
+            'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
             'location' => 'required|string|max:255',
             'country_id' => 'required|exists:countries,id',
             'salary_range' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
-            'requirements' => 'required',
+            'requirements' => 'required|string',
             'closing_date' => 'required|date',
             'status' => 'nullable|in:pending,reject,approved',
         ]);
 
-        // Get package to retrieve default price
         $package = \App\Models\Package::findOrFail($validated['package_id']);
+        $currencyType = $validated['lkr_usd'];
 
-        // Decide final price: use custom_price if present, otherwise package's price
-        $finalPrice = isset($validated['custom_price']) && $validated['custom_price'] !== ''
-            ? $validated['custom_price']
-            : $package->lkr_price;
+        // Calculate final price considering currency type and custom price
+        if ($currencyType === 'Foreign' && isset($validated['custom_price']) && $validated['custom_price'] !== '') {
+            // Fetch latest exchange rate for USD → LKR conversion
+            $latestConversion = \App\Models\Conversion::latest()->first();
 
-        // Handle image upload
+            if (!$latestConversion) {
+                throw new \Exception('No exchange rate found. Please update the conversion table.');
+            }
+
+            $usd = floatval($validated['custom_price']);
+            $finalPrice = $usd * $latestConversion->exchange_rate;
+        } else {
+            // Local currency or no custom price: use custom or package LKR price
+            $finalPrice = isset($validated['custom_price']) && $validated['custom_price'] !== ''
+                ? floatval($validated['custom_price'])
+                : $package->lkr_price;
+        }
+
+        // Handle image upload if exists
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('job_images', 'public');
         }
 
-        // Update fields explicitly, including package_id and package_price
         $jobPosting->update([
             'package_id' => $validated['package_id'],
             'package_price' => $finalPrice,
@@ -967,16 +1027,17 @@ class JobPostingController extends Controller
             'requirements' => $validated['requirements'],
             'closing_date' => $validated['closing_date'],
             'status' => $validated['status'] ?? $jobPosting->status,
+            'currency_type' => $currencyType, // save currency type for reference if needed
         ]);
 
         return redirect()->route('employer.job_postings.employer.jobs')
             ->with('success', 'Job Posting updated successfully.');
-
     } catch (\Exception $e) {
         return back()->withInput()
             ->with('error', 'An error occurred while updating the job posting: ' . $e->getMessage());
     }
 }
+
 
     public function generateJobAdsReportByDateRange(Request $request)
     {

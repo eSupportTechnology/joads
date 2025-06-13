@@ -314,6 +314,7 @@ Route::prefix('employer')->name('employer.')->group(function () {
             Route::get('/{jobPosting}/edit', [JobPostingController::class, 'edit'])->name('post.edit');
             Route::patch('/{jobPosting}', [JobPostingController::class, 'update'])->name('post.update');
             Route::delete('/{jobPosting}', [JobPostingController::class, 'destroy'])->name('post.destroy');
+            Route::get('/convert-usd-to-lkr', [JobPostingController::class, 'convertUsdToLkr'])->name('convert.usd.to.lkr');
         });
     });
 });
