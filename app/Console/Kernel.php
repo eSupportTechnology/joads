@@ -38,5 +38,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\ResetUpdateCount::class,
+        \App\Console\Commands\FetchConversionRate::class,
     ];
 }
