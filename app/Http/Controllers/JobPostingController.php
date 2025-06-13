@@ -689,7 +689,7 @@ class JobPostingController extends Controller
 
                 foreach ($categoryIds as $catId) {
                     foreach ($subcategoryIds as $subId) {
-                       
+
                         $latestJob = JobPosting::where('job_id', 'like', 'J%')
                             ->lockForUpdate()
                             ->orderByRaw('CAST(SUBSTRING(job_id, 2) AS UNSIGNED) DESC')
@@ -939,6 +939,7 @@ class JobPostingController extends Controller
             'requirements' => 'nullable|string',
             'closing_date' => 'required|date',
             'package_id' => 'required|exists:packages,id',
+            'package_price' => 'nullable|numeric',
         ]);
 
         $job = JobPosting::findOrFail($id);
@@ -952,6 +953,7 @@ class JobPostingController extends Controller
         $job->salary_range = $request->salary_range;
         $job->requirements = $request->requirements;
         $job->closing_date = $request->closing_date;
+        $job->package_price = $request->package_price;
 
         // Check if package has changed
         if ($job->package_id != $request->package_id) {
