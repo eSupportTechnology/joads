@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class JobApprovedMail extends Mailable
 {
-   use Queueable, SerializesModels;
+    use Queueable, SerializesModels;
 
     public $job;
     public $employer;
@@ -26,15 +26,25 @@ class JobApprovedMail extends Mailable
 
     public function build()
     {
+        $jobUrl = route('job.details', $this->job->id);
+
         $body = str_replace(
-            ['{{ company_name }}', '{{ job_title }}'],
-            [$this->employer?->company_name ?? 'Company', $this->job->title],
+            ['{{ company_name }}', '{{ job_title }}', '{{ job_url }}'],
+            [
+                $this->employer?->company_name ?? 'Company',
+                $this->job->title,
+                $jobUrl
+            ],
             $this->template->body
         );
 
-        return $this->subject($this->template->subject)
-                    ->view('Admin.emails.job_approved')
-                    ->with(['body' => $body,]);
-    }
 
+        return $this->subject($this->template->subject)
+            ->view('Admin.emails.job_approved')
+            ->with([
+                'body' => $body,
+                'job_url' => $jobUrl
+            ]);
+
+    }
 }

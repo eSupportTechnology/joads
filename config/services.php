@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'openexchangerates' => [
+    'app_id' => env('OPENEXCHANGERATES_APP_ID'),
+],
+
+
 ];
