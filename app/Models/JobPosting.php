@@ -35,6 +35,7 @@ class JobPosting extends Model
         'payment_method',
         'country_id',
         'package_price',
+        'currency_type',
     ];
 
     // Relationships
@@ -74,5 +75,9 @@ public function employer()
 public function package()
 {
     return $this->belongsTo(Package::class, 'package_id');
+}
+public function conversion(){
+
+    return $this->belongsTo(Conversion::class);
 }
 }

@@ -208,20 +208,33 @@
                             enctype="multipart/form-data" id="jobPostingForm">
                             @csrf
                             <div id="contacts-container">
-                                <!-- Package Selection -->
+
                                 <div id="contacts-container">
+                                    <!-- Currency Selection -->
+                                    <div class="mb-3">
+                                        <label for="lkr_usd" class="form-label">Currency Type</label>
+                                        <select name="lkr_usd" id="lkr_usd" class="form-control" required>
+                                            <option value="">Select a Currency</option>
+                                            <option value="Local">Local(LKR)</option>
+                                            <option value="Foreign">Foreign(USD)</option>
+                                        </select>
+                                    </div>
                                     <!-- Package Selection -->
                                     <div class="mb-3">
                                         <label for="package_id" class="form-label">Package *</label>
                                         <select name="package_id" id="package_id" class="form-control" required>
                                             <option value="">Select a package</option>
                                             @foreach ($packages as $package)
-                                                <option value="{{ $package->id }}" data-price="{{ $package->lkr_price }}">
+                                                <option value="{{ $package->id }}" data-lkr="{{ $package->lkr_price }}"
+                                                    data-usd="{{ $package->usd_price }}"
+                                                    data-size="{{ $package->package_size }}"
+                                                    data-duration="{{ $package->duration->duration }}">
                                                     {{ $package->package_size }} ads - ({{ $package->duration->duration }}
                                                     days)
-                                                    - Rs. {{ $package->lkr_price }}
+                                                    - Rs. {{ $package->lkr_price }} / {{ $package->usd_price }} USD
                                                 </option>
                                             @endforeach
+
                                         </select>
                                     </div>
 
@@ -237,7 +250,6 @@
                                                     id="custom_price_{{ $index }}" class="form-control"
                                                     placeholder="Enter price or leave blank for default">
                                             </div>
-                                            <!-- Other fields like title, category_ids, etc. go here -->
                                         </div>
                                     @endforeach
                                 </div>
@@ -420,24 +432,71 @@
     </div>
 
     <script>
-        const priceInputs = document.querySelectorAll('[id^="custom_price_"]');
-        priceInputs.forEach(input => {
-            input.dataset.userEdited = 'false';
-            input.addEventListener('input', () => {
-                input.dataset.userEdited = 'true';
-            });
-        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const currencySelect = document.getElementById('lkr_usd');
+            const packageSelect = document.getElementById('package_id');
+            const priceInputs = document.querySelectorAll('[id^="custom_price_"]');
 
-        document.getElementById('package_id').addEventListener('change', function() {
-            const price = this.options[this.selectedIndex].getAttribute('data-price');
+            priceInputs.forEach(input => {
+                input.dataset.userEdited = 'false';
 
-            document.querySelectorAll('[id^="custom_price_"]').forEach(input => {
-                // Only set price if user hasn't manually edited
-                if (!input.value || input.dataset.userEdited === 'false') {
-                    input.value = price;
-                    input.dataset.userEdited = 'false'; // Reset in case it was blank
-                }
+                input.addEventListener('input', async () => {
+                    input.dataset.userEdited = 'true';
+
+                    const usd = parseFloat(input.value);
+                    if (currencySelect.value === 'Foreign' && !isNaN(usd)) {
+                        try {
+                            const response = await fetch(`/convert-usd-to-lkr?usd=${usd}`);
+                            const data = await response.json();
+                            if (data.success) {
+                                input.setAttribute('data-lkr-price', data
+                                .lkr);
+                                console.log(
+                                    `Converted ${usd} USD → ${data.lkr} LKR @ rate ${data.rate}`
+                                    );
+                            }
+                        } catch (e) {
+                            console.error('Conversion failed', e);
+                        }
+                    }
+                });
             });
+
+            function updatePrices() {
+                const currency = currencySelect.value;
+
+                Array.from(packageSelect.options).forEach(option => {
+                    const size = option.getAttribute('data-size');
+                    const duration = option.getAttribute('data-duration');
+                    const lkr = option.getAttribute('data-lkr');
+                    const usd = option.getAttribute('data-usd');
+
+                    if (size && duration) {
+                        option.textContent =
+                            currency === 'Local' ?
+                            `${size} ads - (${duration} days) - Rs. ${lkr}` :
+                            `${size} ads - (${duration} days) - $${usd} USD`;
+                    }
+                });
+
+                const selectedOption = packageSelect.options[packageSelect.selectedIndex];
+                if (!selectedOption) return;
+
+                const price = currency === 'Local' ?
+                    selectedOption.getAttribute('data-lkr') :
+                    selectedOption.getAttribute('data-usd');
+
+                priceInputs.forEach(input => {
+                    if (!input.value || input.dataset.userEdited === 'false') {
+                        input.value = price;
+                        input.dataset.userEdited = 'false';
+                    }
+                });
+            }
+
+
+            currencySelect.addEventListener('change', updatePrices);
+            packageSelect.addEventListener('change', updatePrices);
         });
         const selectedCategories = new Map();
         const selectedSubcategories = new Map();
