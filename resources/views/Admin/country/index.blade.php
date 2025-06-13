@@ -114,14 +114,14 @@
                                             <td>{{ $country->total_view_count ?? 0 }}</td>
                                             <td class="actions-column">
                                                 <a href="{{ route('countries.edit', $country) }}"
-                                                    class="btn custom-btn custom-btn-warning">
+                                                    class="btn custom-btn custom-btn-warning" style="height:15px">
                                                     <i class="icon-pencil-alt icon-fixed-size"></i> Edit
                                                 </a>
                                                 <form action="{{ route('countries.destroy', $country) }}" method="POST"
                                                     class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn custom-btn custom-btn-danger"
+                                                    <button type="submit" class="btn custom-btn custom-btn-danger" style="height:15px"
                                                         onclick="return confirm('Are you sure you want to delete this country?')">
                                                         <i class="icon-trash icon-fixed-size"></i> Delete
                                                     </button>
