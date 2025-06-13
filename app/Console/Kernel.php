@@ -29,6 +29,7 @@ class Kernel extends ConsoleKernel
         {
             $schedule->command('app:post-history-update')->dailyAt('23:59');
             $schedule->command('reset:update-count')->dailyAt('00:00');
+            $schedule->command('conversion:fetch-rate')->dailyAt('00:00');
         }
 
 

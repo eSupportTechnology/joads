@@ -29,13 +29,13 @@ class PostHistoryUpdate extends Command
         $this->info('Inserting daily view counts into post histories...');
 
         // Fetch all job postings
-        $jobPostings = DB::table('job_postings')->select('id', 'view_count')->get();
+        $jobPostings = DB::table('job_postings')->select('id', 'update_count')->get();
 
         foreach ($jobPostings as $jobPosting) {
             // Insert a new record for each job posting
             DB::table('post_histories')->insert([
                 'post_id' => $jobPosting->id,
-                'daily_count' => $jobPosting->view_count,
+                'daily_count' => $jobPosting->update_count,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
