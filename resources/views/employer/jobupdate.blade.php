@@ -45,48 +45,50 @@
             @method('patch')
 
             <!-- Currency Selection -->
-<div class="mb-3">
-    <label for="lkr_usd" class="form-label">Currency Type</label>
-    <select name="lkr_usd" id="lkr_usd" class="form-control" required>
-        <option value="">Select a Currency</option>
-        <option value="Local" {{ old('lkr_usd', $jobPosting->currency_type) == 'Local' ? 'selected' : '' }}>Local(LKR)</option>
-        <option value="Foreign" {{ old('lkr_usd', $jobPosting->currency_type) == 'Foreign' ? 'selected' : '' }}>Foreign(USD)</option>
-    </select>
-</div>
+            <div class="mb-3">
+                <label for="lkr_usd" class="form-label">Currency Type</label>
+                <select name="lkr_usd" id="lkr_usd" class="form-control" required>
+                    <option value="">Select a Currency</option>
+                    <option value="Local" {{ old('lkr_usd', $jobPosting->currency_type) == 'Local' ? 'selected' : '' }}>
+                        Local(LKR)</option>
+                    <option value="Foreign" {{ old('lkr_usd', $jobPosting->currency_type) == 'Foreign' ? 'selected' : '' }}>
+                        Foreign(USD)</option>
+                </select>
+            </div>
 
-<!-- Package Selection -->
-<div class="mb-3">
-    <label for="package_id" class="form-label">Package *</label>
-    <select name="package_id" id="package_id" class="form-control @error('package_id') is-invalid @enderror" required>
-        <option value="">Select a package</option>
-        @foreach ($packages as $package)
-            <option value="{{ $package->id }}"
-                data-lkr="{{ $package->lkr_price }}"
-                data-usd="{{ $package->usd_price }}"
-                data-size="{{ $package->package_size }}"
-                data-duration="{{ $package->duration->duration }}"
-                {{ old('package_id', $jobPosting->package_id) == $package->id ? 'selected' : '' }}>
-                {{ $package->package_size }} ads - ({{ $package->duration->duration }} days)
-                - Rs. {{ $package->lkr_price }} / ${{ $package->usd_price }} USD
-            </option>
-        @endforeach
-    </select>
-    @error('package_id')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
+            <!-- Package Selection -->
+            <div class="mb-3">
+                <label for="package_id" class="form-label">Package *</label>
+                <select name="package_id" id="package_id" class="form-control @error('package_id') is-invalid @enderror"
+                    required>
+                    <option value="">Select a package</option>
+                    @foreach ($packages as $package)
+                        <option value="{{ $package->id }}" data-lkr="{{ $package->lkr_price }}"
+                            data-usd="{{ $package->usd_price }}" data-size="{{ $package->package_size }}"
+                            data-duration="{{ $package->duration->duration }}"
+                            {{ old('package_id', $jobPosting->package_id) == $package->id ? 'selected' : '' }}>
+                            {{ $package->package_size }} ads - ({{ $package->duration->duration }} days)
+                            - Rs. {{ $package->lkr_price }} / ${{ $package->usd_price }} USD
+                        </option>
+                    @endforeach
+                </select>
+                @error('package_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-<!-- Custom Price -->
-<div class="mb-3">
-    <label for="custom_price" class="form-label">Package Price</label>
-    <input type="number" step="0.01" name="custom_price" id="custom_price"
-        class="form-control @error('custom_price') is-invalid @enderror"
-        placeholder="Enter price or leave blank to use default"
-        value="{{ old('custom_price', $jobPosting->package_price) }}">
-    @error('custom_price')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
+            <!-- Custom Price -->
+            <div class="mb-3">
+                <label for="custom_price" class="form-label">Package Price</label>
+                <input type="number" step="0.01" name="custom_price" id="custom_price"
+                    class="form-control @error('custom_price') is-invalid @enderror"
+                    placeholder="Enter price or leave blank to use default"
+                    value="{{ old('custom_price', $jobPosting->package_price) }}">
+
+                @error('custom_price')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
             <div class="mb-3">
                 <label for="title" class="form-label">Job Title</label>
@@ -202,7 +204,7 @@
 
     <script type="text/javascript">
         var session_layout = '{{ session()->get('
-            layout ') }}';
+                            layout ') }}';
     </script>
 @endsection
 
@@ -222,64 +224,67 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-    const currencySelect = document.getElementById('lkr_usd');
-    const packageSelect = document.getElementById('package_id');
-    const priceInput = document.getElementById('custom_price');
+            const currencySelect = document.getElementById('lkr_usd');
+            const packageSelect = document.getElementById('package_id');
+            const priceInput = document.getElementById('custom_price');
 
-    // Track if user manually edited price
-    let userEdited = false;
+            // Get initial value from backend
+            const initialDBValue = priceInput.value.trim();
+            let userEdited = false;
 
-    priceInput.addEventListener('input', () => {
-        userEdited = true;
-    });
+            // Detect if user changes input manually
+            priceInput.addEventListener('input', () => {
+                userEdited = true;
+            });
 
-    function updatePackageOptions() {
-        const currency = currencySelect.value;
+            // Update package display based on selected currency
+            function updatePackageOptionLabels() {
+                const currency = currencySelect.value;
 
-        Array.from(packageSelect.options).forEach(option => {
-            const size = option.getAttribute('data-size');
-            const duration = option.getAttribute('data-duration');
-            const lkr = option.getAttribute('data-lkr');
-            const usd = option.getAttribute('data-usd');
+                Array.from(packageSelect.options).forEach(option => {
+                    const size = option.getAttribute('data-size');
+                    const duration = option.getAttribute('data-duration');
+                    const lkr = option.getAttribute('data-lkr');
+                    const usd = option.getAttribute('data-usd');
 
-            if (size && duration) {
-                option.textContent =
-                    currency === 'Local'
-                        ? `${size} ads - (${duration} days) - Rs. ${lkr}`
-                        : `${size} ads - (${duration} days) - $${usd} USD`;
+                    if (size && duration) {
+                        option.textContent = currency === 'Local' ?
+                            `${size} ads - (${duration} days) - Rs. ${lkr}` :
+                            `${size} ads - (${duration} days) - $${usd} USD`;
+                    }
+                });
             }
+
+            // Set price if not manually changed
+            function updatePriceFromPackage() {
+                const selectedOption = packageSelect.options[packageSelect.selectedIndex];
+                if (!selectedOption) return;
+
+                const currency = currencySelect.value;
+                const newPrice = currency === 'Local' ?
+                    selectedOption.getAttribute('data-lkr') :
+                    selectedOption.getAttribute('data-usd');
+
+                // If not edited or value equals the original DB value
+                if (!userEdited || priceInput.value.trim() === initialDBValue) {
+                    priceInput.value = newPrice;
+                }
+            }
+
+            // Events
+            currencySelect.addEventListener('change', () => {
+                updatePackageOptionLabels();
+                updatePriceFromPackage();
+            });
+
+            packageSelect.addEventListener('change', () => {
+                updatePriceFromPackage();
+            });
+
+            // Initialize on load
+            updatePackageOptionLabels();
         });
-    }
 
-    function updatePriceInput() {
-        const selectedOption = packageSelect.options[packageSelect.selectedIndex];
-        if (!selectedOption) return;
-
-        const currency = currencySelect.value;
-        const price = currency === 'Local'
-            ? selectedOption.getAttribute('data-lkr')
-            : selectedOption.getAttribute('data-usd');
-
-        if (!userEdited) {
-            priceInput.value = price;
-        }
-    }
-
-    // On currency change
-    currencySelect.addEventListener('change', () => {
-        updatePackageOptions();
-        updatePriceInput();
-    });
-
-    // On package change
-    packageSelect.addEventListener('change', () => {
-        updatePriceInput();
-    });
-
-    // Initial update on page load
-    updatePackageOptions();
-    updatePriceInput();
-});
 
 
         document.getElementById('image').addEventListener('change', function(event) {
