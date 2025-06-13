@@ -27,9 +27,7 @@ class Kernel extends ConsoleKernel
      */
         protected function schedule(Schedule $schedule)
         {
-            $schedule->command('app:post-history-update')->dailyAt('00:00');
-            $schedule->command('reset:update-count')->dailyAt('00:00');
-            $schedule->command('conversion:fetch-rate')->dailyAt('00:00');
+            $schedule->command('app:run-daily-tasks')->dailyAt('00:00');
         }
 
 
@@ -39,6 +37,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        Commands\RunDailyTasks::class,
         Commands\ResetUpdateCount::class,
         Commands\PostHistoryUpdate::class,   
         \App\Console\Commands\FetchConversionRate::class,
