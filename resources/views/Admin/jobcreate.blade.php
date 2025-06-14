@@ -2,105 +2,145 @@
 
 @section('title', 'Job')
 
-@section('css')
+@section('style')
     <style>
-        .custom-select-wrapper {
+        form#jobPostingForm {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+            font-family: Arial, sans-serif;
+        }
+
+        .job-posting {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
             position: relative;
         }
 
-        .custom-select-dropdown {
-            display: none;
+        .remove-job-posting {
             position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            max-height: 280px;
-            overflow-y: auto;
-            background: #fff;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            margin-top: 5px;
-        }
-
-        .custom-select-option {
-            padding: 8px 15px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .custom-select-option:hover,
-        .custom-select-option.highlighted {
-            background-color: #f8f9fa;
-        }
-
-        .custom-select-option.selected {
-            background-color: #e9ecef;
-        }
-
-        .custom-select-dropdown::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .custom-select-dropdown::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        .custom-select-dropdown::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        .custom-select-dropdown::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-
-        .custom-select-dropdown.show {
-            display: block;
-        }
-
-        .contact-item {
-            border: 1px solid #dee2e6;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-
-        .remove-contact {
-            float: right;
-            color: red;
-            cursor: pointer;
-        }
-
-        .tag-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 5px;
-        }
-
-        .tag {
-            background-color: #0d6efd;
+            top: 10px;
+            right: 10px;
+            background: #d9534f;
+            border: none;
             color: white;
             padding: 5px 10px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            font-size: 0.875rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.2s ease;
+        }
+        .remove-job-posting:hover {
+            background: #c9302c;
         }
 
-        .tag .remove {
-            margin-left: 8px;
+        label.form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+        }
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #5a9bd4;
+            box-shadow: 0 0 5px rgba(90, 155, 212, 0.5);
+            background-color: #fff;
+        }
+
+        /* Button container for alignment */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-start; /* Align left */
+            margin-bottom: 1.5rem;
+        }
+
+        button#addJobPosting,
+        button[type="submit"] {
+            flex: 1 1 180px; /* Same width base, flexible */
+            padding: 12px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            border: none;
             cursor: pointer;
-            font-weight: bold;
+            user-select: none;
+            transition: background-color 0.2s ease;
+            font-family: inherit;
+            text-align: center;
+        }
+
+        button#addJobPosting {
+            background-color: #28a745;
+            color: white;
+        }
+        button#addJobPosting:hover {
+            background-color: #218838;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: white;
+        }
+        button[type="submit"]:hover {
+            background-color: #0069d9;
+        }
+
+        .image-preview-container {
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-height: 140px;
+            overflow: hidden;
+        }
+        .image-preview {
+            max-width: 100%;
+            display: block;
+            border-radius: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            form#jobPostingForm {
+            margin: 1rem 1rem;
+            padding: 1rem;
+            }
+
+            .button-group {
+            flex-direction: column;
+            gap: 10px;
+            }
+
+            button#addJobPosting,
+            button[type="submit"] {
+            flex: none;
+            width: 100%;
+            }
         }
     </style>
-@endsection
-
-@section('style')
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/animate.css') }}">
 @endsection
 
 @section('breadcrumb-title')
@@ -113,699 +153,588 @@
 @endsection
 
 @section('content')
-    <div class="container">
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+    <form action="{{ route('admin.job_postings.store') }}" method="POST" enctype="multipart/form-data" id="jobPostingForm">
+        @csrf
+
+        <!-- Container for dynamically added job postings -->
+        <div id="jobPostingsContainer"></div>
+
+        <div class="button-group">
+        <button type="button" id="addJobPosting" class="btn btn-success">Add Another Job</button>
+        <button type="submit" class="btn btn-primary">save jobs</button>
+        </div>
+    </form>
+
+    <!-- Template for one job posting -->
+    <template id="jobPostingTemplate">
+        <div class="job-posting position-relative">
+            <button type="button" class="remove-job-posting position-absolute top-0 end-0 m-2">Remove</button>
+
+            <!-- Currency Type -->
+            <div class="mb-3">
+                <label for="lkr_usd___INDEX__" class="form-label">Currency Type</label>
+                <select name="job_postings[__INDEX__][lkr_usd]" id="lkr_usd___INDEX__" class="form-control" required>
+                    <option value="">Select a Currency</option>
+                    <option value="Local">Local(LKR)</option>
+                    <option value="Foreign">Foreign(USD)</option>
+                </select>
             </div>
-        @endif
-        <div class="card content-card">
-            <div class="card-body">
 
+            <!-- Package -->
+            <div class="mb-3">
+                <label for="package_id___INDEX__" class="form-label">Package *</label>
+                <select name="job_postings[__INDEX__][package_id]" id="package_id___INDEX__" class="form-control" required>
+                    <option value="">Select a package</option>
+                    @foreach ($packages as $package)
+                        <option value="{{ $package->id }}" data-lkr="{{ $package->lkr_price }}"
+                            data-usd="{{ $package->usd_price }}"
+                            data-size="{{ $package->package_size }}"
+                            data-duration="{{ $package->duration->duration }}">
+                            {{ $package->package_size }} ads - ({{ $package->duration->duration }}
+                            days)
+                            - Rs. {{ $package->lkr_price }} / {{ $package->usd_price }} USD
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-                <h1>Create Job Posting</h1>
-                <form action="{{ route('admin.job_postings.store') }}" method="POST" enctype="multipart/form-data"
-                    id="jobPostingForm">
-                    @csrf
-
-                  <div id="contacts-container">
-                                    <!-- Currency Selection -->
-                                    <div class="mb-3">
-                                        <label for="lkr_usd" class="form-label">Currency Type</label>
-                                        <select name="lkr_usd" id="lkr_usd" class="form-control" required>
-                                            <option value="">Select a Currency</option>
-                                            <option value="Local">Local(LKR)</option>
-                                            <option value="Foreign">Foreign(USD)</option>
-                                        </select>
-                                    </div>
-                                    <!-- Package Selection -->
-                                    <div class="mb-3">
-                                        <label for="package_id" class="form-label">Package *</label>
-                                        <select name="package_id" id="package_id" class="form-control" required>
-                                            <option value="">Select a package</option>
-                                            @foreach ($packages as $package)
-                                                <option value="{{ $package->id }}" data-lkr="{{ $package->lkr_price }}"
-                                                    data-usd="{{ $package->usd_price }}"
-                                                    data-size="{{ $package->package_size }}"
-                                                    data-duration="{{ $package->duration->duration }}">
-                                                    {{ $package->package_size }} ads - ({{ $package->duration->duration }}
-                                                    days)
-                                                    - Rs. {{ $package->lkr_price }} / {{ $package->usd_price }} USD
-                                                </option>
-                                            @endforeach
-
-                                        </select>
-                                    </div>
-
-                                    @foreach ($jobPostings as $index => $job)
-                                        <div class="job-posting">
-                                            <!-- Custom Price Field -->
-                                            <div class="mb-3">
-                                                <label for="custom_price_{{ $index }}" class="form-label">Package
-                                                    Price</label>
-                                                <input type="number" step="0.01"
-                                                    name="job_postings[{{ $index }}][custom_price]"
-                                                    id="custom_price_{{ $index }}" class="form-control"
-                                                    placeholder="Enter price or leave blank for default">
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                    <div id="contacts-container">
-                        <div class="contact-item">
-                            <!-- Job Posting Fields (same as original code) -->
-                            <div class="form-group position-relative">
-                                <label for="employer_id_0" class="form-label">Employer *</label>
-                                <select name="job_postings[0][employer_id]" id="employer_id_0" class="form-control"
-                                    required>
-                                    <option value="">Select an employer</option>
-                                    @foreach ($employers as $employer)
-                                        <option value="{{ $employer->id }}">{{ $employer->company_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="mb-3 mt-3">
-                                <label for="title_0" class="form-label">Job Title *</label>
-                                <input type="text" name="job_postings[0][title]" id="title_0" class="form-control"
-                                    required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="description_0" class="form-label">Description</label>
-                                <textarea name="job_postings[0][description]" id="description_0" class="form-control" rows="4"></textarea>
-                            </div>
-
-                            <!-- Categories -->
-                            <div class="mb-3">
-                                <label for="category_id_0" class="form-label">Categories *</label>
-                                <select id="category_id_0" class="form-control" onchange="handleCategorySelect(this)">
-                                    <option value="">Select a category</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-                                <div id="selected_categories_0" class="tag-container mt-2"></div>
-                                <div id="hidden_category_inputs_0"></div>
-                            </div>
-
-                            <!-- Subcategories -->
-                            <div class="mb-3">
-                                <label for="subcategory_id_0" class="form-label">Subcategories *</label>
-                                <select id="subcategory_id_0" class="form-control" onchange="handleSubcategorySelect(this)"
-                                    disabled>
-                                    <option value="">Select subcategory</option>
-                                    {{-- Options will be loaded dynamically --}}
-                                </select>
-                                <div id="selected_subcategories_0" class="tag-container mt-2"></div>
-                                <div id="hidden_subcategory_inputs_0"></div>
-                            </div>
-
-
-                            <div class="mb-3">
-                                <label for="location_0" class="form-label">Location *</label>
-                                <input type="text" name="job_postings[0][location]" id="location_0" class="form-control"
-                                    required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="country_0" class="form-label">Country *</label>
-                                <select name="job_postings[0][country_id]" id="country_0" class="form-control" required>
-                                    <option value="">Select a country</option>
-                                    @foreach ($countries as $country)
-                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="salary_range_0" class="form-label">Salary Range</label>
-                                <input type="text" name="job_postings[0][salary_range]" id="salary_range_0"
-                                    class="form-control">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="image_0" class="form-label">Image</label>
-                                <input type="file" name="job_postings[0][image]" id="image_0"
-                                    class="form-control image-input" accept="image/*">
-                                <div class="image-preview-container mt-3">
-                                    <img class="image-preview" src="" alt="Image Preview"
-                                        style="max-width: 100%; display: none;">
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="requirements_0" class="form-label">Requirements</label>
-                                <textarea name="job_postings[0][requirements]" id="requirements_0" class="form-control" rows="4"></textarea>
-                            </div>
-
-                            <div class="mb-3 col-md-3">
-                                <label for="closing_date_0" class="form-label">Closing Date *</label>
-                                <input type="date" name="job_postings[0][closing_date]" id="closing_date_0"
-                                    class="form-control" required>
-                            </div>
-
-
-                            <input type="hidden" name="job_postings[0][status]" value="pending">
+            <div clsss="mb-3">
+                @foreach ($jobPostings as $index => $job)
+                    <div class="job-posting">
+                        <!-- Custom Price Field -->
+                        <div class="mb-3">
+                            <label class="form-label">Package Price</label>
+                            <input type="number" step="0.01" name="job_postings[__INDEX__][custom_price]" id="custom_price___INDEX__"class="form-control"placeholder="Enter price or leave blank for default">
                         </div>
                     </div>
+                @endforeach
+            </div>
 
-                    <button type="button" id="addContact" class="btn btn-success">Add Another Job</button>
-                    <button type="submit" class="btn btn-primary">Create Jobs</button>
-                </form>
+            <!-- Employer -->
+            <div class="mb-3">
+                <label class="form-label">Employer *</label>
+                <select name="job_postings[__INDEX__][employer_id]" class="form-control" required>
+                    <option value="">Select an employer</option>
+                    @foreach ($employers as $employer)
+                        <option value="{{ $employer->id }}">{{ $employer->company_name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-                <div class="modal fade" id="paymentMethodModal" tabindex="-1" aria-labelledby="paymentMethodModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="paymentMethodModalLabel">Select Payment Method</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="radio" name="paymentMethod"
-                                        id="contactContributor" value="contact_contributor">
-                                    <label class="form-check-label" for="contactContributor">
-                                        Contact Contributor
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="paymentMethod"
-                                        id="onlinePayment" value="online">
-                                    <label class="form-check-label" for="onlinePayment">
-                                        Online Payment
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" id="confirmPaymentMethod">Confirm</button>
-                            </div>
-                        </div>
+            <!-- Job Title -->
+            <div class="mb-3">
+                <label class="form-label">Job Title *</label>
+                <input type="text" name="job_postings[__INDEX__][title]" class="form-control" required>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea name="job_postings[__INDEX__][description]" class="form-control" rows="4"></textarea>
+            </div>
+
+            <!-- Categories -->
+            <div class="mb-3">
+                <label class="form-label">Categories *</label>
+                <select class="form-control category-select" onchange="handleCategorySelect(this)">
+                    <option value="">Select a category</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                    @endforeach
+                </select>
+                <div class="tag-container mt-2 selected_categories"></div>
+                <div class="hidden_category_inputs"></div>
+            </div>
+
+            <!-- Subcategories -->
+            <div class="mb-3">
+                <label class="form-label">Subcategories *</label>
+                <select class="form-control subcategory-select" onchange="handleSubcategorySelect(this)" disabled>
+                    <option value="">Select subcategory</option>
+                </select>
+                <div class="tag-container mt-2 selected_subcategories"></div>
+                <div class="hidden_subcategory_inputs"></div>
+            </div>
+
+            <!-- Location -->
+            <div class="mb-3">
+                <label class="form-label">Location *</label>
+                <input type="text" name="job_postings[__INDEX__][location]" class="form-control" required>
+            </div>
+
+            <!-- Country -->
+            <div class="mb-3">
+                <label class="form-label">Country *</label>
+                <select name="job_postings[__INDEX__][country_id]" class="form-control" required>
+                    <option value="">Select a country</option>
+                    @foreach ($countries as $country)
+                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Salary Range -->
+            <div class="mb-3">
+                <label class="form-label">Salary Range</label>
+                <input type="text" name="job_postings[__INDEX__][salary_range]" class="form-control">
+            </div>
+
+            <!-- Image -->
+            <div class="mb-3">
+                <label class="form-label">Image</label>
+                <input type="file" name="job_postings[__INDEX__][image]" class="form-control image-input" accept="image/*">
+                <div class="image-preview-container mt-3">
+                    <img class="image-preview" src="" alt="Image Preview" style="max-width: 100%; display: none;">
+                </div>
+            </div>
+
+            <!-- Requirements -->
+            <div class="mb-3">
+                <label class="form-label">Requirements</label>
+                <textarea name="job_postings[__INDEX__][requirements]" class="form-control" rows="4"></textarea>
+            </div>
+
+            <!-- Closing Date -->
+            <div class="mb-3 col-md-3">
+                <label class="form-label">Closing Date *</label>
+                <input type="date" name="job_postings[__INDEX__][closing_date]" class="form-control" required>
+            </div>
+
+            <input type="hidden" name="job_postings[__INDEX__][status]" value="pending">
+        </div>
+
+    </template>
+
+    <!-- payment model -->
+    <div class="modal fade" id="paymentMethodModal" tabindex="-1" aria-labelledby="paymentMethodModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentMethodModalLabel">Select Payment Method</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="paymentMethod"
+                            id="contactContributor" value="contact_contributor">
+                        <label class="form-check-label" for="contactContributor"> Contact Contributor </label>
                     </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod"
+                            id="onlinePayment" value="online">
+                        <label class="form-check-label" for="onlinePayment">Online Payment</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="confirmPaymentMethod">Confirm</button>
                 </div>
             </div>
         </div>
     </div>
 
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const currencySelect = document.getElementById('lkr_usd');
-            const packageSelect = document.getElementById('package_id');
-            const priceInputs = document.querySelectorAll('[id^="custom_price_"]');
 
-            priceInputs.forEach(input => {
-                input.dataset.userEdited = 'false';
+        document.addEventListener('DOMContentLoaded', function () {
 
-                input.addEventListener('input', async () => {
-                    input.dataset.userEdited = 'true';
+            const container = document.getElementById('jobPostingsContainer');
+            const template = document.getElementById('jobPostingTemplate').content;
+            const addBtn = document.getElementById('addJobPosting');
+            const subcategoriesByCategory = @json($subcategories->groupBy('category_id'));
+            let jobIndex = 0;
 
-                    const usd = parseFloat(input.value);
-                    if (currencySelect.value === 'Foreign' && !isNaN(usd)) {
-                        try {
-                            const response = await fetch(`/convert-usd-to-lkr?usd=${usd}`);
-                            const data = await response.json();
-                            if (data.success) {
-                                input.setAttribute('data-lkr-price', data
-                                .lkr);
-                                console.log(
-                                    `Converted ${usd} USD → ${data.lkr} LKR @ rate ${data.rate}`
-                                    );
+            // Add new job posting block
+            function addJobPosting() {
+
+                const newIndex = jobIndex++;
+                let clone = document.importNode(template, true);
+
+                // Replace __INDEX__ in the clone's innerHTML, for all relevant fields
+                clone.firstElementChild.innerHTML = clone.firstElementChild.innerHTML.replace(/__INDEX__/g, newIndex);
+
+                // Append clone directly as DOM node, so you have a direct reference
+                container.appendChild(clone.firstElementChild);
+
+                const newBlock = container.lastElementChild; // The appended block
+
+                // Image preview setup (same as before)
+                const imageInput = newBlock.querySelector('.image-input');
+                const imgPreview = newBlock.querySelector('.image-preview');
+                if (imageInput && imgPreview) {
+                    imageInput.addEventListener('change', function () {
+                        if (imageInput.files && imageInput.files[0]) {
+                            if (!imageInput.files[0].type.startsWith('image/')) {
+                                alert('Please select a valid image file.');
+                                imageInput.value = '';
+                                imgPreview.src = '';
+                                imgPreview.style.display = 'none';
+                                return;
                             }
-                        } catch (e) {
-                            console.error('Conversion failed', e);
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                imgPreview.src = e.target.result;
+                                imgPreview.style.display = 'block';
+                            };
+                            reader.onerror = function () {
+                                alert('Error reading the image file.');
+                                imageInput.value = '';
+                                imgPreview.src = '';
+                                imgPreview.style.display = 'none';
+                            };
+                            reader.readAsDataURL(imageInput.files[0]);
+                        } else {
+                            imgPreview.src = '';
+                            imgPreview.style.display = 'none';
                         }
-                    }
-                });
-            });
-
-            function updatePrices() {
-                const currency = currencySelect.value;
-
-                Array.from(packageSelect.options).forEach(option => {
-                    const size = option.getAttribute('data-size');
-                    const duration = option.getAttribute('data-duration');
-                    const lkr = option.getAttribute('data-lkr');
-                    const usd = option.getAttribute('data-usd');
-
-                    if (size && duration) {
-                        option.textContent =
-                            currency === 'Local' ?
-                            `${size} ads - (${duration} days) - Rs. ${lkr}` :
-                            `${size} ads - (${duration} days) - $${usd} USD`;
-                    }
-                });
-
-                const selectedOption = packageSelect.options[packageSelect.selectedIndex];
-                if (!selectedOption) return;
-
-                const price = currency === 'Local' ?
-                    selectedOption.getAttribute('data-lkr') :
-                    selectedOption.getAttribute('data-usd');
-
-                priceInputs.forEach(input => {
-                    if (!input.value || input.dataset.userEdited === 'false') {
-                        input.value = price;
-                        input.dataset.userEdited = 'false';
-                    }
-                });
-            }
-
-
-            currencySelect.addEventListener('change', updatePrices);
-            packageSelect.addEventListener('change', updatePrices);
-        });
-
-
-
-        const selectedCategories = new Map();
-        const selectedSubcategories = new Map();
-
-
-        function handleCategorySelect(select) {
-            const value = select.value;
-            const text = select.options[select.selectedIndex].text;
-
-            if (value && !selectedCategories.has(value)) {
-                selectedCategories.set(value, text);
-
-                // Show tag
-                const tag = document.createElement('div');
-                tag.className = 'tag';
-                tag.dataset.id = value;
-                tag.innerHTML = `${text} <span class="remove" onclick="removeCategory('${value}')">&times;</span>`;
-                document.getElementById('selected_categories_0').appendChild(tag);
-
-                // Add hidden input
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'job_postings[0][category_ids][]';
-                input.value = value;
-                input.id = `category_input_${value}`;
-                document.getElementById('hidden_category_inputs_0').appendChild(input);
-
-                // Enable subcategory dropdown
-                const subcategorySelect = document.getElementById('subcategory_id_0');
-                subcategorySelect.disabled = false;
-                subcategorySelect.innerHTML = `<option value="">Select subcategory</option>`;
-
-                // Simulate fetching subcategories
-                loadSubcategories(value);
-
-                // select.value = '';
-            }
-        }
-
-        function loadSubcategories(categoryId) {
-            const subcategorySelect = document.getElementById('subcategory_id_0');
-            subcategorySelect.innerHTML = '<option value="">Loading...</option>';
-            subcategorySelect.disabled = true;
-
-            fetch(`/subcategories/${categoryId}`)
-                .then(response => response.json())
-                .then(data => {
-                    subcategorySelect.innerHTML = '<option value="">Select subcategory</option>';
-                    data.forEach(sub => {
-                        const option = document.createElement('option');
-                        option.value = sub.id;
-                        option.text = sub.name;
-                        option.dataset.categoryId = categoryId;
-                        subcategorySelect.appendChild(option);
                     });
-                    subcategorySelect.disabled = false;
-                })
-                .catch(error => {
-                    console.error("Error loading subcategories:", error);
-                    subcategorySelect.innerHTML = '<option value="">Failed to load subcategories</option>';
-                });
-        }
-
-
-        function handleSubcategorySelect(select) {
-            const value = select.value;
-            const text = select.options[select.selectedIndex].text;
-            const categoryId = select.options[select.selectedIndex].dataset.categoryId;
-
-            if (value && !selectedSubcategories.has(value)) {
-                selectedSubcategories.set(value, {
-                    name: text,
-                    category_id: categoryId
-                });
-
-                // Add subcategory tag
-                const tag = document.createElement('div');
-                tag.className = 'tag';
-                tag.dataset.id = value;
-                tag.innerHTML = `${text} <span class="remove" onclick="removeSubcategory('${value}')">&times;</span>`;
-                document.getElementById('selected_subcategories_0').appendChild(tag);
-
-                // Add hidden input
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'job_postings[0][subcategory_ids][]';
-                input.value = value;
-                input.id = `subcategory_input_${value}`;
-                document.getElementById('hidden_subcategory_inputs_0').appendChild(input);
-
-                // select.value = '';
-            }
-        }
-
-        function removeCategory(id) {
-            const hasSubcategory = [...selectedSubcategories.values()].some(s => s.category_id === id);
-            if (hasSubcategory) {
-                alert("Remove related subcategories first.");
-                return;
-            }
-
-            selectedCategories.delete(id);
-            document.querySelector(`.tag[data-id='${id}']`)?.remove();
-            document.getElementById(`category_input_${id}`)?.remove();
-
-            // Disable subcategory select if no categories are left
-            if (selectedCategories.size === 0) {
-                document.getElementById('subcategory_id_0').disabled = true;
-                document.getElementById('subcategory_id_0').innerHTML = '<option value="">Select subcategory</option>';
-            }
-        }
-
-        function removeSubcategory(id) {
-            selectedSubcategories.delete(id);
-            document.querySelector(`#selected_subcategories_0 .tag[data-id='${id}']`)?.remove();
-            document.getElementById(`subcategory_input_${id}`)?.remove();
-        }
-
-
-
-
-
-        document.addEventListener("DOMContentLoaded", function() {
-            let contactIndex = 1;
-            let maxJobs = 0;
-
-            const packageSelect = document.getElementById("package_id");
-            const addJobButton = document.getElementById("addContact");
-            const contactsContainer = document.getElementById("contacts-container");
-
-            setupCategoryListener(document.querySelector('.category-select'));
-            // Handle package selection change
-            packageSelect.addEventListener("change", function() {
-                const selectedOption = packageSelect.options[packageSelect.selectedIndex];
-                if (selectedOption.value) {
-                    maxJobs = parseInt(selectedOption.getAttribute("data-max-jobs"), 10);
-                } else {
-                    maxJobs = 0;
                 }
-                validateJobLimit();
+
+                // Query selects inside the new block
+                const packageSelect = newBlock.querySelector(`select[name="job_postings[${newIndex}][package_id]"]`);
+                const currencySelect = newBlock.querySelector(`select[name="job_postings[${newIndex}][lkr_usd]"]`);
+                const customPriceInput = newBlock.querySelector(`input[name="job_postings[${newIndex}][custom_price]"]`);
+
+                if (packageSelect && window.jobPostingPackageOptions && currencySelect) {
+                    const currency = currencySelect.value;
+                    packageSelect.innerHTML = '<option value="">Select a package</option>';
+                    window.jobPostingPackageOptions.forEach(pkg => {
+                        const option = document.createElement('option');
+                        option.value = pkg.value;
+                        if (currency === 'Foreign') {
+                            option.textContent = `${pkg.size} ads - (${pkg.duration} days) - $${pkg.usd} USD`;
+                        } else {
+                            option.textContent = `${pkg.size} ads - (${pkg.duration} days) - Rs. ${pkg.lkr}`;
+                        }
+                        option.dataset.lkr = pkg.lkr;
+                        option.dataset.usd = pkg.usd;
+                        option.dataset.size = pkg.size;
+                        option.dataset.duration = pkg.duration;
+                        packageSelect.appendChild(option);
+                    });
+                }
+
+                // Setup event listeners
+                if (currencySelect && packageSelect && customPriceInput) {
+                    setupCurrencyAndPackageListeners(newBlock);
+                } else {
+                    console.error('Missing elements in the new job block:', { currencySelect, packageSelect, customPriceInput });
+                }
+            }
+
+            // Update indices for all job posting blocks
+            function updateIndices() {
+                const blocks = container.querySelectorAll('.job-posting');
+                blocks.forEach((block, idx) => {
+                    block.querySelectorAll('input, select, textarea').forEach(input => {
+                        if (input.name) {
+                            input.name = input.name.replace(/job_postings\[\d+\]/, `job_postings[${idx}]`);
+                        }
+                        if (input.id) {
+                            input.id = input.id.replace(/_\d+$/, `_${idx}`);
+                        }
+                    });
+                    block.querySelectorAll('.hidden_category_inputs input').forEach(input => {
+                        input.name = `job_postings[${idx}][categories][]`;
+                    });
+                    block.querySelectorAll('.hidden_subcategory_inputs input').forEach(input => {
+                        input.name = `job_postings[${idx}][subcategories][]`;
+                    });
+                });
+                jobIndex = blocks.length;
+            }
+
+            // Remove job posting (event delegation)
+            container.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-job-posting')) {
+                    const jobBlock = event.target.closest('.job-posting');
+                    if (jobBlock) {
+                        jobBlock.remove();
+                        updateIndices();
+                    }
+                }
             });
 
-            // Add new job form
-            addJobButton.addEventListener("click", function() {
-                if (contactsContainer.children.length >= maxJobs) {
-                    alert(`You cannot add more than ${maxJobs} jobs for this package.`);
+            // Handle category select change - allow multiple categories
+            function handleCategorySelect(selectElem) {
+                const jobPostBlock = selectElem.closest('.job-posting');
+                const subcategorySelect = jobPostBlock.querySelector('.subcategory-select');
+                const selectedCategories = jobPostBlock.querySelector('.selected_categories');
+                const hiddenCategoryInputs = jobPostBlock.querySelector('.hidden_category_inputs');
+                const hiddenSubcategoryInputs = jobPostBlock.querySelector('.hidden_subcategory_inputs');
+                const selectedSubcategories = jobPostBlock.querySelector('.selected_subcategories');
+                const categoryId = selectElem.value;
+                const categoryName = selectElem.options[selectElem.selectedIndex]?.textContent;
+
+                if (!categoryId) return;
+
+                subcategorySelect.disabled = false;
+                subcategorySelect.innerHTML = '<option value="">Select subcategory</option>';
+
+                const relatedSubcategories = subcategoriesByCategory[categoryId] || [];
+                if (relatedSubcategories.length === 0) {
+                    subcategorySelect.innerHTML = '<option value="">No subcategories available</option>';
+                    subcategorySelect.disabled = true;
+                } else {
+                    relatedSubcategories.forEach(sub => {
+                        subcategorySelect.insertAdjacentHTML(
+                            'beforeend',
+                            `<option value="${sub.id}">${sub.name}</option>`
+                        );
+                    });
+                }
+
+                const existing = Array.from(hiddenCategoryInputs.children).some(input => input.value === categoryId);
+                if (!existing) {
+                    const tag = document.createElement('div');
+                    tag.className = 'badge bg-primary text-white mx-1 d-inline-flex align-items-center';
+                    tag.textContent = categoryName + ' ';
+                    const closeBtn = document.createElement('button');
+                    closeBtn.type = 'button';
+                    closeBtn.className = 'ms-2 text-white remove-category';
+                    closeBtn.setAttribute('aria-label', `Remove ${categoryName} category`);
+                    closeBtn.innerHTML = '×';
+                    tag.appendChild(closeBtn);
+                    selectedCategories.appendChild(tag);
+
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    const idx = Array.from(container.children).indexOf(jobPostBlock);
+                    input.name = `job_postings[${idx}][categories][]`;
+                    input.value = categoryId;
+                    hiddenCategoryInputs.appendChild(input);
+
+                    closeBtn.addEventListener('click', function () {
+                        tag.remove();
+                        input.remove();
+
+                        const relatedSubs = subcategoriesByCategory[categoryId] || [];
+                        Array.from(hiddenSubcategoryInputs.children).forEach(subInput => {
+                            if (relatedSubs.some(sub => sub.id == subInput.value)) {
+                                const subTag = Array.from(selectedSubcategories.children).find(t => t.dataset.id == subInput.value);
+                                if (subTag) subTag.remove();
+                                subInput.remove();
+                            }
+                        });
+
+                        if (!hiddenCategoryInputs.children.length) {
+                            subcategorySelect.disabled = true;
+                            selectedSubcategories.innerHTML = '';
+                            hiddenSubcategoryInputs.innerHTML = '';
+                        }
+                    });
+                }
+
+                selectElem.value = '';
+            }
+
+            // Handle subcategory select change - allow multiple subcategories
+            function handleSubcategorySelect(selectElem) {
+                const jobPostBlock = selectElem.closest('.job-posting');
+                const selectedSubcategories = jobPostBlock.querySelector('.selected_subcategories');
+                const hiddenSubcategoryInputs = jobPostBlock.querySelector('.hidden_subcategory_inputs');
+                const subcategoryId = selectElem.value;
+                const subcategoryName = selectElem.options[selectElem.selectedIndex]?.textContent;
+
+                if (!subcategoryId) return;
+
+                const existing = Array.from(hiddenSubcategoryInputs.children).some(input => input.value === subcategoryId);
+                if (!existing) {
+                    const tag = document.createElement('div');
+                    tag.className = 'badge bg-secondary text-white mx-1 d-inline-flex align-items-center';
+                    tag.dataset.id = subcategoryId;
+                    tag.textContent = subcategoryName + ' ';
+                    const closeBtn = document.createElement('button');
+                    closeBtn.type = 'button';
+                    closeBtn.className = 'ms-2 text-white remove-subcategory';
+                    closeBtn.setAttribute('aria-label', `Remove ${subcategoryName} subcategory`);
+                    closeBtn.innerHTML = '×';
+                    tag.appendChild(closeBtn);
+                    selectedSubcategories.appendChild(tag);
+
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    const idx = Array.from(container.children).indexOf(jobPostBlock);
+                    input.name = `job_postings[${idx}][subcategories][]`;
+                    input.value = subcategoryId;
+                    hiddenSubcategoryInputs.appendChild(input);
+
+                    closeBtn.addEventListener('click', function () {
+                        tag.remove();
+                        input.remove();
+                    });
+                }
+
+                selectElem.value = '';
+            }
+
+            // Setup currency and package listeners
+            function setupCurrencyAndPackageListeners(jobBlock) {
+                
+
+                const currencySelect = jobBlock.querySelector('select[name^="job_postings"][name$="[lkr_usd]"]');
+                const packageSelect = jobBlock.querySelector('select[name^="job_postings"][name$="[package_id]"]');
+                const customPriceInput = jobBlock.querySelector('input[name^="job_postings"][name$="[custom_price]"]');
+
+                if (!currencySelect || !packageSelect || !customPriceInput) {
+                    console.error('Missing required elements in job block:', { currencySelect, packageSelect, customPriceInput });
                     return;
                 }
 
-                const container = document.getElementById('contacts-container');
-                const newContact = document.createElement('div');
-                newContact.className = 'contact-item';
-
-                newContact.innerHTML = `
-                <span class="remove-contact">&times;</span>
-                <!-- New Job Posting Fields (same as original code) -->
-                <div class="form-group position-relative">
-                    <label for="employer_id_${contactIndex}" class="form-label">Employer</label>
-                    <select name="job_postings[${contactIndex}][employer_id]" id="employer_id_${contactIndex}" class="form-control" required>
-                        <option value="">Select an employer *</option>
-                        @foreach ($employers as $employer)
-                            <option value="{{ $employer->id }}">{{ $employer->company_name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="mb-3 mt-3">
-                    <label for="title_${contactIndex}" class="form-label">Job Title *</label>
-                    <input type="text" name="job_postings[${contactIndex}][title]" id="title_${contactIndex}" class="form-control" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="description_${contactIndex}" class="form-label">Description</label>
-                    <textarea name="job_postings[${contactIndex}][description]" id="description_${contactIndex}" class="form-control" rows="4"></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label for="category_id_${contactIndex}" class="form-label">Category *</label>
-                    <select name="job_postings[${contactIndex}][category_id]" id="category_id_${contactIndex}" class="form-control category-select" required>
-                        <option value="">Select a category</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="subcategory_id_${contactIndex}" class="form-label">Subcategory *</label>
-                    <select name="job_postings[${contactIndex}][subcategory_id]" id="subcategory_id_${contactIndex}" class="form-control" required>
-                        <option value="">Select a subcategory</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="location_${contactIndex}" class="form-label">Location *</label>
-                    <input type="text" name="job_postings[${contactIndex}][location]" id="location_${contactIndex}" class="form-control" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="country_${contactIndex}" class="form-label">Country *</label>
-                    <select name="job_postings[${contactIndex}][country_id]" id="country_${contactIndex}" class="form-control" required>
-                        <option value="">Select a country</option>
-                        @foreach ($countries as $country)
-                            <option value="{{ $country->id }}">{{ $country->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="salary_range_${contactIndex}" class="form-label">Salary Range</label>
-                    <input type="number" name="job_postings[${contactIndex}][salary_range]" id="salary_range_${contactIndex}" class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label for="image_${contactIndex}" class="form-label">Image</label>
-                    <input type="file" name="job_postings[${contactIndex}][image]" id="image_${contactIndex}" class="form-control image-input" accept="image/*">
-                    <div class="image-preview-container mt-3">
-                        <img class="image-preview" src="" alt="Image Preview" style="max-width: 100%; display: none;">
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="requirements_${contactIndex}" class="form-label">Requirements</label>
-                    <textarea name="job_postings[${contactIndex}][requirements]" id="requirements_${contactIndex}" class="form-control" rows="4"></textarea>
-                </div>
-
-                <div class="mb-3 col-md-3">
-                    <label for="closing_date_${contactIndex}" class="form-label">Closing Date *</label>
-                    <input type="date" name="job_postings[${contactIndex}][closing_date]" id="closing_date_${contactIndex}" class="form-control" required>
-                </div>
-
-                <input type="hidden" name="job_postings[${contactIndex}][status]" value="pending">
-            `;
-
-                container.appendChild(newContact);
-
-                setupCategoryListener(newContact.querySelector('.category-select'));
-                setupImagePreview(newContact.querySelector('.image-input'));
-
-                contactIndex++;
-                validateJobLimit();
-            });
-
-            // Remove contact form
-            document.getElementById('contacts-container').addEventListener('click', function(e) {
-                if (e.target.classList.contains('remove-contact')) {
-                    e.target.closest('.contact-item').remove();
-                    validateJobLimit();
-                }
-            });
-
-            // Validate job limit based on selected package
-            function validateJobLimit() {
-                const currentJobs = contactsContainer.children.length;
-                if (currentJobs >= maxJobs) {
-                    addJobButton.disabled = true;
-                    //alert(`You have reached the maximum job limit (${maxJobs}) for this package.`);
-                } else {
-                    addJobButton.disabled = false;
-                }
-            }
-
-            function setupCategoryListener(categorySelect) {
-                $(categorySelect).on('change', function() {
-                    const categoryId = $(this).val();
-                    const contactItem = $(this).closest('.contact-item');
-                    const subcategorySelect = contactItem.find('select[id^="subcategory_id_"]');
-
-                    // Clear existing options
-                    subcategorySelect.html('<option value="">Select a subcategory</option>');
-
-                    if (categoryId) {
-                        $.ajax({
-                            url: `/subcategories/${categoryId}`,
-                            method: 'GET',
-                            dataType: 'json',
-                            success: function(data) {
-                                $.each(data, function(index, subcategory) {
-                                    subcategorySelect.append(
-                                        $('<option>', {
-                                            value: subcategory.id,
-                                            text: subcategory.name
-                                        })
-                                    );
-                                });
-                            },
-                            error: function(error) {
-                                console.error('Error fetching subcategories:', error);
+                // Initialize package options if not already done
+                if (!window.jobPostingPackageOptions) {
+                    window.jobPostingPackageOptions = [];
+                    const firstPackageSelect = document.querySelector('select[name^="job_postings"][name$="[package_id]"]');
+                    if (firstPackageSelect) {
+                        firstPackageSelect.querySelectorAll('option').forEach(opt => {
+                            if (opt.value && opt.value !== '') {
+                                const lkr = opt.getAttribute('data-lkr');
+                                const usd = opt.getAttribute('data-usd');
+                                const size = opt.getAttribute('data-size');
+                                const duration = opt.getAttribute('data-duration');
+                                if (lkr && usd && size && duration) {
+                                    window.jobPostingPackageOptions.push({
+                                        value: opt.value,
+                                        lkr: lkr,
+                                        usd: usd,
+                                        size: size,
+                                        duration: duration,
+                                    });
+                                } else {
+                                    console.warn(`Skipping package option with missing attributes:`, opt);
+                                }
                             }
                         });
                     }
-                });
-            }
 
-            // Setup image preview
-            function setupImagePreview(input) {
-                input.addEventListener('change', function(event) {
-                    const preview = this.nextElementSibling.querySelector('.image-preview');
-                    const file = event.target.files[0];
-
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            preview.src = e.target.result;
-                            preview.style.display = 'block';
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        preview.style.display = 'none';
+                    if (window.jobPostingPackageOptions.length === 0) {
+                        console.error('No valid package options found.');
+                        packageSelect.innerHTML = '<option value="">No packages available</option>';
+                        customPriceInput.value = '';
+                        return;
                     }
-                });
+                }
+
+
+                // Autofill the custom price field based on the selected package and currency
+                function autofillCustomPrice() {
+                    const currency = currencySelect.value;
+                    const selectedOption = packageSelect.selectedOptions[0];
+                    if (!selectedOption || !selectedOption.value) {
+                        customPriceInput.value = '';
+                        return;
+                    }
+                    if (currency === 'Local') {
+                        customPriceInput.value = selectedOption.dataset.lkr || '';
+                    } else if (currency === 'Foreign') {
+                        customPriceInput.value = selectedOption.dataset.usd || '';
+                    } else {
+                        customPriceInput.value = '';
+                    }
+                }
+
+                // Update package options based on the selected currency
+                function updatePackageOptions() {
+                    const currency = currencySelect.value;
+                    packageSelect.innerHTML = '<option value="">Select a package</option>';
+
+                    window.jobPostingPackageOptions.forEach(pkg => {
+                        let priceText = '';
+                        if (currency === 'Local') {
+                            priceText = `${pkg.size} ads - (${pkg.duration} days) - Rs. ${parseFloat(pkg.lkr).toFixed(2)}`;
+                        } else if (currency === 'Foreign') {
+                            priceText = `${pkg.size} ads - (${pkg.duration} days) - $${parseFloat(pkg.usd).toFixed(2)} USD`;
+                        } else {
+                            priceText = `${pkg.size} ads - (${pkg.duration} days)`;
+                        }
+
+                        const option = document.createElement('option');
+                        option.value = pkg.value;
+                        option.textContent = priceText;
+                        option.dataset.lkr = pkg.lkr;
+                        option.dataset.usd = pkg.usd;
+                        option.dataset.size = pkg.size;
+                        option.dataset.duration = pkg.duration;
+                        packageSelect.appendChild(option);
+                    });
+
+                    if (packageSelect.options.length > 1) {
+                        packageSelect.selectedIndex = 1; // Auto-select first real option
+                    } else {
+                        packageSelect.selectedIndex = 0;
+                    }
+
+                    autofillCustomPrice();
+                }
+
+                // Attach event listeners
+                currencySelect.addEventListener('change', updatePackageOptions);
+                packageSelect.addEventListener('change', autofillCustomPrice);
+
+                // Initialize package options and autofill price on first setup
+                updatePackageOptions();
             }
-
-            // Setup initial image preview
-            document.querySelectorAll('.image-input').forEach(setupImagePreview);
-        });
-    </script>
-
-
-
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const form = document.getElementById('jobPostingForm');
-            const paymentModal = new bootstrap.Modal(document.getElementById('paymentMethodModal'));
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                // Basic form validation
-                if (!validateForm()) {
-                    return;
+            
+            // Event delegation for category and subcategory selects
+            document.addEventListener('change', function(event) {
+                if (event.target.matches('.category-select')) {
+                    handleCategorySelect(event.target);
                 }
-
-                paymentModal.show();
-            });
-
-            document.getElementById('confirmPaymentMethod').addEventListener('click', function() {
-                const selectedPaymentMethodRadio = document.querySelector(
-                    'input[name="paymentMethod"]:checked');
-
-                if (!selectedPaymentMethodRadio) {
-                    alert('Please select a payment method');
-                    return;
-                }
-
-                const selectedPaymentMethod = selectedPaymentMethodRadio.value;
-
-                // Add payment method to form
-                const mainPaymentMethodInput = document.createElement('input');
-                mainPaymentMethodInput.type = 'hidden';
-                mainPaymentMethodInput.name = 'payment_method';
-                mainPaymentMethodInput.value = selectedPaymentMethod;
-                form.appendChild(mainPaymentMethodInput);
-
-                // Handle different payment methods
-                if (selectedPaymentMethod === 'contact_contributor') {
-                    paymentModal.hide();
-                    form.submit(); // Direct form submission
-                } else if (selectedPaymentMethod === 'online') {
-                    const formData = new FormData(form);
-
-                    fetch('/store-form-data', {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            }
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                window.location.href = '/payment/checkout';
-                            } else {
-                                alert('Error processing form data');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('An error occurred. Please try again.');
-                        });
+                if (event.target.matches('.subcategory-select')) {
+                    handleSubcategorySelect(event.target);
                 }
             });
 
-            // Form validation function
-            function validateForm() {
-                let isValid = true;
-                const requiredFields = form.querySelectorAll('[required]');
+            // Payment modal logic
+            function initializePaymentModalLogic() {
+                if (!window.bootstrap || !window.bootstrap.Modal) {
+                    console.alert('Bootstrap Modal is not available.');
+                    return;
+                }
+                const paymentModal = new bootstrap.Modal(document.getElementById('paymentMethodModal'));
+                const confirmPaymentButton = document.getElementById('confirmPaymentMethod');
+                const form = document.getElementById('jobPostingForm');
 
-                requiredFields.forEach(field => {
-                    if (!field.value) {
-                        field.classList.add('is-invalid');
-                        isValid = false;
+                function handlePaymentSelection() {
+                    const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
+                    if (selectedPayment) {
+                        // Check if the selected payment method is 'online'
+                        if (selectedPayment.value === 'online') {
+                            alert('Online payment is not allowed at this time. Please select a different payment method.');
+                            return; // Exit the function without proceeding
+                        }
+
+                        const existingInput = form.querySelector('input[name="payment_method"]');
+                        if (existingInput) existingInput.remove();
+
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'payment_method';
+                        input.value = selectedPayment.value;
+                        form.appendChild(input);
+
+                        paymentModal.hide();
+                        form.submit();
                     } else {
-                        field.classList.remove('is-invalid');
+                        alert('Please select a payment method before confirming.');
                     }
-                });
-
-                if (!isValid) {
-                    alert('Please fill in all required fields');
                 }
 
-                return isValid;
-            }
-        });
-    </script>
-@endsection
+                confirmPaymentButton.addEventListener('click', handlePaymentSelection);
 
-@section('script')
-    <script src="{{ asset('assets/js/clock.js') }}"></script>
-    <script src="{{ asset('assets/js/chart/apex-chart/moment.min.js') }}"></script>
-    <script src="{{ asset('assets/js/notify/bootstrap-notify.min.js') }}"></script>
-    <script src="{{ asset('assets/js/dashboard/default.js') }}"></script>
-    <script src="{{ asset('assets/js/notify/index.js') }}"></script>
-    <script src="{{ asset('assets/js/typeahead/handlebars.js') }}"></script>
-    <script src="{{ asset('assets/js/typeahead/typeahead.bundle.js') }}"></script>
-    <script src="{{ asset('assets/js/typeahead/typeahead.custom.js') }}"></script>
-    <script src="{{ asset('assets/js/typeahead-search/handlebars.js') }}"></script>
-    <script src="{{ asset('assets/js/typeahead-search/typeahead-custom.js') }}"></script>
-    <script src="{{ asset('assets/js/height-equal.js') }}"></script>
-    <script src="{{ asset('assets/js/animation/wow/wow.min.js') }}"></script>
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    paymentModal.show();
+                });
+            }
+
+            // Initialize
+            addJobPosting();
+            addBtn.addEventListener('click', addJobPosting);
+            initializePaymentModalLogic();
+
+        });
+
+    </script>
+
 @endsection
