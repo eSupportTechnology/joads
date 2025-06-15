@@ -97,7 +97,6 @@
         <p style="font-size: 14px; color: #f4f4f4; margin: 0;">
             <footer>
                 <p>All Rights Reserved. © {{ date('Y') }} jobads.lk.</p>
-                <p style="font-size: 13px">Powered By eSupport&reg;</p>
             </footer>
         </p>
     </div>
