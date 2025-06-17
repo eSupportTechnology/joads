@@ -251,9 +251,8 @@
         }
 
         /* Responsive Design */
-
-        /* Large Desktop (1200px and up) */
-        @media (min-width: 1200px) {
+         /* xl-Large Desktop (1400px and up) */
+        @media (min-width: 1500px) {
             .filters {
                 background-color: rgba(0, 0, 0, 0.1);
                 padding: 2px 25px 0px 25px;
@@ -274,7 +273,33 @@
             }
 
             .job-grid {
-                grid-template-columns: repeat(5, 1fr);
+                grid-template-columns: repeat(5,1fr);
+            }
+        }
+
+        /* Large Desktop (1200px and up) */
+        @media (min-width: 1200px)and (max-width: 1499px) {
+            .filters {
+                background-color: rgba(0, 0, 0, 0.1);
+                padding: 2px 25px 0px 25px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .filters-form {
+                width: 70%;
+                margin: 0;
+                flex-wrap: nowrap;
+            }
+
+            .text-input,
+            .dropdown {
+                min-width: 180px;
+            }
+
+            .job-grid {
+                grid-template-columns: repeat(4,1fr);
             }
         }
 
@@ -298,7 +323,7 @@
             }
 
             .job-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(3,1fr);
             }
         }
 
@@ -330,7 +355,7 @@
             }
 
             .job-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2,1fr);
             }
 
             .category-link {
@@ -377,7 +402,7 @@
             }
 
             .job-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2.1fr);
                 justify-items: center;
             }
 
@@ -443,7 +468,8 @@
             }
 
             .job-grid {
-                grid-template-columns: 1fr;
+                      
+                grid-template-columns: repeat(1,1fr);
                 justify-items: center;
             }
 
@@ -522,6 +548,12 @@
                 font-size: 12px;
                 padding: 8px;
                 text-align: center;
+            }
+            
+            .job-grid {
+                      
+                grid-template-columns: repeat(1,1fr);
+                justify-items: center;
             }
         }
 

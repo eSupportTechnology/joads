@@ -25,276 +25,278 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
 
-    <style>
-        /* Unique Header Styles */
+<style>
+    /* Unique Header Styles */
+    .unique-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 30px;
+        background-color: #ffffff;
+        border-bottom: 3px solid #cccbcb;
+        position: sticky;
+        top: 0;
+        min-height: 70px;
+        z-index: 1000;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Logo */
+    .unique-header .logo img {
+        max-height: 60px;
+        width: auto;
+    }
+
+    /* Menu Toggle Button */
+    .menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        position: relative;
+        z-index: 1100;
+        padding: 5px;
+        order: 2;
+    }
+
+    .menu-toggle.open::before {
+        font-size: 20px;
+        color: #333;
+    }
+
+    .menu-toggle:not(.open)::before {
+        font-size: 24px;
+        color: #333;
+    }
+
+    /* Navigation Links */
+    .unique-nav-links {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex: 1;
+        margin-left: 100px;
+        margin-top: 11px;
+        z-index: 100;
+    }
+
+    .unique-nav-links a {
+        text-decoration: none;
+        color: black;
+        font-size: 16px;
+        transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .unique-nav-links a:hover {
+        color: black;
+        transform: translateY(-2px);
+    }
+
+    /* Social Icons */
+    .social-icons {
+        display: flex;
+        gap: 20px;
+        position: absolute; /* Pinned to top-right */
+        top: 15px;
+        right: 30px;
+        z-index: 1001;
+    }
+
+    .social-icons a {
+        text-decoration: none;
+        color: #18799c;
+        transition: transform 0.3s ease;
+    }
+
+    .social-icons a:hover {
+        transform: scale(1.1);
+    }
+
+    .social-icons img {
+        width: 25px;
+        height: auto;
+    }
+
+    /* Profile Section */
+    .menu {
+        display: flex;
+        align-items: center;
+        order: 3;
+    }
+
+    .profile-dropdown {
+        position: relative;
+    }
+
+    .profile-letter-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 30px;
+        background-color: #28adce;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .profile-dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: white;
+        min-width: 160px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        border-radius: 5px;
+        padding: 10px 0;
+        z-index: 1001;
+    }
+
+    .profile-dropdown:hover .profile-dropdown-content {
+        display: block;
+    }
+
+    .profile-dropdown-content a {
+        color: black;
+        padding: 8px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
+    .profile-dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 1077px) {
         .unique-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 30px;
-            background-color: #ffffff;
-            border-bottom: 3px solid #cccbcb;
-            position: sticky;
-            top: 0;
-            min-height: 70px;
-            z-index: 1000;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            flex-wrap: wrap;
+            padding: 10px 15px;
+            min-height: 60px;
         }
 
-        /* Logo */
-        .unique-header .logo img {
-            max-height: 60px;
-            width: auto;
+        .logo {
+            order: 1;
         }
 
-        /* Menu Toggle Button */
+        .logo img {
+            max-height: 45px;
+            margin-left: 0 !important;
+        }
+
         .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            position: relative;
-            z-index: 1100;
-            padding: 5px;
+            display: block;
             order: 2;
+            margin-left: auto;
+            margin-right: 15px;
         }
 
-        .menu-toggle.open::before {
-            font-size: 20px;
-            color: #333;
+        .menu {
+            order: 3;
+            margin-left: 0;
         }
 
-        .menu-toggle:not(.open)::before {
-            font-size: 24px;
-            color: #333;
+        .profile-letter-circle {
+            width: 35px;
+            height: 35px;
+            font-size: 16px;
+            margin-right: 15px;
         }
 
-        /* Navigation Links */
         .unique-nav-links {
+            display: none;
+            order: 4;
+            flex-direction: column;
+            width: 100%;
+            margin: 0;
+            height: 350px;
+            background-color: #ffffff;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            gap: 15px;
+        }
+
+        .unique-nav-links.show {
             display: flex;
-            gap: 20px;
-            align-items: center;
-            flex: 1;
-            margin-left: 100px;
-            margin-top: 11px;
-            z-index: 100;
         }
 
         .unique-nav-links a {
-            text-decoration: none;
-            color: black;
-            font-size: 16px;
-            transition: color 0.3s ease, transform 0.3s ease;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            width: 100%;
+            margin: 0;
         }
 
-        .unique-nav-links a:hover {
-            color: black;
-            transform: translateY(-2px);
+        .unique-nav-links a[href*="postvacancy"],
+        .unique-nav-links a[href*="profile.personal"] {
+            border-radius: 5px;
+            border-bottom: none;
+            margin: 5px 0;
         }
 
-        /* Social Icons */
         .social-icons {
-            display: flex;
-            gap: 20px;
+            top: 20px; /* Adjusted for smaller screens */
+            position: relative;
+            text-align: center
         }
 
-        .social-icons a {
-            text-decoration: none;
-            color: #18799c;
-            transition: transform 0.3s ease;
+        .social-icons img {
+            width: 30px;
+            height: 30px;
         }
 
-        .social-icons a:hover {
-            transform: scale(1.1);
+        .profile-dropdown-content {
+            right: 0;
+            top: 100%;
+            min-width: 140px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .unique-header {
+            padding: 8px 10px;
+        }
+
+        .logo img {
+            max-height: 40px;
+        }
+
+        .profile-letter-circle {
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .unique-nav-links a {
+            font-size: 14px;
+            padding: 10px 0;
         }
 
         .social-icons img {
             width: 25px;
-            height: auto;
+            height: 25px;
         }
+    }
 
-        /* Profile Section */
-        .menu {
-            display: flex;
-            align-items: center;
-            order: 3;
+    /* Desktop - hide menu toggle */
+    @media (min-width: 1077px) {
+        .menu-toggle {
+            display: none !important;
         }
-
-        .profile-dropdown {
-            position: relative;
-        }
-
-        .profile-letter-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 30px;
-            background-color: #28adce;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .profile-dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background: white;
-            min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            border-radius: 5px;
-            padding: 10px 0;
-            z-index: 1001;
-        }
-
-        .profile-dropdown:hover .profile-dropdown-content {
-            display: block;
-        }
-
-        .profile-dropdown-content a {
-            color: black;
-            padding: 8px 16px;
-            text-decoration: none;
-            display: block;
-        }
-
-        .profile-dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
-
-        /* Mobile Responsive Styles */
-        @media (max-width: 768px) {
-            .unique-header {
-                flex-wrap: wrap;
-                padding: 10px 15px;
-                min-height: 60px;
-            }
-
-            .logo {
-                order: 1;
-            }
-
-            .logo img {
-                max-height: 45px;
-                margin-left: 0 !important;
-            }
-
-            .menu-toggle {
-                display: block;
-                order: 2;
-                margin-left: auto;
-                margin-right: 15px;
-            }
-
-            .menu {
-                order: 3;
-                margin-left: 0;
-            }
-
-            .profile-letter-circle {
-                width: 35px;
-                height: 35px;
-                font-size: 16px;
-                margin-right: 15px;
-            }
-
-            .unique-nav-links {
-                display: none;
-                order: 4;
-                flex-direction: column;
-                width: 100%;
-                margin: 0;
-                height: auto;
-                background-color: #ffffff;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                padding: 20px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                z-index: 999;
-                gap: 15px;
-            }
-
-            .unique-nav-links.show {
-                display: flex;
-            }
-
-            .unique-nav-links a {
-                padding: 12px 0;
-                border-bottom: 1px solid #eee;
-                text-align: center;
-                width: 100%;
-                margin: 0;
-            }
-
-            .unique-nav-links a[href*="postvacancy"],
-            .unique-nav-links a[href*="profile.personal"] {
-                border-radius: 5px;
-                border-bottom: none;
-                margin: 5px 0;
-            }
-
-            .social-icons {
-                justify-content: center;
-                padding: 15px 0;
-                border-top: 1px solid #eee;
-                margin-top: 10px;
-                width: 100%;
-            }
-
-            .social-icons img {
-                width: 30px;
-                height: 30px;
-            }
-
-            .profile-dropdown-content {
-                right: 0;
-                top: 100%;
-                min-width: 140px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .unique-header {
-                padding: 8px 10px;
-            }
-
-            .logo img {
-                max-height: 40px;
-            }
-
-            .profile-letter-circle {
-                width: 30px;
-                height: 30px;
-                font-size: 14px;
-                margin-right: 10px;
-            }
-
-            .unique-nav-links a {
-                font-size: 14px;
-                padding: 10px 0;
-            }
-
-            .social-icons img {
-                width: 25px;
-                height: 25px;
-            }
-        }
-
-        /* Desktop - hide menu toggle */
-        @media (min-width: 769px) {
-            .menu-toggle {
-                display: none !important;
-            }
-        }
-    </style>
+    }
+</style>
 
 </head>
 

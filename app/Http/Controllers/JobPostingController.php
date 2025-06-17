@@ -303,7 +303,8 @@ class JobPostingController extends Controller
             ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
             ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
             ->orderBy('approved_date', 'desc')
-            ->paginate($categoryId && $categoryId != 45 ? 50 : 250);
+            // dd($jobs);
+            ->paginate($categoryId && $categoryId != 45 ? 50 : 300);
 
 
 
