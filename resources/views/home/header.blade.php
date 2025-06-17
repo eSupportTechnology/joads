@@ -126,14 +126,15 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
     }
 
     .profile-dropdown {
-        position: relative;
+        right:25px;
+        top:50px;
+        position: absolute;
     }
 
     .profile-letter-circle {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        margin-right: 30px;
         background-color: #28adce;
         color: white;
         display: flex;
@@ -173,13 +174,18 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
     }
 
     /* Mobile Responsive Styles */
-    @media (max-width: 1077px) {
+    @media (max-width: 1134px) {
         .unique-header {
             flex-wrap: wrap;
             padding: 10px 15px;
             min-height: 60px;
             width: 100%
         }
+    .profile-dropdown {
+        right:100px;
+        top:-55px;
+        position: absolute;
+    }
 
         .logo {
             order: 1;
@@ -237,7 +243,6 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
             padding: 12px 0;
             border-bottom: 1px solid #eee;
             text-align: center;
-            width: 50%;
             margin: 0;
         }
 
@@ -294,7 +299,7 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
     }
 
     /* Desktop - hide menu toggle */
-    @media (min-width: 1077px) {
+    @media (min-width: 1135px) {
         .menu-toggle {
             display: none !important;
         }
@@ -373,9 +378,7 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
                     <img src="{{ asset('tiktok.jpeg') }}" alt="TikTok">
                 </a>
             </div>
-        </nav>
-
-        <div class="menu">
+            <div class="menu">
             @auth
                 <!-- For authenticated users -->
                 <div class="profile-dropdown">
@@ -403,6 +406,9 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
                 <a href="{{ route('register') }}" class="signup-btn">Sign Up</a>
             @endguest --}}
         </div>
+
+        </nav>
+
     </header>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
