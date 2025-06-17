@@ -223,8 +223,8 @@
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                 responsive: true,
                 lengthMenu: [
-                    [10, 25, 50, -1],
-                    [10, 25, 50, "All"]
+                    [250, 400, 500, -1],
+                    [250, 400, 500, "All"]
                 ]
             });
         });

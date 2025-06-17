@@ -13,6 +13,7 @@ class CountryController extends Controller
         $countries = Country::select('countries.id', 'countries.name')
             ->leftJoin('job_postings', 'countries.id', '=', 'job_postings.country_id')
             ->selectRaw('SUM(job_postings.view_count) as total_view_count')
+            ->selectRaw('SUM(job_postings.update_count) as total_update_count')
             ->groupBy('countries.id', 'countries.name')
             ->get();
 

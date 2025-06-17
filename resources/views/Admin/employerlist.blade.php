@@ -122,7 +122,7 @@
                 $('#keytable').DataTable().destroy();
             }
             $('#keytable').DataTable({
-                pageLength: 100
+                pageLength: 250
             });
         });
     </script>

@@ -131,6 +131,7 @@ public function getFilteredJobPostings(Request $request)
     })->map(function ($group) {
         return $group->sum('view_count');
     });
+ 
 
     // Get today's and weekly employer counts
     $today = \Carbon\Carbon::today();
@@ -139,8 +140,13 @@ public function getFilteredJobPostings(Request $request)
     $weeklyEmployerCount = DB::table('job_postings')
         ->whereBetween('created_at', [$today->copy()->subDays(6), $today])
         ->count();
+    $todayViewCount = DB::table('job_postings')->sum('view_count');
+    $todayUpdateCount=DB::table('job_postings')->sum('update_count');
+
 
     return view('Admin.report.employer', [
+        'todayViewCount'=>$todayViewCount,
+        'todayUpdateCount'=>$todayUpdateCount,
         'jobPostings' => $results,
         'totalEarningsLkr' => $totalLkr,
         'dailyTotals' => $dailyTotals,

@@ -3,11 +3,11 @@
 @section('title', 'Countries List')
 
 @section('css')
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatable-extension.css') }}">
 @endsection
 
 @section('style')
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatable-extension.css') }}">
     <style>
         .icon-fixed-size {
             width: 16px;
@@ -68,6 +68,18 @@
             text-align: center;
             min-width: 200px;
         }
+
+        /* Hide Actions column when printing */
+        @media print {
+            .actions-column {
+                display: none;
+            }
+
+            #countries-table td:nth-last-child(1),
+            #countries-table th:nth-last-child(1) {
+                display: none;
+            }
+        }
     </style>
 @endsection
 
@@ -103,6 +115,7 @@
                                         <th>#</th>
                                         <th>Name</th>
                                         <th>Total Views</th>
+                                        <th>Today Views</th>
                                         <th class="actions-column">Actions</th>
                                     </tr>
                                 </thead>
@@ -112,16 +125,17 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $country->name }}</td>
                                             <td>{{ $country->total_view_count ?? 0 }}</td>
+                                            <td>{{ $country->total_update_count ?? 0 }}</td>
                                             <td class="actions-column">
                                                 <a href="{{ route('countries.edit', $country) }}"
-                                                    class="btn custom-btn custom-btn-warning" style="height:15px">
+                                                    class="btn custom-btn custom-btn-warning">
                                                     <i class="icon-pencil-alt icon-fixed-size"></i> Edit
                                                 </a>
                                                 <form action="{{ route('countries.destroy', $country) }}" method="POST"
                                                     class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn custom-btn custom-btn-danger" style="height:15px"
+                                                    <button type="submit" class="btn custom-btn custom-btn-danger"
                                                         onclick="return confirm('Are you sure you want to delete this country?')">
                                                         <i class="icon-trash icon-fixed-size"></i> Delete
                                                     </button>
@@ -143,27 +157,30 @@
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.buttons.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatable-extension/jszip.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/buttons.colVis.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatable-extension/pdfmake.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatable-extension/vfs_fonts.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.autoFill.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.select.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/buttons.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatable-extension/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatable-extension/buttons.print.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.responsive.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/responsive.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.keyTable.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.colReorder.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.fixedHeader.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.rowReorder.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.scroller.min.js') }}"></script>
     <script>
         $(document).ready(function() {
             $('#countries-table').DataTable({
                 responsive: true,
                 pageLength: 25,
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy',
+                    'csv',
+                    'excel',
+                    'pdf',
+                    {
+                        extend: 'print',
+                        exportOptions: {
+                            columns: ':not(.actions-column)' // Exclude actions column during export
+                        }
+                    }
+                ],
                 order: [
                     [0, 'asc']
                 ],
