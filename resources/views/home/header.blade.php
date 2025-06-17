@@ -178,6 +178,7 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
             flex-wrap: wrap;
             padding: 10px 15px;
             min-height: 60px;
+            width: 100%
         }
 
         .logo {
@@ -214,16 +215,18 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
             flex-direction: column;
             width: 100%;
             margin: 0;
-            height: 350px;
+            height: 400px;
             background-color: #ffffff;
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
-            padding: 20px;
+            padding-right: 5px;
+            padding-left: 5px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 999;
             gap: 15px;
+            justify-content: center
         }
 
         .unique-nav-links.show {
@@ -234,7 +237,7 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
             padding: 12px 0;
             border-bottom: 1px solid #eee;
             text-align: center;
-            width: 100%;
+            width: 50%;
             margin: 0;
         }
 
@@ -248,7 +251,7 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
         .social-icons {
             top: 20px; /* Adjusted for smaller screens */
             position: relative;
-            text-align: center
+            justify-content: center
         }
 
         .social-icons img {
