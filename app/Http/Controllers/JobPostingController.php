@@ -289,22 +289,20 @@ class JobPostingController extends Controller
         $jobs = JobPosting::with(['category', 'subcategory', 'country', 'package.duration', 'employer'])
             ->where('status', 'approved')
             ->where('is_active', true)
-            ->whereDate('closing_date', '>=', $today) // Add this line
+            ->whereDate('closing_date', '>=', $today)
             ->when($search, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('title', 'like', "%{$search}%")
                         ->orWhere('description', 'like', "%{$search}%")
-                        ->orWhereHas('employer', function ($q) use ($search) {
-                            $q->where('company_name', 'like', "%{$search}%");
-                        });
+                        ->orWhereHas('employer', fn($q) => $q->where('company_name', 'like', "%{$search}%"));
                 });
             })
-            ->when($location, fn($query, $location) => $query->where('location', 'like', "%{$location}%"))
-            ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
+            ->when($location, fn($query) => $query->where('location', 'like', "%{$location}%"))
+            ->when($countryId, fn($query) => $query->where('country_id', $countryId))
             ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
-            ->orderBy('approved_date', 'desc')
-            // dd($jobs);
+            ->orderBy('approved_date', 'asc') // Use 'desc' if you want the newest jobs first
             ->paginate($categoryId && $categoryId != 45 ? 50 : 300);
+
 
 
 
