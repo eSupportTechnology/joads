@@ -381,7 +381,7 @@
             }
 
             .job-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(5, 1fr);
             }
 
             .category-link {
