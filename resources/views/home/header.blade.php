@@ -105,6 +105,7 @@
         /* Social Icons */
         .social-icons {
             display: flex;
+            /* gap: 20px; */
         }
 
         .social-icons a {
@@ -118,7 +119,7 @@
         }
 
         .social-icons img {
-            width: 25px;
+            width: 35px;
             height: auto;
         }
 
@@ -130,15 +131,14 @@
         }
 
         .profile-dropdown {
-            right: 25px;
-            top: 50px;
-            position: absolute;
+            position: relative;
         }
 
         .profile-letter-circle {
             width: 40px;
             height: 40px;
             border-radius: 50%;
+            margin-left: 10px;
             background-color: #28adce;
             color: white;
             display: flex;
@@ -156,7 +156,7 @@
             top: 100%;
             background: white;
             min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
             border-radius: 5px;
             padding: 10px 0;
             z-index: 1001;
@@ -178,18 +178,11 @@
         }
 
         /* Mobile Responsive Styles */
-        @media (max-width: 1134px) {
+        @media (max-width: 768px) {
             .unique-header {
                 flex-wrap: wrap;
                 padding: 10px 15px;
                 min-height: 60px;
-                width: 100%
-            }
-
-            .profile-dropdown {
-                right: 100px;
-                top: -55px;
-                position: absolute;
             }
 
             .logo {
@@ -226,18 +219,16 @@
                 flex-direction: column;
                 width: 100%;
                 margin: 0;
-                height: 400px;
+                height: auto;
                 background-color: #ffffff;
                 position: absolute;
                 top: 100%;
                 left: 0;
                 right: 0;
-                padding-right: 5px;
-                padding-left: 5px;
+                padding: 20px;
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 z-index: 999;
                 gap: 15px;
-                justify-content: center
             }
 
             .unique-nav-links.show {
@@ -248,6 +239,7 @@
                 padding: 12px 0;
                 border-bottom: 1px solid #eee;
                 text-align: center;
+                width: 100%;
                 margin: 0;
             }
 
@@ -256,6 +248,14 @@
                 border-radius: 5px;
                 border-bottom: none;
                 margin: 5px 0;
+            }
+
+            .social-icons {
+                justify-content: center;
+                padding: 15px 0;
+                border-top: 1px solid #eee;
+                margin-top: 10px;
+                width: 100%;
             }
 
             .social-icons img {
@@ -298,7 +298,7 @@
         }
 
         /* Desktop - hide menu toggle */
-        @media (min-width: 1135px) {
+        @media (min-width: 769px) {
             .menu-toggle {
                 display: none !important;
             }

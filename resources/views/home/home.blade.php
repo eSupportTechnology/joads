@@ -303,32 +303,6 @@
             }
         }
 
-        /* Large Desktop (1200px and up) */
-        @media (min-width: 1200px)and (max-width: 1499px) {
-            .filters {
-                background-color: rgba(0, 0, 0, 0.1);
-                padding: 2px 25px 0px 25px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .filters-form {
-                width: 70%;
-                margin: 0;
-                flex-wrap: nowrap;
-            }
-
-            .text-input,
-            .dropdown {
-                min-width: 180px;
-            }
-
-            .job-grid {
-                grid-template-columns: repeat(4,1fr);
-            }
-        }
-
         /* Desktop (992px to 1199px) */
         @media (min-width: 992px) and (max-width: 1199px) {
             .filters {
