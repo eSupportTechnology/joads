@@ -105,9 +105,7 @@
         /* Social Icons */
         .social-icons {
             display: flex;
-            top: 15px;
-            z-index: 1001;
-            gap: 15px;
+            gap: 20px;
         }
 
         .social-icons a {
@@ -127,22 +125,20 @@
 
         /* Profile Section */
         .menu {
-            top: 15px;
             display: flex;
             align-items: center;
             order: 3;
         }
 
         .profile-dropdown {
-            right: 25px;
-            top: 50px;
-            position: absolute;
+            position: relative;
         }
 
         .profile-letter-circle {
             width: 40px;
             height: 40px;
             border-radius: 50%;
+            margin-left: 10px;
             background-color: #28adce;
             color: white;
             display: flex;
@@ -182,18 +178,11 @@
         }
 
         /* Mobile Responsive Styles */
-        @media (max-width: 1134px) {
+        @media (max-width: 768px) {
             .unique-header {
                 flex-wrap: wrap;
                 padding: 10px 15px;
                 min-height: 60px;
-                width: 100%
-            }
-
-            .profile-dropdown {
-                right: 100px;
-                top: -55px;
-                position: absolute;
             }
 
             .logo {
@@ -230,18 +219,16 @@
                 flex-direction: column;
                 width: 100%;
                 margin: 0;
-                height: 400px;
+                height: auto;
                 background-color: #ffffff;
                 position: absolute;
                 top: 100%;
                 left: 0;
                 right: 0;
-                padding-right: 5px;
-                padding-left: 5px;
+                padding: 20px;
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 z-index: 999;
                 gap: 15px;
-                justify-content: center
             }
 
             .unique-nav-links.show {
@@ -252,6 +239,7 @@
                 padding: 12px 0;
                 border-bottom: 1px solid #eee;
                 text-align: center;
+                width: 100%;
                 margin: 0;
             }
 
@@ -263,8 +251,11 @@
             }
 
             .social-icons {
-                display: flex;
-                /* gap: 20px; */
+                justify-content: center;
+                padding: 15px 0;
+                border-top: 1px solid #eee;
+                margin-top: 10px;
+                width: 100%;
             }
 
             .social-icons img {
@@ -307,7 +298,7 @@
         }
 
         /* Desktop - hide menu toggle */
-        @media (min-width: 1135px) {
+        @media (min-width: 769px) {
             .menu-toggle {
                 display: none !important;
             }
@@ -374,20 +365,26 @@
             <!-- Social icons -->
 
             <div class="social-icons">
-                <div class="menu">
-                    <a href="https://www.linkedin.com/company/jobads-lk/?viewAsMember=true" target="_blank">
-                        <img src="{{ asset('linkedin.jpeg') }}" alt="LinkedIn">
-                    </a>
-                    <a href="https://www.facebook.com/jobads.lkJSG" target="_blank">
-                        <img src="{{ asset('facebook.jpeg') }}" alt="Facebook">
-                    </a>
-                    <a href="https://www.instagram.com/jobadslk/" target="_blank">
-                        <img src="{{ asset('Instagram.jpeg') }}" alt="Instagram">
-                    </a>
-                    <a href="https://www.tiktok.com/@jobads.lk" target="_blank">
-                        <img src="{{ asset('tiktok.jpeg') }}" alt="TikTok">
-                    </a>
+                <a href="https://www.linkedin.com/company/jobads-lk/?viewAsMember=true" target="_blank">
+                    <img src="{{ asset('linkedin.jpeg') }}" alt="LinkedIn">
+                </a>
+                <a href="https://www.facebook.com/jobads.lkJSG" target="_blank">
+                    <img src="{{ asset('facebook.jpeg') }}" alt="Facebook">
+                </a>
+                <a href="https://www.instagram.com/jobadslk/" target="_blank">
+                    <img src="{{ asset('Instagram.jpeg') }}" alt="Instagram">
+                </a>
+                <a href="https://www.tiktok.com/@jobads.lk" target="_blank">
+                    <img src="{{ asset('tiktok.jpeg') }}" alt="TikTok">
+                </a>
 
+                {{-- @guest
+                <!-- For guests -->
+                <a href="{{ route('login') }}"class="login-btn">Login</a>
+                <a href="{{ route('register') }}" class="signup-btn">Sign Up</a>
+            @endguest --}}
+            </div>
+            <div class="menu">
                     @auth
                         <!-- For authenticated users -->
                         <div class="profile-dropdown">
@@ -409,7 +406,6 @@
                         </div>
                     @endauth
                 </div>
-            </div>
         </nav>
 
 
