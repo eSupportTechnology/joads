@@ -254,9 +254,8 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
         }
 
         .social-icons {
-            top: 20px; /* Adjusted for smaller screens */
-            position: relative;
-            justify-content: center
+            display: flex;
+            /* gap: 20px; */
         }
 
         .social-icons img {
@@ -364,6 +363,7 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
             </a>
 
             <!-- Social icons -->
+            <div class="menu">
             <div class="social-icons">
                 <a href="https://www.linkedin.com/company/jobads-lk/?viewAsMember=true" target="_blank">
                     <img src="{{ asset('linkedin.jpeg') }}" alt="LinkedIn">
@@ -378,7 +378,6 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
                     <img src="{{ asset('tiktok.jpeg') }}" alt="TikTok">
                 </a>
             </div>
-            <div class="menu">
             @auth
                 <!-- For authenticated users -->
                 <div class="profile-dropdown">
@@ -406,8 +405,8 @@ src="https://www.facebook.com/tr?id=902449721836213&ev=PageView&noscript=1"
                 <a href="{{ route('register') }}" class="signup-btn">Sign Up</a>
             @endguest --}}
         </div>
-
         </nav>
+
 
     </header>
 
