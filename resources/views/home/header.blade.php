@@ -118,7 +118,7 @@
         }
 
         .social-icons img {
-            width: 35px;
+            width: 25px;
             height: auto;
         }
 
@@ -258,8 +258,8 @@
             }
 
             .social-icons img {
-                width: 30px;
-                height: 30px;
+                width: 25px;
+                height: auto;
             }
 
             .profile-dropdown-content {
@@ -323,7 +323,7 @@
             <!-- "Post Your Vacancy" as a button -->
             <a href="{{ route('user.postvacancy') }}"
                 style="background: linear-gradient(to bottom, #28adce, #18799c); color: white;transition: color 0.3s ease,
-            transform 0.3s ease; padding: 10px 10px; text-decoration: none; border-radius: 5px;"
+            transform 0.3s ease; padding: 10px 10px; text-decoration: none; border-radius: 5px; white-space: nowrap;"
                 onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 10px rgba(0, 0, 0, 0.15)';"
                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)';">
                 Post Your Vacancy
@@ -333,7 +333,7 @@
             <a href="{{ route('profile.personal') }}"
                 style="background: linear-gradient(to bottom, #28adce, #18799c); color: white;
                       transition: color 0.3s ease, transform 0.3s ease; padding: 10px 10px;
-                      text-decoration: none; border-radius: 5px;"
+                      text-decoration: none; border-radius: 5px; white-space: nowrap;"
                 onmouseover="this.style.transform='translateY(-2px)';
                             this.style.boxShadow='0 6px 10px rgba(0, 0, 0, 0.15)';"
                 onmouseout="this.style.transform='translateY(0)';
@@ -343,19 +343,19 @@
 
             <!-- Other navigation links -->
             <a href="{{ route('ourservices') }}"
-                style="text-decoration: none; color: black; font-size: 16px; transition: color 0.3s ease, transform 0.3s ease;"
+                style="text-decoration: none; color: black; font-size: 16px; transition: color 0.3s ease, transform 0.3s ease; white-space: nowrap;"
                 onmouseover="this.style.color='black'; this.style.transform='translateY(-2px)';"
                 onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
                 Direct Recruitment
             </a>
             <a href="/topemployees"
-                style="text-decoration: none;color: black;font-size: 16px;  transition: color 0.3s ease, transform 0.3s ease;"
+                style="text-decoration: none;color: black;font-size: 16px;  transition: color 0.3s ease, transform 0.3s ease; white-space: nowrap;"
                 onmouseover="this.style.color='black'; this.style.transform='translateY(-2px)';"
                 onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
                 Best Employers
             </a>
             <a href="javascript:void(0);" id="contact-us-btn"
-                style="text-decoration: none;color: black; font-size: 16px;  transition: color 0.3s ease, transform 0.3s ease;"
+                style="text-decoration: none;color: black; font-size: 16px;  transition: color 0.3s ease, transform 0.3s ease; white-space: nowrap;"
                 onmouseover="this.style.color='black'; this.style.transform='translateY(-2px)';"
                 onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
                 Contact Us
