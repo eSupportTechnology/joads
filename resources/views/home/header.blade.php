@@ -84,7 +84,6 @@
             display: flex;
             gap: 20px;
             align-items: center;
-            flex: 1;
             margin-left: 100px;
             margin-top: 11px;
             z-index: 100;
