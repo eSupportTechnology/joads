@@ -161,6 +161,7 @@
         }
 
         .filters {
+            margin-top: 8px;
             display: flex;
             gap: 10px;
             align-items: center;

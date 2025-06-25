@@ -344,7 +344,7 @@
 
         .social-icons {
             margin-top: 14px;
-            padding-right: 20px;
+            padding-right: 29px;
             display: flex;
             gap: 8px;
             align-items: center;
