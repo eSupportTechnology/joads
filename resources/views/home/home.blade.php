@@ -769,7 +769,7 @@
 
 
     <!-- Filters Section -->
-    <section class="filters" style="margin-top:-8px !important;">
+    <section class="filters" style="margin-top:8px !important;">
         <p class="jobtitle">
             Available New Jobs : {{ $totalCount }}
             @if (session('selected_category_id'))
