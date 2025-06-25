@@ -126,6 +126,14 @@
             font-size: 14px;
             border-bottom: 1px dotted #000;
             cursor: pointer;
+            width: 100%;              /* ✅ Ensure fills grid column */
+            min-width: 0;             /* ✅ Prevent overflow from text */
+            box-sizing: border-box;
+            cursor: pointer;
+
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .main-footer {
@@ -326,9 +334,9 @@
                 min-width: 180px;
             }
 
-            .job-grid {
+            /* .job-grid {
                 grid-template-columns: repeat(4,1fr);
-            }
+            } */
         }
 
         /* Desktop (992px to 1199px) */
@@ -598,6 +606,26 @@
 
             .view-btn {
                 padding: 8px 15px;
+            }
+        }
+
+        .job-table th,
+        .job-table td {
+            width: calc(100% / 7); /* Adjust if the number of columns changes */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @media (min-width: 1000px) and (max-width: 1499px) {
+        .force-5-cols {
+                display: grid !important;
+                grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+            }
+        }
+        @media (min-width: 1200px) and (max-width: 1499px) {
+            .job-grid {
+                grid-template-columns: repeat(5, 1fr);
             }
         }
     </style>
