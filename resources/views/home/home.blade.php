@@ -235,7 +235,7 @@
 
         .view-btn {
             background: rgb(107, 190, 212);
-            color: white;
+            color: black;
             border: none;
             padding: 12px 20px;
             border-radius: 6px;
