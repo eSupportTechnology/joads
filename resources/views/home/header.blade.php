@@ -103,7 +103,7 @@
         /* Social Icons */
         .social-icons {
             display: flex;
-            gap: 20px;
+            gap: 8px;
         }
 
         .social-icons a {
@@ -356,13 +356,13 @@
             height: 24px;
         }
         @media (max-width: 1242px) {
-            .first_link {
+            /* .first_link {
                 padding-left: 50px;
-            }
+            } */
         }
-        .first_link {
+        /* .first_link {
             padding-left: 60px;
-        }
+        } */
 
     </style>
 
