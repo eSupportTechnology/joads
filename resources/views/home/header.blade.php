@@ -346,7 +346,7 @@
             margin-top: 14px;
             padding-right: 20px;
             display: flex;
-            gap: 20px;
+            gap: 8px;
             align-items: center;
             margin-left: auto;
         }
