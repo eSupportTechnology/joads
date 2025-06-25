@@ -234,8 +234,8 @@
         }
 
         .view-btn {
-            background: rgb(107, 190, 212);
-            color: black;
+            background: #24A0C2;
+            color: white;
             border: none;
             padding: 12px 20px;
             border-radius: 6px;
