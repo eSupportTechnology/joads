@@ -837,7 +837,7 @@
                 $isAllCategory = request()->category_id === '45';
             @endphp
 
-            @if ($isCategorySelected && !$isAllCategory)
+            {{-- @if ($isCategorySelected && !$isAllCategory)
                 <!-- Display as Table if Specific Category (not "45") is Selected -->
                 <div class="overflow-x-auto">
                     <table class="job-table w-full min-w-full">
@@ -883,7 +883,7 @@
                         </tbody>
                     </table>
                 </div>
-            @else
+            @else --}}
                 <!-- Display as Cards if No Category or "All" is Selected -->
                 <div class="job-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                     @foreach ($jobs as $job)
@@ -916,7 +916,7 @@
                         </div>
                     @endforeach
                 </div>
-            @endif
+            {{-- @endif --}}
 
             <!-- Pagination -->
             <div class="pagination-container flex justify-center mt-8" style="margin-top: 20px;">
