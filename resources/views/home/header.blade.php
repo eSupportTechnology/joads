@@ -521,43 +521,47 @@
 
     <script>
         // Mobile menu toggle functionality
-                document.addEventListener('DOMContentLoaded', function () {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const navElements = document.querySelectorAll('.nav-links, .social-icons');
+        document.addEventListener('DOMContentLoaded', function () {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navElements = document.querySelectorAll('.nav-links, .social-icons');
+    let menuOpen = false;
 
-            if (menuToggle && navElements.length > 0) {
-                menuToggle.addEventListener('click', function () {
-                    navElements.forEach(el => {
-                        const currentDisplay = getComputedStyle(el).display;
-                        if (currentDisplay === 'none') {
-                            el.setAttribute('style', 'display: flex !important;');
-                        } else {
-                            el.setAttribute('style', 'display: none !important;');
-                        }
-                    });
-                });
+    if (menuToggle && navElements.length > 0) {
+        // Toggle menu on button click
+        menuToggle.addEventListener('click', function (e) {
+            e.stopPropagation(); // Prevent it from triggering the outside click listener
 
-                // Close menu when clicking outside
-                document.addEventListener('click', function (event) {
-                    if (!menuToggle.contains(event.target) && ![...navElements].some(el => el.contains(event.target))) {
-                        navElements.forEach(el => {
-                            el.setAttribute('style', 'display: none !important;');
-                        });
-                    }
-                });
+            menuOpen = !menuOpen;
 
-                // Close when clicking any nav or social link
-                navElements.forEach(container => {
-                    container.querySelectorAll('a').forEach(link => {
-                        link.addEventListener('click', function () {
-                            navElements.forEach(el => {
-                                el.setAttribute('style', 'display: none !important;');
-                            });
-                        });
-                    });
+            navElements.forEach(el => {
+                el.setAttribute('style', `display: ${menuOpen ? 'flex' : 'none'} !important;`);
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function (event) {
+            if (menuOpen && !menuToggle.contains(event.target) && ![...navElements].some(el => el.contains(event.target))) {
+                navElements.forEach(el => {
+                    el.setAttribute('style', 'display: none !important;');
                 });
+                menuOpen = false;
             }
         });
+
+        // Close when clicking any nav/social link
+        navElements.forEach(container => {
+            container.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function () {
+                    navElements.forEach(el => {
+                        el.setAttribute('style', 'display: none !important;');
+                    });
+                    menuOpen = false;
+                });
+            });
+        });
+    }
+});
+
 
 
 

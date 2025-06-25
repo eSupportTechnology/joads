@@ -134,6 +134,11 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             word-break: break-word;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .job-card:hover {
+            transform: scale(1.02); /* Slight zoom in */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Optional for elevation */
         }
 
         .main-footer {
