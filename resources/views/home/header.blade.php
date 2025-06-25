@@ -39,7 +39,6 @@
         .unique-header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             padding: 15px 30px;
             background-color: #ffffff;
             border-bottom: 3px solid #cccbcb;
@@ -301,68 +300,155 @@
             .menu-toggle {
                 display: none !important;
             }
+            .nav-links {
+                display: flex !important;
+            }
+            .social-icons {
+                display: flex !important;
+            }
         }
+
+        @media (max-width: 769px) {
+            .nav-links {
+                display: none !important;
+            }
+            .social-icons {
+                display: none !important;
+            }
+            .first_link {
+                padding-left: 0;
+            }
+        }
+        .unique-header {
+            width: 100%;
+            background-color: #fff;
+            padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Push logo to left, social icons to right */
+        }
+
+        .logo img {
+            max-height: 60px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .social-icons {
+            margin-top: 14px;
+            padding-right: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .social-icons img {
+            width: 24px;
+            height: 24px;
+        }
+        @media (max-width: 1242px) {
+            .first_link {
+                padding-left: 50px;
+            }
+        }
+        .first_link {
+            padding-left: 60px;
+        }
+
     </style>
 
 </head>
 
 <body>
     <header class="unique-header">
-        <div class="logo">
-            <a href="/">
-                <img src="{{ asset('Jobads.png') }}" alt="Logo" class="unique-logo"
-                    style="max-height: 60px; margin-left: 20px;">
-            </a>
-        </div>
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo">
+                    <a href="/">
+                        <img src="{{ asset('Jobads.png') }}" alt="Logo" class="unique-logo"
+                            style="max-height: 60px; margin-left: 20px;">
+                    </a>
+                </div>
+            </div>
 
-        <button class="menu-toggle" aria-label="Toggle Navigation">
-            ☰
-        </button>
 
-        <nav class="nav-links unique-nav-links">
-            <!-- "Post Your Vacancy" as a button -->
-            <a href="{{ route('user.postvacancy') }}"
-                style="background: linear-gradient(to bottom, #28adce, #18799c); color: white;transition: color 0.3s ease,
-            transform 0.3s ease; padding: 10px 10px; text-decoration: none; border-radius: 5px; white-space: nowrap;"
-                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 10px rgba(0, 0, 0, 0.15)';"
-                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)';">
-                Post Your Vacancy
-            </a>
 
-            <!-- "CV Create" as a button -->
-            <a href="{{ route('profile.personal') }}"
-                style="background: linear-gradient(to bottom, #28adce, #18799c); color: white;
-                      transition: color 0.3s ease, transform 0.3s ease; padding: 10px 10px;
-                      text-decoration: none; border-radius: 5px; white-space: nowrap;"
-                onmouseover="this.style.transform='translateY(-2px)';
-                            this.style.boxShadow='0 6px 10px rgba(0, 0, 0, 0.15)';"
-                onmouseout="this.style.transform='translateY(0)';
-                           this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)';">
-                Create Free CV
-            </a>
+            <nav class="nav-links unique-nav-links">
+                <!-- "Post Your Vacancy" as a button -->
+                <a href="{{ route('user.postvacancy') }}"
+                    style="background: linear-gradient(to bottom, #28adce, #18799c); color: white;transition: color 0.3s ease,
+                transform 0.3s ease; padding: 10px 10px; text-decoration: none; border-radius: 5px; white-space: nowrap;"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 10px rgba(0, 0, 0, 0.15)';"
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)';">
+                    Post Your Vacancy
+                </a>
 
-            <!-- Other navigation links -->
-            <a href="{{ route('ourservices') }}"
-                style="text-decoration: none; color: black; font-size: 16px; transition: color 0.3s ease, transform 0.3s ease; white-space: nowrap;"
-                onmouseover="this.style.color='black'; this.style.transform='translateY(-2px)';"
-                onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
-                Direct Recruitment
-            </a>
-            <a href="/topemployees"
-                style="text-decoration: none;color: black;font-size: 16px;  transition: color 0.3s ease, transform 0.3s ease; white-space: nowrap;"
-                onmouseover="this.style.color='black'; this.style.transform='translateY(-2px)';"
-                onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
-                Best Employers
-            </a>
-            <a href="javascript:void(0);" id="contact-us-btn"
-                style="text-decoration: none;color: black; font-size: 16px;  transition: color 0.3s ease, transform 0.3s ease; white-space: nowrap;"
-                onmouseover="this.style.color='black'; this.style.transform='translateY(-2px)';"
-                onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
-                Contact Us
-            </a>
+                <!-- "CV Create" as a button -->
+                <a href="{{ route('profile.personal') }}"
+                    style="background: linear-gradient(to bottom, #28adce, #18799c); color: white;
+                        transition: color 0.3s ease, transform 0.3s ease; padding: 10px 10px;
+                        text-decoration: none; border-radius: 5px; white-space: nowrap;"
+                    onmouseover="this.style.transform='translateY(-2px)';
+                                this.style.boxShadow='0 6px 10px rgba(0, 0, 0, 0.15)';"
+                    onmouseout="this.style.transform='translateY(0)';
+                            this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)';">
+                    Create Free CV
+                </a>
 
-            <!-- Social icons -->
+                <!-- Other navigation links -->
+                <a class="first_link" href="{{ route('ourservices') }}"
+                    style="text-decoration: none; color: black; font-size: 16px; transition: color 0.3s ease, transform 0.3s ease; white-space: nowrap;"
+                    onmouseover="this.style.color='black'; this.style.transform='translateY(-2px)';"
+                    onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
+                    Direct Recruitment
+                </a>
+                <a href="/topemployees"
+                    style="text-decoration: none;color: black;font-size: 16px;  transition: color 0.3s ease, transform 0.3s ease; white-space: nowrap;"
+                    onmouseover="this.style.color='black'; this.style.transform='translateY(-2px)';"
+                    onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
+                    Best Employers
+                </a>
+                <a href="javascript:void(0);" id="contact-us-btn"
+                    style="text-decoration: none;color: black; font-size: 16px;  transition: color 0.3s ease, transform 0.3s ease; white-space: nowrap; padding-right:6px;"
+                    onmouseover="this.style.color='black'; this.style.transform='translateY(-2px)';"
+                    onmouseout="this.style.color='black'; this.style.transform='translateY(0)';">
+                    Contact Us
+                </a>
 
+                <!-- Social icons -->
+
+
+                        @auth
+                            <!-- For authenticated users -->
+                            <div class="profile-dropdown">
+                                <!-- Display First Letter of User's Name in a Circle -->
+                                <div class="profile-letter-circle">
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                </div>
+                                <div class="profile-dropdown-content">
+                                    <a href="{{ route('profile.edit') }}">My Profile</a>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <x-dropdown-link :href="route('logout')"
+                                            onclick="event.preventDefault();
+                                            this.closest('form').submit();">
+                                            {{ __('Log Out') }}
+                                        </x-dropdown-link>
+                                    </form>
+                                </div>
+                            </div>
+                        @endauth
+                    </div>
+            </nav>
             <div class="social-icons">
                 <a href="https://www.linkedin.com/company/jobads-lk/?viewAsMember=true" target="_blank">
                     <img src="{{ asset('linkedin.jpeg') }}" alt="LinkedIn">
@@ -377,13 +463,7 @@
                     <img src="{{ asset('tiktok.jpeg') }}" alt="TikTok">
                 </a>
 
-                {{-- @guest
-                <!-- For guests -->
-                <a href="{{ route('login') }}"class="login-btn">Login</a>
-                <a href="{{ route('register') }}" class="signup-btn">Sign Up</a>
-            @endguest --}}
-            </div>
-            <div class="menu">
+                <div class="menu">
                     @auth
                         <!-- For authenticated users -->
                         <div class="profile-dropdown">
@@ -405,9 +485,11 @@
                         </div>
                     @endauth
                 </div>
-        </nav>
-
-
+            </div>
+            <button class="menu-toggle" aria-label="Toggle Navigation">
+                ☰
+            </button>
+        </div>
     </header>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -439,34 +521,46 @@
 
     <script>
         // Mobile menu toggle functionality
-        document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', function () {
             const menuToggle = document.querySelector('.menu-toggle');
-            const navLinks = document.querySelector('.unique-nav-links');
+            const navElements = document.querySelectorAll('.nav-links, .social-icons');
 
-            if (menuToggle && navLinks) {
-                menuToggle.addEventListener('click', function() {
-                    navLinks.classList.toggle('show');
-                    menuToggle.classList.toggle('open');
+            if (menuToggle && navElements.length > 0) {
+                menuToggle.addEventListener('click', function () {
+                    navElements.forEach(el => {
+                        const currentDisplay = getComputedStyle(el).display;
+                        if (currentDisplay === 'none') {
+                            el.setAttribute('style', 'display: flex !important;');
+                        } else {
+                            el.setAttribute('style', 'display: none !important;');
+                        }
+                    });
                 });
 
                 // Close menu when clicking outside
-                document.addEventListener('click', function(event) {
-                    if (!menuToggle.contains(event.target) && !navLinks.contains(event.target)) {
-                        navLinks.classList.remove('show');
-                        menuToggle.classList.remove('open');
+                document.addEventListener('click', function (event) {
+                    if (!menuToggle.contains(event.target) && ![...navElements].some(el => el.contains(event.target))) {
+                        navElements.forEach(el => {
+                            el.setAttribute('style', 'display: none !important;');
+                        });
                     }
                 });
 
-                // Close menu when clicking on a navigation link
-                const navLinksItems = navLinks.querySelectorAll('a');
-                navLinksItems.forEach(link => {
-                    link.addEventListener('click', function() {
-                        navLinks.classList.remove('show');
-                        menuToggle.classList.remove('open');
+                // Close when clicking any nav or social link
+                navElements.forEach(container => {
+                    container.querySelectorAll('a').forEach(link => {
+                        link.addEventListener('click', function () {
+                            navElements.forEach(el => {
+                                el.setAttribute('style', 'display: none !important;');
+                            });
+                        });
                     });
                 });
             }
         });
+
+
+
     </script>
 
     <script>

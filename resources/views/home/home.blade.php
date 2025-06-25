@@ -96,7 +96,7 @@
         .scroll-wrapper {
             background-color: #d9d9d9;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            margin: 12px 15px;
+            margin: 5px 15px;
             padding: 0px;
             overflow-y: visible;
         }
@@ -149,6 +149,7 @@
             padding: 12px 0px 12px 0px;
             scroll-behavior: smooth;
             margin-top: 0.5px;
+            width: 1750px;
         }
 
         .filters {
@@ -641,7 +642,7 @@
 
 
 
-    <div class="scroll-wrapper">
+    <div class="scroll-wrapper container-fluid">
         <!-- Scroll buttons -->
         <button class="scroll-btn left-scroll" id="scrollLeft">
             <i class="fa fa-chevron-left"></i>
