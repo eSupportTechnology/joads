@@ -429,7 +429,7 @@
 
                         @auth
                             <!-- For authenticated users -->
-                            <div class="profile-dropdown">
+                            <div class="profile-dropdown" style="display:none !important;">
                                 <!-- Display First Letter of User's Name in a Circle -->
                                 <div class="profile-letter-circle">
                                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
@@ -549,16 +549,16 @@
         });
 
         // Close when clicking any nav/social link
-        navElements.forEach(container => {
-            container.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', function () {
-                    navElements.forEach(el => {
-                        el.setAttribute('style', 'display: none !important;');
-                    });
-                    menuOpen = false;
-                });
-            });
-        });
+        // navElements.forEach(container => {
+        //     container.querySelectorAll('a').forEach(link => {
+        //         link.addEventListener('click', function () {
+        //             navElements.forEach(el => {
+        //                 el.setAttribute('style', 'display: none !important;');
+        //             });
+        //             menuOpen = false;
+        //         });
+        //     });
+        // });
     }
 });
 

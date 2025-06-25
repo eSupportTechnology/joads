@@ -289,7 +289,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
             .sidebar {
                 padding: 10mm;
-                height: auto !important;
+                /* height: auto !important; */
                 break-inside: avoid-page;
             }
 
@@ -321,16 +321,25 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 margin-top: 10mm;
             }
         }
+        @media print {
+            .sidebar {
+                height: 1063px; /* Default height for shorter content */
+            }
+
+            .sidebar.tall {
+                height: 2185px; /* Taller version */
+            }
+        }
     </style>
 </head>
 
 <body>
     <?php
     use Illuminate\Support\Facades\Storage;
-    
+
     $profileImagePath = $user->profile_image ? 'profile_images/' . $user->profile_image : null;
     $imageSrc = null;
-    
+
     if ($profileImagePath && Storage::disk('public')->exists($profileImagePath)) {
         $imageFile = Storage::disk('public')->get($profileImagePath);
         $mimeType = Storage::disk('public')->mimeType($profileImagePath);
@@ -635,7 +644,12 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             const mainContent = document.querySelector('.main-content');
             const sidebar = document.querySelector('.sidebar');
             const totalHeight = mainContent.offsetHeight;
-            sidebar.style.height = totalHeight + 'px';
+            if (totalHeight <= 1122) {
+                sidebar.classList.remove('tall');
+            } else {
+                sidebar.classList.add('tall');
+            }
+            // sidebar.style.height = totalHeight + 'px';
         }
 
         window.addEventListener('load', adjustSidebarHeight);
