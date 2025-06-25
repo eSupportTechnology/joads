@@ -5,7 +5,7 @@
 <footer class="jobads-main-footer"
     style="background-color: #18799c; color: #fff; padding: 30px; text-align: center; border-radius: 50px 0 0 0;">
     <div class="jobads-footer-content"
-        style="display: flex; justify-content: space-between; gap: 40px; max-width: 1200px; margin: 0 auto; flex-wrap: wrap;">
+        style="display: flex; justify-content: space-between; gap: 40px; max-width: 1200px; margin: 0 auto; flex-wrap: wrap; margin-top: -25px;">
         <div class="jobads-footer-section" style="flex: 1; min-width: 250px; text-align: left;">
             <h3 style="font-size: 22px; font-weight: bold; margin-bottom: 15px; color: #fff;">About Us</h3>
             <p style="font-size: 16px; line-height: 1.6; color: #f0f0f0;">
