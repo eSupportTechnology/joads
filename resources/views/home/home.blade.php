@@ -634,6 +634,17 @@
                 grid-template-columns: repeat(5, 1fr);
             }
         }
+        .category-link {
+        transition: all 0.3s ease;
+    }
+
+    .category-link:hover {
+        background-color: #e0e0e0 !important;
+        color: black !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        position: relative;
+        top: -1px; /* slight lift */
+    }
     </style>
 
 </head>

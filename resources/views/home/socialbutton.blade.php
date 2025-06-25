@@ -51,9 +51,9 @@
     </style>
 </head>
 <body>
-    <div class="whatsapp-icon">
-        <a href="https://wa.me/94777580451" target="_blank" aria-label="Chat on WhatsApp">
-            <img src="{{ asset('whatsapp.jpeg') }}" alt="WhatsApp Icon">
+    <div class="whatsapp-icon" style="display: block !important;">
+        <a href="https://wa.me/94777580451" target="_blank" aria-label="Chat on WhatsApp" style="display: block !important;">
+            <img style="display: block !important;" src="{{ asset('whatsapp.jpeg') }}" alt="WhatsApp Icon">
         </a>
     </div>
 </body>
