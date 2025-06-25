@@ -93,7 +93,7 @@
     </div>
 
     <div class="jobads-footer-bottom"
-        style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
+        style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); margin-bottom: -28px;">
         <p style="font-size: 14px; color: #f4f4f4; margin: 0;">
             <footer>
                 <p>All Rights Reserved. © {{ date('Y') }} jobads.lk.</p>

@@ -234,7 +234,7 @@
         }
 
         .view-btn {
-            background: linear-gradient(135deg, #3a7ecc, #18799c);
+            background: rgb(107, 190, 212);
             color: white;
             border: none;
             padding: 12px 20px;
@@ -247,6 +247,7 @@
         }
 
         .view-btn:hover {
+            background: rgb(108, 157, 189);
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(58, 126, 204, 0.4);
         }
