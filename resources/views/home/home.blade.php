@@ -892,11 +892,11 @@
                             onclick="window.location='{{ route('job.details', $job->id) }}'">
                             <a href="{{ route('job.details', $job->id) }}"
                                 class="job-title block text-gray-900 hover:text-blue-600 transition-colors duration-150"
-                                style="font-size:15px; margin-bottom: 0px;">
+                                style="font-size:14px; margin-bottom: 0px;">
                                 {{ $job->title }}
                             </a>
                             <p class="company-name text-gray-700"
-                                style="font-size: 14px; margin-top: 2px; margin-bottom: 0px; font-weight:600; line-height:1;">
+                                style="font-size: 13px; margin-top: 2px; margin-bottom: 0px; font-weight:600; line-height:1;">
                                 {{ $job->employer == null ? '' : $job->employer->company_name }}
                             </p>
                             <p class="location text-gray-600"
