@@ -906,7 +906,7 @@
                             <div class="flex justify-between items-end mt-2"
                                 style="display: flex; justify-content: space-between;">
                                 <p class="text-red-600"
-                                    style="font-size: 12px; color:rgba(255, 0, 0, 0.6); font-weight: 700; margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
+                                    style="font-size: 12px; color:rgba(255, 0, 0, 0.6); margin-top: 3px; margin-bottom: 0px; line-height: 1.2;">
                                     {{ \Carbon\Carbon::parse($job->approved_date)->format('d-M') }} - {{ \Carbon\Carbon::parse($job->closing_date)->format('d-M') }}
                                 </p>
                                 <p class="text-gray-500"

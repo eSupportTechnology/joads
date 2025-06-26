@@ -96,7 +96,7 @@
         style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); margin-bottom: -28px;">
         <p style="font-size: 14px; color: #f4f4f4; margin: 0;">
             <footer>
-                <p>All Rights Reserved. © {{ date('Y') }} jobads.lk.</p>
+                <p>All Rights Reserved. © 2024 - {{ date('Y') }} jobads.lk.</p>
             </footer>
         </p>
     </div>
