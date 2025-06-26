@@ -300,7 +300,7 @@ class JobPostingController extends Controller
             ->when($location, fn($query) => $query->where('location', 'like', "%{$location}%"))
             ->when($countryId, fn($query) => $query->where('country_id', $countryId))
             ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
-            ->orderBy('approved_date', 'asc') // Use 'desc' if you want the newest jobs first
+            ->orderBy('approved_date', 'desc') // Use 'desc' if you want the newest jobs first
             ->paginate($categoryId && $categoryId != 45 ? 50 : 300);
 
 
