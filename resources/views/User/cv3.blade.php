@@ -97,7 +97,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         }
 
         .section-title {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
             color: #eee;
             margin: 15px 0;
@@ -154,7 +154,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         }
 
         .profile-text {
-            background-color: #f8f9fa;
+            background-color: white;
             border-radius: 5px;
             text-align: left;
             width: 90%;
@@ -298,12 +298,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 height: auto !important;
             }
 
-            .main-content>.content-wrapper::before,
-            .sidebar::before {
-                content: '';
-                display: block;
-                height: 10mm;
-            }
+
 
             .section-title {
                 margin: 6mm 0;
@@ -329,7 +324,13 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             .sidebar.tall {
                 height: 2185px; /* Taller version */
             }
+            .content-wrapper {
+                margin-top:25px !important;
+            }
         }
+        .content-wrapper {
+                margin-top:-35px !important;
+            }
     </style>
 </head>
 
@@ -620,7 +621,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 </div>
 
                 <div class="signature-section">
-                    <p style="text-align: center; margin-bottom: 25px;">I hereby certify that the particulars given
+                    <p style="text-align: center; margin-bottom: 25px; margin-top:-15px;">I hereby certify that the particulars given
                         above are true and correct to the best of my knowledge.</p>
                     <div class="signature-container">
                         <div class="signature-block">
