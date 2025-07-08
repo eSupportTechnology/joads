@@ -186,9 +186,7 @@
             </div>
             <div style="grid-column: span 3;">
                 <label for="title">Title</label>
-                <div id="editor-title" class="editor-container">
-                    {!! Auth::user()->title ?? '' !!}
-                </div>
+                <textarea id="editor-title">{{ Auth::user()->title ?? '' }}</textarea>
                 <input type="hidden" name="title" class="title-input">
             </div>
             <div class="profile-image-section">
@@ -292,14 +290,14 @@
             <!-- Skills Editor -->
             <div style="grid-column: span 3;">
                 <label for="skills">Skills <span class="required">*</span></label>
-                <div id="editor-skills" class="editor-container">{!! Auth::user()->skills !!}</div>
+                <textarea id="editor-skills">{{ Auth::user()->skills ?? '' }}</textarea>
                 <input type="hidden" name="skills" class="skills-input">
             </div>
 
             <!-- Certifications Editor -->
             <div style="grid-column: span 3;">
                 <label for="certifications">Certifications <span class="required">*</span></label>
-                <div id="editor-certifications" class="editor-container">{!! Auth::user()->certifications !!}</div>
+                <textarea id="editor-certifications">{{ Auth::user()->certifications ?? '' }}</textarea>
                 <input type="hidden" name="certifications" class="certifications-input">
             </div>
             <div>
@@ -315,18 +313,14 @@
             <!-- Referees 1 -->
             <div style="grid-column: span 3;">
                 <label for="referees">Referees 1</label>
-                <div id="editor-referees1" class="editor-container">
-                    {!! Auth::user()->referees !!}
-                </div>
+                <textarea id="editor-referees">{{ Auth::user()->referees ?? '' }}</textarea>
                 <input type="hidden" name="referees" class="referees1-input">
             </div>
 
             <!-- Referees 2 -->
             <div style="grid-column: span 3;">
                 <label for="referees2">Referees 2</label>
-                <div id="editor-referees2" class="editor-container">
-                    {!! Auth::user()->referees2 !!}
-                </div>
+                <textarea id="editor-referees2">{{ Auth::user()->referees2 ?? '' }}</textarea>
                 <input type="hidden" name="referees2" class="referees2-input">
             </div>
             <div>
@@ -347,60 +341,7 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script>
-        // Initialize TinyMCE for skills and certifications
-        document.addEventListener('DOMContentLoaded', function() {
-            // Common configuration for both editors
-            const editorConfig = {
-                height: 300,
-                menubar: false,
-                plugins: [
-                    'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
-                    'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                    'insertdatetime', 'table', 'code', 'help', 'wordcount'
-                ],
-                toolbar: 'undo redo | formatselect | ' +
-                    'bold italic backcolor | alignleft aligncenter ' +
-                    'alignright alignjustify | bullist numlist outdent indent | ' +
-                    'removeformat | help',
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                init_instance_callback: function(editor) {
-                    // Set initial content from the editor div
-                    const editorContainer = document.getElementById(editor.id);
-                    editor.setContent(editorContainer.innerHTML);
 
-                    // Update hidden input with initial content
-                    const inputName = editor.id.replace('editor-', '');
-                    const hiddenInput = document.querySelector(`input[name="${inputName}"]`);
-                    if (hiddenInput) {
-                        hiddenInput.value = editor.getContent();
-                    }
-                },
-                setup: function(editor) {
-                    editor.on('change keyup', function() {
-                        // Get the corresponding hidden input
-                        const inputName = editor.id.replace('editor-', '');
-                        const hiddenInput = document.querySelector(`input[name="${inputName}"]`);
-                        if (hiddenInput) {
-                            hiddenInput.value = editor.getContent();
-                        }
-                    });
-                }
-            };
-
-            // Initialize TinyMCE for skills
-            tinymce.init({
-                ...editorConfig,
-                selector: '#editor-skills'
-            });
-
-            // Initialize TinyMCE for certifications
-            tinymce.init({
-                ...editorConfig,
-                selector: '#editor-certifications'
-            });
-        });
-    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const profileImageInput = document.getElementById('profile_image');
@@ -571,77 +512,62 @@
         @endif
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Common configuration for TinyMCE editors
-            const editorConfig = {
-                height: 300,
-                menubar: false,
-                plugins: [
-                    'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
-                    'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                    'insertdatetime', 'table', 'code', 'help', 'wordcount'
-                ],
-                toolbar: 'undo redo | formatselect | ' +
-                    'bold italic backcolor | alignleft aligncenter ' +
-                    'alignright alignjustify | bullist numlist outdent indent | ' +
-                    'removeformat | help',
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                init_instance_callback: function(editor) {
-                    // Set initial content from the editor div
-                    const editorContainer = document.getElementById(editor.id);
-                    editor.setContent(editorContainer.innerHTML);
-
-                    // Update hidden input with initial content
-                    const inputName = editor.id.replace('editor-', '');
-                    const hiddenInput = document.querySelector(
-                        `input[name="${inputName.replace('1', '')}"]`);
-                    if (hiddenInput) {
-                        hiddenInput.value = editor.getContent();
-                    }
-                },
-                setup: function(editor) {
-                    editor.on('change keyup', function() {
-                        // Update the corresponding hidden input
-                        const inputName = editor.id.replace('editor-', '');
-                        const hiddenInput = document.querySelector(
-                            `input[name="${inputName.replace('1', '')}"]`);
-                        if (hiddenInput) {
-                            hiddenInput.value = editor.getContent();
-                        }
-                    });
+       document.addEventListener('DOMContentLoaded', function () {
+    const editorConfig = {
+        selector: '',
+        height: 300,
+        menubar: false,
+        plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
+            'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'table', 'code', 'help', 'wordcount'
+        ],
+        toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | ' +
+            'bullist numlist outdent indent | fontsizeselect | removeformat | help',
+        fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
+        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+        style_formats: [
+            {
+                title: 'Font size',
+                items: [
+                    { title: '8pt', inline: 'span', styles: { fontSize: '8pt' } },
+                    { title: '10pt', inline: 'span', styles: { fontSize: '10pt' } },
+                    { title: '12pt', inline: 'span', styles: { fontSize: '12pt' } },
+                    { title: '14pt', inline: 'span', styles: { fontSize: '14pt' } },
+                    { title: '18pt', inline: 'span', styles: { fontSize: '18pt' } },
+                    { title: '24pt', inline: 'span', styles: { fontSize: '24pt' } },
+                    { title: '36pt', inline: 'span', styles: { fontSize: '36pt' } },
+                ]
+            }
+        ],
+        init_instance_callback: function (editor) {
+            const inputName = editor.id.replace('editor-', '');
+            const hiddenInput = document.querySelector(`input[name="${inputName}"]`);
+            if (hiddenInput) {
+                hiddenInput.value = editor.getContent();
+            }
+        },
+        setup: function (editor) {
+            editor.on('change keyup', function () {
+                const inputName = editor.id.replace('editor-', '');
+                const hiddenInput = document.querySelector(`input[name="${inputName}"]`);
+                if (hiddenInput) {
+                    hiddenInput.value = editor.getContent();
                 }
-            };
-
-            // Initialize TinyMCE for title
-            tinymce.init({
-                ...editorConfig,
-                selector: '#editor-title'
             });
+        }
+    };
 
-            // Initialize TinyMCE for skills
-            tinymce.init({
-                ...editorConfig,
-                selector: '#editor-skills'
-            });
-
-            // Initialize TinyMCE for certifications
-            tinymce.init({
-                ...editorConfig,
-                selector: '#editor-certifications'
-            });
-
-            // Initialize TinyMCE for referees1
-            tinymce.init({
-                ...editorConfig,
-                selector: '#editor-referees1'
-            });
-
-            // Initialize TinyMCE for referees2
-            tinymce.init({
-                ...editorConfig,
-                selector: '#editor-referees2'
-            });
+    // Initialize all editors
+    ['#editor-title', '#editor-skills', '#editor-certifications', '#editor-referees', '#editor-referees2'].forEach(selector => {
+        tinymce.init({
+            ...editorConfig,
+            selector: selector
         });
+    });
+});
+
+
     </script>
 </body>
 

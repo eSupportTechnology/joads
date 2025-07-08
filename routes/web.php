@@ -123,6 +123,7 @@ Route::middleware('guest')->group(function () {
 // })->name('user.jobseekerprofile.personal');
 
 Route::get('profile/education', [EducationController::class, 'showEducation'])->middleware('auth')->name('user.jobseekerprofile.education');
+Route::get('profile/education-academic', [EducationController::class, 'showAcademicEducation'])->middleware('auth')->name('user.jobseekerprofile.education-academic');
 
 // routes/web.php
 
@@ -136,6 +137,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('profile/education/{id}/delete', [EducationController::class, 'destroy'])
         ->name('education.delete');
+
+        Route::post('profile/academic-education', [EducationController::class, 'academicStore'])
+        ->name('academic-education.store');
+
+    Route::put('profile/academic-education/{id}', [EducationController::class, 'academicUpdate'])
+        ->name('academic-education.update');
+
+    Route::get('profile/academic-education/{id}/delete', [EducationController::class, 'academicDestroy'])
+        ->name('academic-education.delete');
 });
 
 // List all press releases
@@ -959,7 +969,7 @@ Route::middleware(['auth:admin'])->group(function () {
 
     Route::get('/reports/customers', [JobPostingController::class, 'generateCustomerReport'])
         ->name('reports.customers')->middleware('check.permission:reports.customers');
-    
+
     Route::get('/reports/performance',[PerformanceReportController::class, 'index'])->name('reports.performance')->middleware('check.permission:reports.performance');
 
     //settings management

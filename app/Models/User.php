@@ -80,6 +80,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(JobEducation::class, 'job_seeker_id');
     }
+
+    public function jobAcademicEducations()
+    {
+        return $this->hasMany(JobAcademicEducation::class, 'job_seeker_id');
+    }
     public function applications()
     {
         return $this->hasMany(Application::class, 'user_id');

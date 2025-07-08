@@ -173,7 +173,7 @@ class ProfileController extends Controller
 
         return $pdf->download('cv.pdf');
     }
-    
+
     public function generateCv2()
     {
         $user = auth()->user();

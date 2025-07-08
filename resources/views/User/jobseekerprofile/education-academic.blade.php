@@ -172,10 +172,10 @@
 
     <div class="check">
         <div class="education-container">
-            <h2 class="section-header">Professional Qualifications</h2>
+            <h2 class="section-header">Academic Qualifications</h2>
 
-            @foreach (auth()->user()->jobEducations ?? [] as $education)
-                <form method="POST" action="{{ route('education.update', $education->id) }}"
+            @foreach (auth()->user()->jobAcademicEducations ?? [] as $education)
+                <form method="POST" action="{{ route('academic-education.update', $education->id) }}"
                     class="education-form mb-4">
                     @csrf
                     @method('PUT')
@@ -215,7 +215,7 @@
                         <div class="form-row mt-2">
                             <div class="col">
                                 <button type="submit" class="btn btn-success">Update</button>
-                                <a href="{{ route('education.delete', $education->id) }}"
+                                <a href="{{ route('academic-education.delete', $education->id) }}"
                                     onclick="return confirm('Are you sure you want to delete this education record?')"
                                     class="btn btn-danger">Delete</a>
                             </div>
@@ -225,7 +225,7 @@
             @endforeach
 
             <h3 class="mt-4">Add New Qualification</h3>
-            <form method="POST" action="{{ route('education.store') }}" id="newEducationForm">
+            <form method="POST" action="{{ route('academic-education.store') }}" id="newEducationForm">
                 @csrf
                 <input type="hidden" name="job_seeker_id" value="{{ auth()->id() }}">
 
