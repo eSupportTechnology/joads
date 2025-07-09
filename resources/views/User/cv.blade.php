@@ -88,7 +88,6 @@ $job_posting_id = request()->query('job_posting_id');
         }
 
         .section {
-            margin: 15px 0;
         }
 
         .section-title {
@@ -133,10 +132,8 @@ $job_posting_id = request()->query('job_posting_id');
         }
 
         .signature-section {
-            padding: 20px;
             background: var(--light-gray);
             border-radius: 8px;
-            margin-top: 20px;
         }
 
         table {
@@ -148,6 +145,11 @@ $job_posting_id = request()->query('job_posting_id');
         }
         .main-top {
             margin-left:20px;
+        }
+        .mobile-email {
+            display: flex;
+            justify-content: start;
+            gap: 25px;
         }
     </style>
 </head>
@@ -247,7 +249,7 @@ $job_posting_id = request()->query('job_posting_id');
                                 <i class="fas fa-map-marker-alt"></i> {{ $user->address }}
                             </div>
                             <?php endif; ?>
-                            <div class="social-links">
+                            <div class="social-links mobile-email">
                                 <?php if ($user->phone_number): ?>
                                 <div class="contact-item">
                                     <i class="fas fa-phone"></i> {{ $user->phone_number }}
@@ -285,10 +287,10 @@ $job_posting_id = request()->query('job_posting_id');
                 $user->gender ||
                 $user->nationality ||
                 $user->nic_no)
-            <div class="section">
+            <div class="section" style="margin-top: 25px;">
                 <h2 class="section-title">PERSONAL DETAILS</h2>
                 <div class="summary">
-                    <table style="width: 100%;">
+                    <table style="width: 100%; line-height: normal;">
                         <tbody>
                             @if ($user->fullname)
                                 <tr>
@@ -349,7 +351,7 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($user->summary)
             <div class="section">
                 <h2 class="section-title">PROFESSIONAL SUMMARY</h2>
-                <div class="summary">
+                <div class="summary" style="text-align: justify;">
                     {{ $user->summary }}
                 </div>
             </div>
@@ -358,7 +360,7 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($user->skills)
             <div class="section">
                 <h2 class="section-title">EXPERTISE</h2>
-                <div class=" expertise">
+                <div class=" expertise" style="margin-left: 20px;">
                     {!! $user->skills !!}
                 </div>
             </div>
@@ -398,8 +400,32 @@ $job_posting_id = request()->query('job_posting_id');
 
         @if ($educations && $educations->count() > 0)
             <div class="section">
-                <h2 class="section-title">Education</h2>
+                <h2 class="section-title">Professional Qualifications</h2>
                 @foreach ($educations as $education)
+                    <div class="education-item">
+                        <div class="education-header">
+                            <div>
+                                <div class="degree">{{ $education->degree }} in {{ $education->institution_name }}
+                                </div>
+                                <div class="field-of-study">
+                                    {!! $education->field_of_study !!}
+                                </div>
+                                <div class="institution">{{ $education->institution_name }}</div>
+                            </div>
+                            <div class="date-range">
+                                {{ \Carbon\Carbon::parse($education->start_date)->format('M Y') }} -
+                                {{ $education->end_date ? \Carbon\Carbon::parse($education->end_date)->format('M Y') : 'Present' }}
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        @if ($academicEducations && $educations->count() > 0)
+            <div class="section">
+                <h2 class="section-title">Academic Qualifications</h2>
+                @foreach ($academicEducations as $education)
                     <div class="education-item">
                         <div class="education-header">
                             <div>
@@ -441,22 +467,22 @@ $job_posting_id = request()->query('job_posting_id');
                 belief.
             </p>
             <div class="signature-container"
-                style="display: flex; justify-content: space-between; padding: 20px; align-items: flex-start;">
+                style="display: flex; justify-content: space-between; padding: 9px; align-items: flex-start;">
                 <div class="signature-block" style="margin-right: 40px;">
-                    <p style="margin-top: 10px;">
+                    <p style="margin-top: 10px; display:flex; justify-content:center;">
                         {{ $user->name }}
                     </p>
                     <div class="signature-line" style="border-bottom: 1px solid var(--primary-color1); width: 200px;">
                     </div>
-                    <div class="signature-label">Name and Signature</div>
+                    <div class="signature-label" style="display:flex; justify-content:center;">Name and Signature</div>
                 </div>
                 <div class="date-block">
-                    <p style="margin-top: 10px;">
+                    <p style="margin-top: 10px; display:flex; justify-content:center;">
                         {{ date('d/m/Y') }}
                     </p>
                     <div class="signature-line" style="border-bottom: 1px solid var(--primary-color1); width: 200px;">
                     </div>
-                    <div class="signature-label">Date</div>
+                    <div class="signature-label" style="display:flex; justify-content:center;">Date</div>
                 </div>
             </div>
         </div>
