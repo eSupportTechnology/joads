@@ -224,7 +224,7 @@ $job_posting_id = request()->query('job_posting_id');
             border: 4px solid var(--secondary-color);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             position: relative;
-            margin-top: 15px;
+            margin-top: 13px;
         }
 
         .profile-image {
