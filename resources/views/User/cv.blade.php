@@ -68,6 +68,37 @@ $job_posting_id = request()->query('job_posting_id');
             .color-selection {
                 display: none !important;
             }
+
+            .it-secction, .experience-item, .signature-container {
+                page-break-inside: avoid;
+                break-inside: avoid;
+                display: block;
+            }
+            .experience-item * {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .experience-item p {
+            margin: 0 !important;
+            padding: 0;
+        }
+
+        .experience-item {
+            margin-top: 12px;
+        }
+
+        .experience-item:first-of-type {
+            margin-top: 0;
+        }
+        .section {
+            margin-top: 25px;
+        }
+        .education-item {
+            margin-bottom: 15px;
+        }
         }
 
         .download-btn-container {
@@ -106,14 +137,11 @@ $job_posting_id = request()->query('job_posting_id');
         .expertise,
         .experience-item,
         .education-item {
-            padding: 10px;
+            padding-left: 10px;
             background: var(--light-gray);
-            border-radius: 8px;
-            margin-bottom: 10px;
         }
 
-        .experience-header,
-        .education-header {
+        .experience-header, .academic-header {
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
@@ -151,6 +179,33 @@ $job_posting_id = request()->query('job_posting_id');
             justify-content: start;
             gap: 25px;
         }
+
+        .experience-item * {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .experience-item p {
+            margin: 0 !important;
+            padding: 0;
+        }
+
+        .experience-item {
+            margin-top: 12px;
+        }
+
+        .experience-item:first-of-type {
+            margin-top: 0;
+        }
+        .section {
+            margin-top: 25px;
+        }
+        .education-item {
+            margin-bottom: 15px;
+        }
+
     </style>
 </head>
 
@@ -287,7 +342,7 @@ $job_posting_id = request()->query('job_posting_id');
                 $user->gender ||
                 $user->nationality ||
                 $user->nic_no)
-            <div class="section" style="margin-top: 25px;">
+            <div class="section">
                 <h2 class="section-title">PERSONAL DETAILS</h2>
                 <div class="summary">
                     <table style="width: 100%; line-height: normal;">
@@ -367,9 +422,9 @@ $job_posting_id = request()->query('job_posting_id');
         @endif
 
         @if ($user->certifications)
-            <div class="section">
+            <div class="section it-secction">
                 <h2 class="section-title">IT & COMPUTER SKILLS</h2>
-                <div class="expertise">
+                <div class="expertise" style="margin-left: 20px;">
                     {!! $user->certifications !!}
                 </div>
             </div>
@@ -395,15 +450,16 @@ $job_posting_id = request()->query('job_posting_id');
                         </div>
                     </div>
                 @endforeach
+
             </div>
         @endif
 
         @if ($educations && $educations->count() > 0)
-            <div class="section">
+            <div class="section" style="margin-top: 25px;">
                 <h2 class="section-title">Professional Qualifications</h2>
                 @foreach ($educations as $education)
                     <div class="education-item">
-                        <div class="education-header">
+                        <div class="education-header academic-header">
                             <div>
                                 <div class="degree">{{ $education->degree }} in {{ $education->institution_name }}
                                 </div>
@@ -422,7 +478,7 @@ $job_posting_id = request()->query('job_posting_id');
             </div>
         @endif
 
-        @if ($academicEducations && $educations->count() > 0)
+        @if ($academicEducations && $academicEducations->count() > 0)
             <div class="section">
                 <h2 class="section-title">Academic Qualifications</h2>
                 @foreach ($academicEducations as $education)
@@ -434,11 +490,13 @@ $job_posting_id = request()->query('job_posting_id');
                                 <div class="field-of-study">
                                     {!! $education->field_of_study !!}
                                 </div>
-                                <div class="institution">{{ $education->institution_name }}</div>
                             </div>
-                            <div class="date-range">
-                                {{ \Carbon\Carbon::parse($education->start_date)->format('M Y') }} -
-                                {{ $education->end_date ? \Carbon\Carbon::parse($education->end_date)->format('M Y') : 'Present' }}
+                            <div style="display: flex; justify-content: space-between;">
+                                <div class="institution">{{ $education->institution_name }}</div>
+                                <div class="date-range">
+                                    {{ \Carbon\Carbon::parse($education->start_date)->format('M Y') }} -
+                                    {{ $education->end_date ? \Carbon\Carbon::parse($education->end_date)->format('M Y') : 'Present' }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -449,7 +507,7 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($user->referees && $user->referees2)
             <div class="section">
                 <h2 class="section-title">REFEREES</h2>
-                <div style="display: flex; justify-content: space-between;padding: 0px 20px">
+                <div style="display: flex; justify-content: space-between;">
                     <div class="education-item">
                         {!! $user->referees !!}
                     </div>
@@ -462,7 +520,7 @@ $job_posting_id = request()->query('job_posting_id');
 
         <!-- Signature Section -->
         <div class="section signature-section">
-            <p style="text-align: left; margin-left: 10px;">
+            <p style="text-align: left; margin-left: 10px; margin-top:-60px;">
                 I confirm that the above-mentioned particulars are true and accurate to the best of my knowledge and
                 belief.
             </p>

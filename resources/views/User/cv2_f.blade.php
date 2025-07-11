@@ -68,37 +68,6 @@ $job_posting_id = request()->query('job_posting_id');
             .color-selection {
                 display: none !important;
             }
-
-            .it-secction, .experience-item, .signature-container {
-                page-break-inside: avoid;
-                break-inside: avoid;
-                display: block;
-            }
-            .experience-item * {
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
-            padding-top: 0;
-            padding-bottom: 0;
-        }
-
-        .experience-item p {
-            margin: 0 !important;
-            padding: 0;
-        }
-
-        .experience-item {
-            margin-top: 12px;
-        }
-
-        .experience-item:first-of-type {
-            margin-top: 0;
-        }
-        .section {
-            margin-top: 25px;
-        }
-        .education-item {
-            margin-bottom: 15px;
-        }
         }
 
         .download-btn-container {
@@ -119,6 +88,7 @@ $job_posting_id = request()->query('job_posting_id');
         }
 
         .section {
+            margin: 15px 0;
         }
 
         .section-title {
@@ -137,11 +107,14 @@ $job_posting_id = request()->query('job_posting_id');
         .expertise,
         .experience-item,
         .education-item {
-            padding-left: 10px;
+            padding: 10px;
             background: var(--light-gray);
+            border-radius: 8px;
+            margin-bottom: 10px;
         }
 
-        .experience-header, .academic-header {
+        .experience-header,
+        .education-header {
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
@@ -160,8 +133,10 @@ $job_posting_id = request()->query('job_posting_id');
         }
 
         .signature-section {
+            padding: 20px;
             background: var(--light-gray);
             border-radius: 8px;
+            margin-top: 20px;
         }
 
         table {
@@ -170,40 +145,6 @@ $job_posting_id = request()->query('job_posting_id');
 
         td {
             padding: 4px;
-        }
-        .main-top {
-            margin-left:20px;
-        }
-        .mobile-email {
-            display: flex;
-            justify-content: start;
-            gap: 25px;
-        }
-
-        .experience-item * {
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
-            padding-top: 0;
-            padding-bottom: 0;
-        }
-
-        .experience-item p {
-            margin: 0 !important;
-            padding: 0;
-        }
-
-        .experience-item {
-            margin-top: 12px;
-        }
-
-        .experience-item:first-of-type {
-            margin-top: 0;
-        }
-        .section {
-            margin-top: 25px;
-        }
-        .education-item {
-            margin-bottom: 15px;
         }
         .main-top {
             margin-left:20px;
@@ -233,13 +174,12 @@ $job_posting_id = request()->query('job_posting_id');
         .profile-image {
             width: 100%;
             height: 100%;
-            object-fit: fill;
+            object-fit: cover;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
         }
-
     </style>
 </head>
 
@@ -338,7 +278,7 @@ $job_posting_id = request()->query('job_posting_id');
                                 <i class="fas fa-map-marker-alt"></i> {{ $user->address }}
                             </div>
                             <?php endif; ?>
-                            <div class="social-links mobile-email">
+                            <div class="social-links">
                                 <?php if ($user->phone_number): ?>
                                 <div class="contact-item">
                                     <i class="fas fa-phone"></i> {{ $user->phone_number }}
@@ -386,7 +326,7 @@ $job_posting_id = request()->query('job_posting_id');
             <div class="section">
                 <h2 class="section-title">PERSONAL DETAILS</h2>
                 <div class="summary">
-                    <table style="width: 100%; line-height: normal;">
+                    <table style="width: 100%;">
                         <tbody>
                             @if ($user->fullname)
                                 <tr>
@@ -447,7 +387,7 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($user->summary)
             <div class="section">
                 <h2 class="section-title">PROFESSIONAL SUMMARY</h2>
-                <div class="summary" style="text-align: justify;">
+                <div class="summary">
                     {{ $user->summary }}
                 </div>
             </div>
@@ -456,16 +396,16 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($user->skills)
             <div class="section">
                 <h2 class="section-title">EXPERTISE</h2>
-                <div class=" expertise" style="margin-left: 20px;">
+                <div class=" expertise">
                     {!! $user->skills !!}
                 </div>
             </div>
         @endif
 
         @if ($user->certifications)
-            <div class="section it-secction">
+            <div class="section">
                 <h2 class="section-title">IT & COMPUTER SKILLS</h2>
-                <div class="expertise" style="margin-left: 20px;">
+                <div class="expertise">
                     {!! $user->certifications !!}
                 </div>
             </div>
@@ -491,16 +431,15 @@ $job_posting_id = request()->query('job_posting_id');
                         </div>
                     </div>
                 @endforeach
-
             </div>
         @endif
 
         @if ($educations && $educations->count() > 0)
-            <div class="section" style="margin-top: 25px;">
-                <h2 class="section-title">Professional Qualifications</h2>
+            <div class="section">
+                <h2 class="section-title">Education</h2>
                 @foreach ($educations as $education)
                     <div class="education-item">
-                        <div class="education-header academic-header">
+                        <div class="education-header">
                             <div>
                                 <div class="degree">{{ $education->degree }} in {{ $education->institution_name }}
                                 </div>
@@ -519,36 +458,10 @@ $job_posting_id = request()->query('job_posting_id');
             </div>
         @endif
 
-        @if ($academicEducations && $academicEducations->count() > 0)
-            <div class="section">
-                <h2 class="section-title">Academic Qualifications</h2>
-                @foreach ($academicEducations as $education)
-                    <div class="education-item">
-                        <div class="education-header">
-                            <div>
-                                <div class="degree">{{ $education->degree }} in {{ $education->institution_name }}
-                                </div>
-                                <div class="field-of-study">
-                                    {!! $education->field_of_study !!}
-                                </div>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <div class="institution">{{ $education->institution_name }}</div>
-                                <div class="date-range">
-                                    {{ \Carbon\Carbon::parse($education->start_date)->format('M Y') }} -
-                                    {{ $education->end_date ? \Carbon\Carbon::parse($education->end_date)->format('M Y') : 'Present' }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @endif
-
         @if ($user->referees && $user->referees2)
             <div class="section">
                 <h2 class="section-title">REFEREES</h2>
-                <div style="display: flex; justify-content: space-between;">
+                <div style="display: flex; justify-content: space-between;padding: 0px 20px">
                     <div class="education-item">
                         {!! $user->referees !!}
                     </div>
@@ -561,27 +474,27 @@ $job_posting_id = request()->query('job_posting_id');
 
         <!-- Signature Section -->
         <div class="section signature-section">
-            <p style="text-align: left; margin-left: 10px; margin-top:-60px;">
+            <p style="text-align: left; margin-left: 10px;">
                 I confirm that the above-mentioned particulars are true and accurate to the best of my knowledge and
                 belief.
             </p>
             <div class="signature-container"
-                style="display: flex; justify-content: space-between; padding: 9px; align-items: flex-start;">
+                style="display: flex; justify-content: space-between; padding: 20px; align-items: flex-start;">
                 <div class="signature-block" style="margin-right: 40px;">
-                    <p style="margin-top: 10px; display:flex; justify-content:center;">
+                    <p style="margin-top: 10px;">
                         {{ $user->name }}
                     </p>
                     <div class="signature-line" style="border-bottom: 1px solid var(--primary-color1); width: 200px;">
                     </div>
-                    <div class="signature-label" style="display:flex; justify-content:center;">Name and Signature</div>
+                    <div class="signature-label">Name and Signature</div>
                 </div>
                 <div class="date-block">
-                    <p style="margin-top: 10px; display:flex; justify-content:center;">
+                    <p style="margin-top: 10px;">
                         {{ date('d/m/Y') }}
                     </p>
                     <div class="signature-line" style="border-bottom: 1px solid var(--primary-color1); width: 200px;">
                     </div>
-                    <div class="signature-label" style="display:flex; justify-content:center;">Date</div>
+                    <div class="signature-label">Date</div>
                 </div>
             </div>
         </div>

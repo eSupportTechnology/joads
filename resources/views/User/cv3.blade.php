@@ -324,6 +324,12 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             .sidebar.tall {
                 height: 2185px; /* Taller version */
             }
+            .sidebar.tall2 {
+                height: 3277px; /* Taller version */
+            }
+            .sidebar.tall3 {
+                height: 4370.5px; /* Taller version */
+            }
             .content-wrapper {
                 margin-top:25px !important;
             }
@@ -647,8 +653,18 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             const totalHeight = mainContent.offsetHeight;
             if (totalHeight <= 1122) {
                 sidebar.classList.remove('tall');
-            } else {
+            } else if(totalHeight > 1122 && totalHeight < 2244) {
+                sidebar.classList.remove('tall2');
+                sidebar.classList.remove('tall3');
                 sidebar.classList.add('tall');
+            } else if(totalHeight > 2244 && totalHeight < 3366) {
+                sidebar.classList.add('tall2');
+                sidebar.classList.remove('tall');
+                sidebar.classList.remove('tall3');
+            } else if(totalHeight > 3366 && totalHeight < 4488) {
+                sidebar.classList.remove('tall2');
+                sidebar.classList.remove('tall');
+                sidebar.classList.add('tall3');
             }
             // sidebar.style.height = totalHeight + 'px';
         }

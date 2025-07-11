@@ -19,7 +19,7 @@
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            object-fit: cover;
+            object-fit: fill;
             margin-bottom: 10px;
             border: 3px solid #ddd;
         }
@@ -227,9 +227,9 @@
                     id="linkedin">
             </div>
 
-            <div>
+            <div style="grid-column: span 3;">
                 <label for="summary">Professional Summary</label>
-                <textarea name="summary" id="summary" class="personalprofile">{{ Auth::user()->summary }}</textarea>
+                <textarea style="height:200px;" name="summary" cols="30" id="summary" class="personalprofile">{{ Auth::user()->summary }}</textarea>
             </div>
 
             <div>

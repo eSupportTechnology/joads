@@ -89,14 +89,14 @@ class ProfileController extends Controller
                 $user->save();
             }
 
-            $user->jobEducations()->delete();
-            if ($request->has('educations')) {
-                foreach ($request->input('educations', []) as $education) {
-                    if (!empty($education['institution_name']) && !empty($education['degree'])) {
-                        $user->jobEducations()->create($education);
-                    }
-                }
-            }
+            // $user->jobEducations()->delete();
+            // if ($request->has('educations')) {
+            //     foreach ($request->input('educations', []) as $education) {
+            //         if (!empty($education['institution_name']) && !empty($education['degree'])) {
+            //             $user->jobEducations()->create($education);
+            //         }
+            //     }
+            // }
         });
 
         return redirect()->route('profile.edit')
