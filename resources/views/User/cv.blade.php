@@ -172,7 +172,7 @@ $job_posting_id = request()->query('job_posting_id');
             padding: 4px;
         }
         .main-top {
-            margin-left:20px;
+            margin-left:13px;
         }
         .mobile-email {
             display: flex;
