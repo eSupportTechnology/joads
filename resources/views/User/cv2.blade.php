@@ -205,9 +205,6 @@ $job_posting_id = request()->query('job_posting_id');
         .education-item {
             margin-bottom: 15px;
         }
-        .main-top {
-            margin-left:20px;
-        }
         .header-content {
             display: flex;
             justify-content: space-between;
