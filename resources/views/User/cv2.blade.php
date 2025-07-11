@@ -581,7 +581,7 @@ $job_posting_id = request()->query('job_posting_id');
                     <p style="margin-top: 10px; display:flex; justify-content:center;">
                         {{ $user->name }}
                     </p>
-                    <div class="signature-line" style="border-bottom: 1px solid var(--primary-color1); width: 200px;">
+                    <div class="signature-line" style="border-bottom: 1px solid var(--primary-color1); width: auto;">
                     </div>
                     <div class="signature-label" style="display:flex; justify-content:center;">Name and Signature</div>
                 </div>
@@ -589,7 +589,7 @@ $job_posting_id = request()->query('job_posting_id');
                     <p style="margin-top: 10px; display:flex; justify-content:center;">
                         {{ date('d/m/Y') }}
                     </p>
-                    <div class="signature-line" style="border-bottom: 1px solid var(--primary-color1); width: 200px;">
+                    <div class="signature-line" style="border-bottom: 1px solid var(--primary-color1); width: auto;">
                     </div>
                     <div class="signature-label" style="display:flex; justify-content:center;">Date</div>
                 </div>
