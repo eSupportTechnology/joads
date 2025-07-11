@@ -387,7 +387,7 @@ $job_posting_id = request()->query('job_posting_id');
                 $user->gender ||
                 $user->nationality ||
                 $user->nic_no)
-            <div class="section">
+            <div class="section" style="margin-top:2px;">
                 <h2 class="section-title">PERSONAL DETAILS</h2>
                 <div class="summary">
                     <table style="width: 100%; line-height: normal; margin-top:5px;">
