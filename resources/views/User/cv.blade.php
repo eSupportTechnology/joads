@@ -347,7 +347,7 @@ $job_posting_id = request()->query('job_posting_id');
                 $user->nic_no)
             <div class="section">
                 <h2 class="section-title">PERSONAL DETAILS</h2>
-                <div class="summary">
+                <div class="summary" style="margin-top:5px;">
                     <table style="width: 100%; line-height: normal;">
                         <tbody>
                             @if ($user->fullname)
@@ -409,7 +409,7 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($user->summary)
             <div class="section">
                 <h2 class="section-title">PROFESSIONAL SUMMARY</h2>
-                <div class="summary" style="text-align: justify;">
+                <div class="summary" style="text-align: justify; margin-top:5px;">
                     {{ $user->summary }}
                 </div>
             </div>
@@ -418,7 +418,7 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($user->skills)
             <div class="section">
                 <h2 class="section-title">EXPERTISE</h2>
-                <div class=" expertise" style="margin-left: 20px;">
+                <div class=" expertise" style="margin-left: 20px; margin-top:5px;">
                     {!! $user->skills !!}
                 </div>
             </div>
@@ -427,7 +427,7 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($user->certifications)
             <div class="section it-secction">
                 <h2 class="section-title">IT & COMPUTER SKILLS</h2>
-                <div class="expertise" style="margin-left: 20px;">
+                <div class="expertise" style="margin-left: 20px; margin-top:5px;">
                     {!! $user->certifications !!}
                 </div>
             </div>
@@ -436,8 +436,10 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($experiences && $experiences->count() > 0)
             <div class="section">
                 <h2 class="section-title">Work Experience</h2>
-                @foreach ($experiences as $experience)
-                    <div class="experience-item">
+                @foreach ($experiences as $key => $experience)
+                    <div class="experience-item" @if ($key == 0)
+                        style="margin-top:5px;"
+                    @endif>
                         <div class="experience-header">
                             <div>
                                 <div class="job-title">{{ $experience->job_title }}</div>
@@ -460,8 +462,10 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($educations && $educations->count() > 0)
             <div class="section" style="margin-top: 25px;">
                 <h2 class="section-title">Professional Qualifications</h2>
-                @foreach ($educations as $education)
-                    <div class="education-item">
+                @foreach ($educations as $ekey => $education)
+                    <div class="education-item" @if ($ekey == 0)
+                        style="margin-top:5px;"
+                    @endif>
                         <div class="education-header academic-header">
                             <div>
                                 <div class="degree">{{ $education->degree }} in {{ $education->institution_name }}
@@ -484,8 +488,10 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($academicEducations && $academicEducations->count() > 0)
             <div class="section">
                 <h2 class="section-title">Academic Qualifications</h2>
-                @foreach ($academicEducations as $education)
-                    <div class="education-item">
+                @foreach ($academicEducations as $akey => $education)
+                    <div class="education-item" @if ($akey == 0)
+                        style="margin-top:5px;"
+                    @endif>
                         <div class="education-header">
                             <div>
                                 <div class="degree">{{ $education->degree }} in {{ $education->institution_name }}
