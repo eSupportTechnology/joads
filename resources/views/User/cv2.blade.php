@@ -200,7 +200,7 @@ $job_posting_id = request()->query('job_posting_id');
             margin-top: 0;
         }
         .section {
-            margin-top: 25px;
+            margin-top: 16px;
         }
         .education-item {
             margin-bottom: 15px;
@@ -238,6 +238,10 @@ $job_posting_id = request()->query('job_posting_id');
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+        }
+
+        .ql-align-justify {
+            text-align: justify !important;
         }
 
     </style>
@@ -486,7 +490,7 @@ $job_posting_id = request()->query('job_posting_id');
                                 {{ $experience->end_date ? \Carbon\Carbon::parse($experience->end_date)->format('M Y') : 'Present' }}
                             </div>
                         </div>
-                        <div class="job-description">
+                        <div class="job-description" style="text-align: justify;">
                             {!! $experience->job_description !!}
                         </div>
                     </div>
@@ -548,7 +552,7 @@ $job_posting_id = request()->query('job_posting_id');
         @if ($user->referees && $user->referees2)
             <div class="section">
                 <h2 class="section-title">REFEREES</h2>
-                <div style="display: flex; justify-content: space-between;">
+                <div style="display: flex; justify-content: space-between; margin-top:5px;">
                     <div class="education-item">
                         {!! $user->referees !!}
                     </div>
@@ -561,7 +565,7 @@ $job_posting_id = request()->query('job_posting_id');
 
         <!-- Signature Section -->
         <div class="section signature-section">
-            <p style="text-align: left; margin-left: 10px; margin-top:-60px;">
+            <p style="text-align: justify; margin-left: 10px; margin-top:-60px;">
                 I confirm that the above-mentioned particulars are true and accurate to the best of my knowledge and
                 belief.
             </p>
