@@ -653,15 +653,15 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             const totalHeight = mainContent.offsetHeight;
             if (totalHeight <= 1122) {
                 sidebar.classList.remove('tall');
-            } else if(totalHeight > 1122 && totalHeight < 2244) {
+            } else if(totalHeight > 1122 && totalHeight < 2200) {
                 sidebar.classList.remove('tall2');
                 sidebar.classList.remove('tall3');
                 sidebar.classList.add('tall');
-            } else if(totalHeight > 2244 && totalHeight < 3366) {
+            } else if(totalHeight > 2244 && totalHeight < 3300) {
                 sidebar.classList.add('tall2');
                 sidebar.classList.remove('tall');
                 sidebar.classList.remove('tall3');
-            } else if(totalHeight > 3366 && totalHeight < 4488) {
+            } else if(totalHeight > 3366 && totalHeight < 4400) {
                 sidebar.classList.remove('tall2');
                 sidebar.classList.remove('tall');
                 sidebar.classList.add('tall3');
