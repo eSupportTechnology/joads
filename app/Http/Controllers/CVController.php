@@ -36,8 +36,9 @@ class CVController extends Controller
         $user = auth()->user(); // Fetch authenticated user
         $experiences = $user->jobExperiences; // Assuming relationship is defined
         $educations = $user->jobEducations; // Assuming relationship is defined
+        $academicEducations = $user->jobAcademicEducations;
 
-        return view('User.cv3', compact('user', 'experiences', 'educations'));
+        return view('User.cv3', compact('user', 'experiences', 'educations', 'academicEducations'));
     }
 
     public function generateCV(Request $request)

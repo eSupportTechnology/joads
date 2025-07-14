@@ -75,6 +75,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             max-width: 135mm;
             width: 125mm;
             box-sizing: border-box;
+            padding-left: 10px;
         }
 
         .main-content .section-title {
@@ -157,7 +158,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             background-color: white;
             border-radius: 5px;
             text-align: left;
-            width: 90%;
+            width: 100%;
         }
 
         .experience-item,
@@ -254,7 +255,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
         .signature-line {
             border-bottom: 1px solid #000;
-            width: 100%;
+            width: auto;
             margin: 10px 0;
             height: 2px;
         }
@@ -296,6 +297,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             .main-content {
                 padding: 10mm;
                 height: auto !important;
+                padding-left:10px;
             }
 
 
@@ -337,6 +339,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         .content-wrapper {
                 margin-top:-35px !important;
             }
+
     </style>
 </head>
 
@@ -584,7 +587,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                             <h2 class="section-title">PROFILE</h2>
                             <div class="experience-item">
                                 <div class="profile-text">
-                                    <p>{{ $user->summary }}</p>
+                                    <p style="text-align: justify;">{{ $user->summary }}</p>
                                 </div>
                             </div>
                         </div>
@@ -601,7 +604,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                                         {{ \Carbon\Carbon::parse($experience->start_date)->format('Y') }} -
                                         {{ $experience->end_date ? \Carbon\Carbon::parse($experience->end_date)->format('Y') : 'Present' }}
                                     </div>
-                                    <div class="job-description">
+                                    <div class="job-description" style="text-align: justify;">
                                         {!! $experience->job_description !!}
                                     </div>
                                 </div>
@@ -611,7 +614,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
                     @if (isset($educations) && $educations->count() > 0)
                         <div class="education-section">
-                            <h2 class="section-title">EDUCATION</h2>
+                            <h2 class="section-title">Professional Qualification</h2>
                             @foreach ($educations as $education)
                                 <div class="education-item">
                                     <div class="degree job-title">{{ $education->degree }} in
@@ -624,15 +627,31 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                             @endforeach
                         </div>
                     @endif
+
+                    @if (isset($academicEducations) && $academicEducations->count() > 0)
+                        <div class="education-section">
+                            <h2 class="section-title">Academic Qualifications</h2>
+                            @foreach ($academicEducations as $education)
+                                <div class="education-item">
+                                    <div class="degree job-title">{{ $education->degree }} in
+                                        {{ $education->institution_name }}</div>
+                                    @if ($education->field_of_study)
+                                        <div class="job-description">{!! $education->field_of_study !!}</div>
+                                    @endif
+                                    <div style="margin-left: 15px;" class="institution">{{ $education->institution_name }}</div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
 
                 <div class="signature-section">
-                    <p style="text-align: center; margin-bottom: 25px; margin-top:-15px;">I hereby certify that the particulars given
+                    <p style="text-align: left; margin-bottom: 25px; margin-top:-35px;">I hereby certify that the particulars given
                         above are true and correct to the best of my knowledge.</p>
                     <div class="signature-container">
                         <div class="signature-block">
                             <div class="signature-value">{{ $user->name }}</div>
-                            <div class="signature-line"></div>
+                            <div style="width: auto;" class="signature-line"></div>
                             <div class="signature-label">Name and Signature</div>
                         </div>
                         <div class="signature-block">
