@@ -401,6 +401,11 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 onchange="updateSidebarColor(this.value)">
             <span style="color: #1A355E">Blue</span>
         </label>
+        <label for="sidebar_color4">
+            <input type="radio" name="sidebar_color_radio" id="sidebar_color4" value="#FF0000"
+                onchange="updateSidebarColor(this.value)">
+            <span style="color: #FF0000">Red</span>
+        </label>
     </div>
 
     <div class="download-btn-container">
