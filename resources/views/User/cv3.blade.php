@@ -683,7 +683,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 sidebar.classList.remove('tall2');
                 sidebar.classList.remove('tall3');
                 sidebar.classList.add('tall');
-            } else if(totalHeight > 2244 && totalHeight < 3300) {
+            } else if(totalHeight > 2244 && totalHeight < 3200) {
                 sidebar.classList.add('tall2');
                 sidebar.classList.remove('tall');
                 sidebar.classList.remove('tall3');
