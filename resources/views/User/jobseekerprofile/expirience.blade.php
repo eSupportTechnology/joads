@@ -54,6 +54,9 @@
             border-radius: 4px;
             background-color: #f9f9f9;
         }
+        input[type="date"] {
+            width: 50%;
+        }
 
         .editor-container {
             margin-bottom: 20px;
@@ -174,12 +177,12 @@
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-3">
                             <label>Start Date <span class="required">*</span></label>
                             <input type="date" name="start_date" value="{{ $experience->start_date }}"
                                 class="form-control" required>
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-3">
                             <label>End Date <span class="required">*</span></label>
                             <input type="date" name="end_date" value="{{ $experience->end_date }}"
                                 class="form-control" required>

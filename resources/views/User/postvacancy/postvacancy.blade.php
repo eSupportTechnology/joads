@@ -923,7 +923,7 @@
 
 
         <!-- Third Row -->
-        @if (!empty($packageDetails->description_three))
+        {{-- @if (!empty($packageDetails->description_three))
             <div class="grid-row">
                 <div class="postcontainer">
                     <div class="postheader">
@@ -934,7 +934,7 @@
                     </div>
                 </div>
             </div>
-        @endif
+        @endif --}}
 
 
 
