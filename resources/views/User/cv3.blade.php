@@ -627,7 +627,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
                         @if (isset($educations) && $educations->count() > 0)
                             <div class="education-section">
-                                <h2 tyle="margin-bottom: 5px;" class="section-title">Professional Qualification</h2>
+                                <h2 style="margin-bottom: 5px;" class="section-title">Professional Qualification</h2>
                                 @foreach ($educations as $education)
                                     <div class="education-item">
                                         <div class="degree job-title">{{ $education->degree }} in
