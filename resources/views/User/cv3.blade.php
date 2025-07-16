@@ -66,6 +66,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             padding: 10mm;
             color: #fff;
             box-sizing: border-box;
+            height: 100%;
         }
 
         .main-content {
@@ -320,19 +321,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             }
         }
         @media print {
-            .sidebar {
-                height: 1063px; /* Default height for shorter content */
-            }
 
-            .sidebar.tall {
-                height: 2185px; /* Taller version */
-            }
-            .sidebar.tall2 {
-                height: 3277px; /* Taller version */
-            }
-            .sidebar.tall3 {
-                height: 4370.5px; /* Taller version */
-            }
             .content-wrapper {
                 margin-top:25px !important;
             }
@@ -685,35 +674,38 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             </div>
         </div>
     </div>
-
     <script>
-        function adjustSidebarHeight() {
+        function adjustContentHeightForPrint() {
+            const pageHeight = 1090; // A4 printable height in pixels after accounting for margin
             const mainContent = document.querySelector('.main-content');
             const sidebar = document.querySelector('.sidebar');
-            const totalHeight = mainContent.offsetHeight;
-            if (totalHeight <= 1122) {
-                sidebar.classList.remove('tall');
-            } else if(totalHeight > 1122 && totalHeight < 2244) {
-                sidebar.classList.remove('tall2');
-                sidebar.classList.remove('tall3');
-                sidebar.classList.add('tall');
-            } else if(totalHeight > 2244 && totalHeight < 3300) {
-                sidebar.classList.add('tall2');
-                sidebar.classList.remove('tall');
-                sidebar.classList.remove('tall3');
-            } else if(totalHeight > 3300 && totalHeight < 4488) {
-                sidebar.classList.remove('tall2');
-                sidebar.classList.remove('tall');
-                sidebar.classList.add('tall3');
-            }
-            // sidebar.style.height = totalHeight + 'px';
+
+            if (!mainContent || !sidebar) return;
+
+            const actualHeight = mainContent.scrollHeight;
+
+            const pages = Math.ceil(actualHeight / pageHeight);
+
+            const finalHeight = pages * pageHeight;
+
+            // Apply consistent height to both sidebar and content
+            mainContent.style.height = finalHeight + 'px';
+            sidebar.style.height = finalHeight + 'px';
         }
 
-        window.addEventListener('load', adjustSidebarHeight);
-        window.onbeforeprint = adjustSidebarHeight;
+        window.addEventListener('load', adjustContentHeightForPrint);
+        window.onbeforeprint = adjustContentHeightForPrint;
+    </script>
+
+
+    <script>
+
+
+        // window.addEventListener('load', adjustSidebarHeight);
+        // window.onbeforeprint = adjustSidebarHeight;
 
         function handlePrint() {
-            adjustSidebarHeight();
+            // adjustSidebarHeight();
             window.print();
         }
 
