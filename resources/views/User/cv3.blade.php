@@ -181,11 +181,11 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         .date-range {
             color: #666;
             font-style: italic;
-            margin: 5px 0;
+            margin: 0px 0;
         }
 
         .job-description {
-            margin-left: 15px;
+            margin-left: 0px;
         }
 
         .job-description ul {
@@ -589,7 +589,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                     </div>
                     @if ($user->summary)
                         <div class="profile-section">
-                            <h2 class="section-title">PROFILE</h2>
+                            <h2 style="margin-bottom: 5px;" class="section-title">PROFILE</h2>
                             <div class="experience-item">
                                 <div class="profile-text">
                                     <p style="text-align: justify;">{{ $user->summary }}</p>
@@ -600,14 +600,16 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
                     @if (isset($experiences) && $experiences->count() > 0)
                         <div class="experience-section">
-                            <h2 class="section-title">WORK EXPERIENCE</h2>
+                            <h2 style="margin-bottom: 5px;" class="section-title">WORK EXPERIENCE</h2>
                             @foreach ($experiences as $experience)
                                 <div class="experience-item">
                                     <div class="job-title">{{ $experience->job_title }}</div>
-                                    <div class="company-name">{{ $experience->company_name }}</div>
-                                    <div class="date-range">
-                                        {{ \Carbon\Carbon::parse($experience->start_date)->format('Y') }} -
-                                        {{ $experience->end_date ? \Carbon\Carbon::parse($experience->end_date)->format('Y') : 'Present' }}
+                                    <div class="" style="display: flex; justify-content: space-between;">
+                                        <div class="company-name">{{ $experience->company_name }}</div>
+                                        <div class="date-range" style="white-space: nowrap;">
+                                            {{ \Carbon\Carbon::parse($experience->start_date)->format('Y') }} -
+                                            {{ $experience->end_date ? \Carbon\Carbon::parse($experience->end_date)->format('Y') : 'Present' }}
+                                        </div>
                                     </div>
                                     <div class="job-description" style="text-align: justify;">
                                         {!! $experience->job_description !!}
