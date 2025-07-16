@@ -402,9 +402,9 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             <span style="color: #1A355E">Blue</span>
         </label>
         <label for="sidebar_color4">
-            <input type="radio" name="sidebar_color_radio" id="sidebar_color4" value="#FF0000"
+            <input type="radio" name="sidebar_color_radio" id="sidebar_color4" value="#C00000"
                 onchange="updateSidebarColor(this.value)">
-            <span style="color: #FF0000">Red</span>
+            <span style="color: #C00000">Red</span>
         </label>
     </div>
 
@@ -645,7 +645,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                                     @if ($education->field_of_study)
                                         <div class="job-description">{!! $education->field_of_study !!}</div>
                                     @endif
-                                    <div style="margin-left: 15px;" class="institution">{{ $education->institution_name }}</div>
+                                    <div class="institution">{{ $education->institution_name }}</div>
                                 </div>
                             @endforeach
                         </div>
