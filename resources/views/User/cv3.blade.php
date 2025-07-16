@@ -627,7 +627,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
                         @if (isset($educations) && $educations->count() > 0)
                             <div class="education-section">
-                                <h2 class="section-title">Professional Qualification</h2>
+                                <h2 tyle="margin-bottom: 5px;" class="section-title">Professional Qualification</h2>
                                 @foreach ($educations as $education)
                                     <div class="education-item">
                                         <div class="degree job-title">{{ $education->degree }} in
@@ -643,7 +643,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
                         @if (isset($academicEducations) && $academicEducations->count() > 0)
                             <div class="education-section">
-                                <h2 class="section-title">Academic Qualifications</h2>
+                                <h2 style="margin-bottom: 5px;" class="section-title">Academic Qualifications</h2>
                                 @foreach ($academicEducations as $education)
                                     <div class="education-item">
                                         <div class="degree job-title">{{ $education->degree }} in
@@ -659,7 +659,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                     </div>
 
                     <div class="signature-section">
-                        <p style="text-align: left; margin-bottom: 25px; margin-top:-35px;">I hereby certify that the particulars given
+                        <p style="text-align: left; margin-bottom: 25px; margin-top:-40px;">I hereby certify that the particulars given
                             above are true and correct to the best of my knowledge.</p>
                         <div class="signature-container">
                             <div class="signature-block">
