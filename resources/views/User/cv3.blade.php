@@ -676,7 +676,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
     </div>
     <script>
         function adjustContentHeightForPrint() {
-            const pageHeight = 1090; // A4 printable height in pixels after accounting for margin
+            const pageHeight = 1122; // A4 printable height in pixels after accounting for margin
             const mainContent = document.querySelector('.main-content');
             const sidebar = document.querySelector('.sidebar');
 
