@@ -49,6 +49,10 @@
             background-color: #f9f9f9;
         }
 
+        input[type="date"] {
+            width: 50%;
+        }
+
         textarea.form-control {
             resize: none;
         }
