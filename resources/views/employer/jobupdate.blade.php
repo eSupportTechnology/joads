@@ -107,36 +107,41 @@
                 @enderror
             </div>
 
-            <div class="mb-3">
-                <label for="category_id" class="form-label">Category</label>
-                <select name="category_id" id="category_id" class="form-control" required>
+            <div class="detail-item mb-3 border-bottom pb-2">
+                <label for="category_select" class="form-label">Category</label>
+
+                <select id="category_select" class="form-control" multiple>
                     @foreach ($categories as $category)
                         <option value="{{ $category->id }}"
-                            {{ $jobPosting->category_id == $category->id ? 'selected' : '' }}>
+                            {{ in_array($category->id, $jobPosting->category_ids ?? []) ? 'selected' : '' }}>
                             {{ $category->name }}
                         </option>
                     @endforeach
                 </select>
-                @error('category_id')
-                    <div class="text-danger">{{ $message }}</div>
-                @enderror
+
+                <div id="selected_categories" class="tag-container mt-2"></div>
+                <div id="hidden_category_inputs"></div>
             </div>
 
-            <div class="mb-3">
-                <label for="subcategory_id" class="form-label">Subcategory</label>
-                <select name="subcategory_id" id="subcategory_id" class="form-control" required>
-                    <option value="">Select a subcategory</option>
-                    @foreach ($subcategories as $subcategory)
-                        <option value="{{ $subcategory->id }}"
-                            {{ $jobPosting->subcategory_id == $subcategory->id ? 'selected' : '' }}>
-                            {{ $subcategory->name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('subcategory_id')
-                    <div class="text-danger">{{ $message }}</div>
-                @enderror
+            <div class="detail-item mb-3 border-bottom pb-2">
+                <label for="subcategory_select" class="form-label">Subcategory</label>
+
+                <select id="subcategory_select" class="form-control" multiple style="height: 150px">
+    @foreach ($subcategories as $subcategory)
+        <option value="{{ $subcategory->id }}"
+            data-name="{{ $subcategory->name }}"
+            {{ in_array($subcategory->id, $jobPosting->subcategory_ids ?? []) ? 'selected' : '' }}>
+            {{ $subcategory->name }}
+        </option>
+    @endforeach
+</select>
+
+                <div id="selected_subcategories" class="tag-container mt-2"></div>
+                <div id="hidden_subcategory_inputs"></div>
             </div>
+
+
+
 
             <div class="mb-3">
                 <label for="location" class="form-label">Location</label>
@@ -204,7 +209,7 @@
 
     <script type="text/javascript">
         var session_layout = '{{ session()->get('
-                            layout ') }}';
+                                                    layout ') }}';
     </script>
 @endsection
 
@@ -319,6 +324,64 @@
                 imagePreview.style.display = 'none';
             }
         });
+
+        const categories = @json($categories);
+        const subcategories = @json($subcategories);
+
+        const categorySelect = document.getElementById('category_select');
+        const subcategorySelect = document.getElementById('subcategory_select');
+
+        const categoryTagContainer = document.getElementById('selected_categories');
+        const subcategoryTagContainer = document.getElementById('selected_subcategories');
+
+        const hiddenCategoryInputs = document.getElementById('hidden_category_inputs');
+        const hiddenSubcategoryInputs = document.getElementById('hidden_subcategory_inputs');
+
+        function renderSelectedItems(selectEl, tagContainer, hiddenContainer, sourceList, inputName) {
+    tagContainer.innerHTML = '';
+    hiddenContainer.innerHTML = '';
+
+    const selectedOptions = Array.from(selectEl.selectedOptions);
+
+    selectedOptions.forEach(option => {
+        const id = option.value;
+
+        // Tag display
+        const tag = document.createElement('span');
+        tag.className = 'badge bg-success text-white me-1 mb-1';
+
+        // First try to find from JSON list, fallback to data-name or textContent
+        const item = sourceList.find(c => c.id == id);
+        tag.innerText = item?.name || option.dataset.name || option.textContent || 'Unknown';
+        tagContainer.appendChild(tag);
+
+        // Hidden input
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = inputName + '[]';
+        input.value = id;
+        hiddenContainer.appendChild(input);
+    });
+}
+
+
+
+        function handleCategoryChange() {
+            renderSelectedItems(categorySelect, categoryTagContainer, hiddenCategoryInputs, categories, 'category_id');
+        }
+
+        function handleSubcategoryChange() {
+            renderSelectedItems(subcategorySelect, subcategoryTagContainer, hiddenSubcategoryInputs, subcategories,
+                'subcategory_id');
+        }
+
+        // Initial rendering
+        handleCategoryChange();
+        handleSubcategoryChange();
+
+        // Event listeners
+        categorySelect.addEventListener('change', handleCategoryChange);
+        subcategorySelect.addEventListener('change', handleSubcategoryChange);
     </script>
 
 @endsection

@@ -204,11 +204,11 @@
                     </div>
                     <div class="card-body">
 
-                <form action="{{ route('admin.job_postings.store') }}" method="POST" enctype="multipart/form-data"
-                    id="jobPostingForm">
-                    @csrf
+                        <form action="{{ route('admin.job_postings.store') }}" method="POST" enctype="multipart/form-data"
+                            id="jobPostingForm">
+                            @csrf
 
-                  <div id="contacts-container">
+                            <div id="contacts-container">
 
                                 <div id="contacts-container">
                                     <!-- Currency Selection -->
@@ -232,8 +232,9 @@
                                                 <option value="{{ $package->id }}" data-lkr="{{ $package->lkr_price }}"
                                                     data-usd="{{ $package->usd_price }}"
                                                     data-size="{{ $package->package_size }}"
-                                                    data-duration="{{ $package->duration->duration }}">
-                                                    {{ $package->package_size }} ads - ({{ $package->duration->duration }}
+                                                    data-duration="{{ $package->duration->duration ?? '' }}">
+                                                    {{ $package->package_size }} ads -
+                                                    ({{ $package->duration->duration ?? '' }}
                                                     days)
                                                     - Rs. {{ $package->lkr_price }} / {{ $package->usd_price }} USD
                                                 </option>
@@ -258,16 +259,16 @@
                                     @endforeach
                                 </div>
 
-<div class="mb-3">
-                                <label for="employer_id_0" class="form-label">Employer *</label>
-                                <select name="job_postings[0][employer_id]" id="employer_id_0" class="form-control"
-                                    required>
-                                    <option value="">Select an employer</option>
-                                    @foreach ($employers as $employer)
-                                        <option value="{{ $employer->id }}">{{ $employer->company_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                <div class="mb-3">
+                                    <label for="employer_id_0" class="form-label">Employer *</label>
+                                    <select name="job_postings[0][employer_id]" id="employer_id_0" class="form-control"
+                                        required>
+                                        <option value="">Select an employer</option>
+                                        @foreach ($employers as $employer)
+                                            <option value="{{ $employer->id }}">{{ $employer->company_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div class="mb-3">
                                     <label for="title_0" class="form-label">Job Title *</label>
                                     <input type="text" name="job_postings[0][title]" id="title_0" class="form-control"
@@ -297,7 +298,7 @@
                                 <div class="mb-3">
                                     <label for="subcategory_id_0" class="form-label">Subcategories *</label>
                                     <select id="subcategory_id_0" class="form-control"
-                                        onchange="handleSubcategorySelect(this, 0)" disabled>
+                                        onchange="handleSubcategorySelect(this, 0)">
                                         <option value="">Select subcategory</option>
                                         {{-- Options will be loaded dynamically --}}
                                     </select>
@@ -310,6 +311,7 @@
                                     <input type="text" name="job_postings[0][location]" id="location_0"
                                         class="form-control" required>
                                 </div>
+                                
                                 <div class="mb-3">
                                     <label for="country_0" class="form-label">Country *</label>
                                     <select name="job_postings[0][country_id]" id="country_0" class="form-control"
@@ -449,6 +451,7 @@
             const currencySelect = document.getElementById('lkr_usd_0');
             const packageSelect = document.getElementById('package_id');
             const priceInputs = document.querySelectorAll('[id^="custom_price_"]');
+            loadSubcategories('all', 0);
 
             priceInputs.forEach(input => {
                 input.dataset.userEdited = 'false';
@@ -511,58 +514,80 @@
             currencySelect.addEventListener('change', updatePrices);
             packageSelect.addEventListener('change', updatePrices);
         });
-        const selectedCategories = new Map();
-        const selectedSubcategories = new Map();
 
+        // Global maps for categories and subcategories
+        const selectedCategoriesMap = new Map();
+        const selectedSubcategoriesMap = new Map();
 
-        function handleCategorySelect(select) {
+        // Initialize global maps for the first form
+        selectedCategoriesMap.set(0, new Map());
+        selectedSubcategoriesMap.set(0, new Map());
+
+        // Fixed handleCategorySelect function
+        function handleCategorySelect(select, index = 0) {
             const value = select.value;
-            const text = select.options[select.selectedIndex].text;
+            const text = select.options[select.selectedIndex]?.text || 'All Categories';
 
-            if (value && !selectedCategories.has(value)) {
+            const subcategorySelect = document.getElementById(`subcategory_id_${index}`);
+            subcategorySelect.disabled = false;
+            subcategorySelect.innerHTML = `<option value="">Select subcategory</option>`;
+
+            // Get the appropriate selectedCategories map based on index
+            const selectedCategories = selectedCategoriesMap.get(index) || new Map();
+
+            if (!value) {
+                // No category selected, load all subcategories
+                loadSubcategories('all', index);
+                return;
+            }
+
+            if (!selectedCategories.has(value)) {
                 selectedCategories.set(value, text);
 
                 // Show tag
                 const tag = document.createElement('div');
                 tag.className = 'tag';
                 tag.dataset.id = value;
-                tag.innerHTML = `${text} <span class="remove" onclick="removeCategory('${value}')">&times;</span>`;
-                document.getElementById('selected_categories_0').appendChild(tag);
+                tag.innerHTML =
+                    `${text} <span class="remove" onclick="removeCategory('${value}', ${index})">&times;</span>`;
+                document.getElementById(`selected_categories_${index}`).appendChild(tag);
 
                 // Add hidden input
                 const input = document.createElement('input');
                 input.type = 'hidden';
-                input.name = 'job_postings[0][category_ids][]';
+                input.name = `job_postings[${index}][category_ids][]`;
                 input.value = value;
-                input.id = `category_input_${value}`;
-                document.getElementById('hidden_category_inputs_0').appendChild(input);
+                input.id = `category_input_${value}_${index}`;
+                document.getElementById(`hidden_category_inputs_${index}`).appendChild(input);
 
-                // Enable subcategory dropdown
-                const subcategorySelect = document.getElementById('subcategory_id_0');
-                subcategorySelect.disabled = false;
-                subcategorySelect.innerHTML = `<option value="">Select subcategory</option>`;
-
-                // Simulate fetching subcategories
-                loadSubcategories(value);
-
-                // select.value = '';
+                // Load subcategories for selected category
+                loadSubcategories(value, index);
             }
         }
 
-        function loadSubcategories(categoryId) {
-            const subcategorySelect = document.getElementById('subcategory_id_0');
+        // Fixed loadSubcategories function - single definition
+        function loadSubcategories(categoryId, index = 0) {
+            const subcategorySelect = document.getElementById(`subcategory_id_${index}`);
             subcategorySelect.innerHTML = '<option value="">Loading...</option>';
             subcategorySelect.disabled = true;
 
-            fetch(`/subcategories/${categoryId}`)
+            // Use 'all' or '0' when no category is selected
+            const fetchId = categoryId === 'all' || categoryId === '' ? 'all' : categoryId;
+
+            fetch(`/subcategories/${fetchId}`)
                 .then(response => response.json())
                 .then(data => {
                     subcategorySelect.innerHTML = '<option value="">Select subcategory</option>';
                     data.forEach(sub => {
                         const option = document.createElement('option');
                         option.value = sub.id;
-                        option.text = sub.name;
-                        option.dataset.categoryId = categoryId;
+                        // If showing all subcategories, include category name for clarity
+                        if (fetchId === 'all' && sub.category_name) {
+                            option.text = `${sub.name} (${sub.category_name})`;
+                        } else {
+                            option.text = sub.name;
+                        }
+                        option.dataset.categoryId = sub.category_id || categoryId;
                         subcategorySelect.appendChild(option);
                     });
                     subcategorySelect.disabled = false;
@@ -570,14 +595,16 @@
                 .catch(error => {
                     console.error("Error loading subcategories:", error);
                     subcategorySelect.innerHTML = '<option value="">Failed to load subcategories</option>';
+                    subcategorySelect.disabled = false;
                 });
         }
 
-
-        function handleSubcategorySelect(select) {
+        function handleSubcategorySelect(select, index = 0) {
             const value = select.value;
             const text = select.options[select.selectedIndex].text;
             const categoryId = select.options[select.selectedIndex].dataset.categoryId;
+
+            const selectedSubcategories = selectedSubcategoriesMap.get(index) || new Map();
 
             if (value && !selectedSubcategories.has(value)) {
                 selectedSubcategories.set(value, {
@@ -589,22 +616,25 @@
                 const tag = document.createElement('div');
                 tag.className = 'tag';
                 tag.dataset.id = value;
-                tag.innerHTML = `${text} <span class="remove" onclick="removeSubcategory('${value}')">&times;</span>`;
-                document.getElementById('selected_subcategories_0').appendChild(tag);
+                tag.innerHTML = `${text} <span class="remove" onclick="removeSubcategory('${value}', ${index})">&times;</span>`;
+                document.getElementById(`selected_subcategories_${index}`).appendChild(tag);
 
                 // Add hidden input
                 const input = document.createElement('input');
                 input.type = 'hidden';
-                input.name = 'job_postings[0][subcategory_ids][]';
+                input.name = `job_postings[${index}][subcategory_ids][]`;
                 input.value = value;
-                input.id = `subcategory_input_${value}`;
-                document.getElementById('hidden_subcategory_inputs_0').appendChild(input);
-
-                // select.value = '';
+                input.id = `subcategory_input_${value}_${index}`;
+                document.getElementById(`hidden_subcategory_inputs_${index}`).appendChild(input);
             }
         }
 
-        function removeCategory(id) {
+        function removeCategory(id, index = 0) {
+            const selectedCategories = selectedCategoriesMap.get(index);
+            const selectedSubcategories = selectedSubcategoriesMap.get(index);
+
+            if (!selectedCategories || !selectedSubcategories) return;
+
             const hasSubcategory = [...selectedSubcategories.values()].some(s => s.category_id === id);
             if (hasSubcategory) {
                 alert("Remove related subcategories first.");
@@ -612,33 +642,27 @@
             }
 
             selectedCategories.delete(id);
-            document.querySelector(`.tag[data-id='${id}']`)?.remove();
-            document.getElementById(`category_input_${id}`)?.remove();
+            document.querySelector(`#selected_categories_${index} .tag[data-id='${id}']`)?.remove();
+            document.getElementById(`category_input_${id}_${index}`)?.remove();
 
-            // Disable subcategory select if no categories are left
+            // If no categories are left, load all subcategories
             if (selectedCategories.size === 0) {
-                document.getElementById('subcategory_id_0').disabled = true;
-                document.getElementById('subcategory_id_0').innerHTML = '<option value="">Select subcategory</option>';
+                loadSubcategories('all', index);
             }
         }
 
-        function removeSubcategory(id) {
-            selectedSubcategories.delete(id);
-            document.querySelector(`#selected_subcategories_0 .tag[data-id='${id}']`)?.remove();
-            document.getElementById(`subcategory_input_${id}`)?.remove();
-        }
+        function removeSubcategory(id, index = 0) {
+            const selectedSubcategories = selectedSubcategoriesMap.get(index);
+            if (!selectedSubcategories) return;
 
+            selectedSubcategories.delete(id);
+            document.querySelector(`#selected_subcategories_${index} .tag[data-id='${id}']`)?.remove();
+            document.getElementById(`subcategory_input_${id}_${index}`)?.remove();
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             let contactIndex = 1;
-
-            // Maps to store selected categories and subcategories for each form
-            const selectedCategoriesMap = new Map();
-            const selectedSubcategoriesMap = new Map();
-
-            // Initialize maps for the first form
-            selectedCategoriesMap.set(0, new Map());
-            selectedSubcategoriesMap.set(0, new Map());
+            loadSubcategories('all', 0);
 
             const packageSelect = document.getElementById("package_id");
             const addJobButton = document.getElementById("addContact");
@@ -679,8 +703,8 @@
                         data-lkr="{{ $package->lkr_price }}"
                         data-usd="{{ $package->usd_price }}"
                         data-size="{{ $package->package_size }}"
-                        data-duration="{{ $package->duration->duration }}">
-                        {{ $package->package_size }} ads - ({{ $package->duration->duration }} days) - Rs. {{ $package->lkr_price }} / {{ $package->usd_price }} USD
+                        data-duration="{{ $package->duration->duration ?? '' }}">
+                        {{ $package->package_size }} ads - ({{ $package->duration->duration ?? '' }} days) - Rs. {{ $package->lkr_price }} / {{ $package->usd_price }} USD
                     </option>
                 @endforeach
             </select>
@@ -723,7 +747,7 @@
 
             <div class="mb-3">
                 <label for="subcategory_id_${contactIndex}" class="form-label">Subcategories *</label>
-                <select id="subcategory_id_${contactIndex}" class="form-control" onchange="handleSubcategorySelect(this, ${contactIndex})" disabled>
+                <select id="subcategory_id_${contactIndex}" class="form-control" onchange="handleSubcategorySelect(this, ${contactIndex})">
                     <option value="">Select subcategory</option>
                 </select>
                 <div id="selected_subcategories_${contactIndex}" class="tag-container mt-2"></div>
@@ -810,7 +834,7 @@
                     });
                 }
 
-                // ✅ Image preview logic
+                // Image preview logic
                 if (imageInput && imagePreview) {
                     imageInput.addEventListener('change', function() {
                         const file = this.files[0];
@@ -827,8 +851,10 @@
                         }
                     });
                 }
-            }
 
+                // Load all subcategories for new forms initially
+                loadSubcategories('all', index);
+            }
 
             // Function to setup price input with currency conversion
             function setupPriceInput(input) {
@@ -902,7 +928,6 @@
                 });
             }
 
-
             // Main currency and package change listeners
             const currencySelect = document.getElementById('lkr_usd_0');
             currencySelect.addEventListener('change', function() {
@@ -940,10 +965,8 @@
                 });
             }
 
-            // Helper function to get category options (you'll need to populate this with your categories)
+            // Helper function to get category options
             function getCategoryOptions() {
-                // This should return the same category options as in your blade template
-                // You might need to pass this data to JavaScript or fetch it via AJAX
                 const categorySelect = document.getElementById('category_id_0');
                 let options = '';
                 for (let i = 1; i < categorySelect.options.length; i++) {
@@ -985,124 +1008,6 @@
 
             // Setup initial image preview for existing forms
             document.querySelectorAll('.image-input').forEach(setupImagePreview);
-
-            // Global functions for category and subcategory handling
-            window.handleCategorySelect = function(select, index) {
-                const value = select.value;
-                const text = select.options[select.selectedIndex].text;
-                const selectedCategories = selectedCategoriesMap.get(index);
-
-                if (value && !selectedCategories.has(value)) {
-                    selectedCategories.set(value, text);
-
-                    // Show tag
-                    const tag = document.createElement('div');
-                    tag.className = 'tag';
-                    tag.dataset.id = value;
-                    tag.innerHTML =
-                        `${text} <span class="remove" onclick="removeCategory('${value}', ${index})">&times;</span>`;
-                    document.getElementById(`selected_categories_${index}`).appendChild(tag);
-
-                    // Add hidden input
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = `job_postings[${index}][category_ids][]`;
-                    input.value = value;
-                    input.id = `category_input_${value}_${index}`;
-                    document.getElementById(`hidden_category_inputs_${index}`).appendChild(input);
-
-                    // Enable subcategory dropdown
-                    const subcategorySelect = document.getElementById(`subcategory_id_${index}`);
-                    subcategorySelect.disabled = false;
-                    subcategorySelect.innerHTML = `<option value="">Select subcategory</option>`;
-
-                    // Load subcategories
-                    loadSubcategories(value, index);
-                }
-            };
-
-            window.handleSubcategorySelect = function(select, index) {
-                const value = select.value;
-                const text = select.options[select.selectedIndex].text;
-                const categoryId = select.options[select.selectedIndex].dataset.categoryId;
-                const selectedSubcategories = selectedSubcategoriesMap.get(index);
-
-                if (value && !selectedSubcategories.has(value)) {
-                    selectedSubcategories.set(value, {
-                        name: text,
-                        category_id: categoryId
-                    });
-
-                    // Add subcategory tag
-                    const tag = document.createElement('div');
-                    tag.className = 'tag';
-                    tag.dataset.id = value;
-                    tag.innerHTML =
-                        `${text} <span class="remove" onclick="removeSubcategory('${value}', ${index})">&times;</span>`;
-                    document.getElementById(`selected_subcategories_${index}`).appendChild(tag);
-
-                    // Add hidden input
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = `job_postings[${index}][subcategory_ids][]`;
-                    input.value = value;
-                    input.id = `subcategory_input_${value}_${index}`;
-                    document.getElementById(`hidden_subcategory_inputs_${index}`).appendChild(input);
-                }
-            };
-
-            window.removeCategory = function(id, index) {
-                const selectedCategories = selectedCategoriesMap.get(index);
-                const selectedSubcategories = selectedSubcategoriesMap.get(index);
-
-                const hasSubcategory = [...selectedSubcategories.values()].some(s => s.category_id === id);
-                if (hasSubcategory) {
-                    alert("Remove related subcategories first.");
-                    return;
-                }
-
-                selectedCategories.delete(id);
-                document.querySelector(`#selected_categories_${index} .tag[data-id='${id}']`)?.remove();
-                document.getElementById(`category_input_${id}_${index}`)?.remove();
-
-                // Disable subcategory select if no categories are left
-                if (selectedCategories.size === 0) {
-                    document.getElementById(`subcategory_id_${index}`).disabled = true;
-                    document.getElementById(`subcategory_id_${index}`).innerHTML =
-                        '<option value="">Select subcategory</option>';
-                }
-            };
-
-            window.removeSubcategory = function(id, index) {
-                const selectedSubcategories = selectedSubcategoriesMap.get(index);
-                selectedSubcategories.delete(id);
-                document.querySelector(`#selected_subcategories_${index} .tag[data-id='${id}']`)?.remove();
-                document.getElementById(`subcategory_input_${id}_${index}`)?.remove();
-            };
-
-            function loadSubcategories(categoryId, index) {
-                const subcategorySelect = document.getElementById(`subcategory_id_${index}`);
-                subcategorySelect.innerHTML = '<option value="">Loading...</option>';
-                subcategorySelect.disabled = true;
-
-                fetch(`/subcategories/${categoryId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        subcategorySelect.innerHTML = '<option value="">Select subcategory</option>';
-                        data.forEach(sub => {
-                            const option = document.createElement('option');
-                            option.value = sub.id;
-                            option.text = sub.name;
-                            option.dataset.categoryId = categoryId;
-                            subcategorySelect.appendChild(option);
-                        });
-                        subcategorySelect.disabled = false;
-                    })
-                    .catch(error => {
-                        console.error("Error loading subcategories:", error);
-                        subcategorySelect.innerHTML = '<option value="">Failed to load subcategories</option>';
-                    });
-            }
 
             // Remove contact item function
             window.removeContactItem = function(element) {
@@ -1200,7 +1105,7 @@
                 return isValid;
             }
         });
-    </script>
+</script>
 @endsection
 
 @section('script')

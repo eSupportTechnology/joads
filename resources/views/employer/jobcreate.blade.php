@@ -287,7 +287,7 @@
                                 <div class="mb-3">
                                     <label for="subcategory_id_0" class="form-label">Subcategories *</label>
                                     <select id="subcategory_id_0" class="form-control"
-                                        onchange="handleSubcategorySelect(this, 0)" disabled>
+                                        onchange="handleSubcategorySelect(this, 0)">
                                         <option value="">Select subcategory</option>
                                         {{-- Options will be loaded dynamically --}}
                                     </select>
@@ -436,219 +436,238 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const currencySelect = document.getElementById('lkr_usd_0');
-            const packageSelect = document.getElementById('package_id');
-            const priceInputs = document.querySelectorAll('[id^="custom_price_"]');
+    const currencySelect = document.getElementById('lkr_usd_0');
+    const packageSelect = document.getElementById('package_id');
+    const priceInputs = document.querySelectorAll('[id^="custom_price_"]');
 
-            priceInputs.forEach(input => {
-                input.dataset.userEdited = 'false';
+    priceInputs.forEach(input => {
+        input.dataset.userEdited = 'false';
 
-                input.addEventListener('input', async () => {
-                    input.dataset.userEdited = 'true';
+        input.addEventListener('input', async () => {
+            input.dataset.userEdited = 'true';
 
-                    const usd = parseFloat(input.value);
-                    if (currencySelect.value === 'Foreign' && !isNaN(usd)) {
-                        try {
-                            const response = await fetch(`/convert-usd-to-lkr?usd=${usd}`);
-                            const data = await response.json();
-                            if (data.success) {
-                                input.setAttribute('data-lkr-price', data
-                                    .lkr);
-                                console.log(
-                                    `Converted ${usd} USD → ${data.lkr} LKR @ rate ${data.rate}`
-                                );
-                            }
-                        } catch (e) {
-                            console.error('Conversion failed', e);
-                        }
+            const usd = parseFloat(input.value);
+            if (currencySelect.value === 'Foreign' && !isNaN(usd)) {
+                try {
+                    const response = await fetch(`/convert-usd-to-lkr?usd=${usd}`);
+                    const data = await response.json();
+                    if (data.success) {
+                        input.setAttribute('data-lkr-price', data.lkr);
+                        console.log(`Converted ${usd} USD → ${data.lkr} LKR @ rate ${data.rate}`);
                     }
-                });
-            });
-
-            function updatePrices() {
-                const currency = currencySelect.value;
-
-                Array.from(packageSelect.options).forEach(option => {
-                    const size = option.getAttribute('data-size');
-                    const duration = option.getAttribute('data-duration');
-                    const lkr = option.getAttribute('data-lkr');
-                    const usd = option.getAttribute('data-usd');
-
-                    if (size && duration) {
-                        option.textContent =
-                            currency === 'Local' ?
-                            `${size} ads - (${duration} days) - Rs. ${lkr}` :
-                            `${size} ads - (${duration} days) - $${usd} USD`;
-                    }
-                });
-
-                const selectedOption = packageSelect.options[packageSelect.selectedIndex];
-                if (!selectedOption) return;
-
-                const price = currency === 'Local' ?
-                    selectedOption.getAttribute('data-lkr') :
-                    selectedOption.getAttribute('data-usd');
-
-                priceInputs.forEach(input => {
-                    if (!input.value || input.dataset.userEdited === 'false') {
-                        input.value = price;
-                        input.dataset.userEdited = 'false';
-                    }
-                });
+                } catch (e) {
+                    console.error('Conversion failed', e);
+                }
             }
-
-
-            currencySelect.addEventListener('change', updatePrices);
-            packageSelect.addEventListener('change', updatePrices);
         });
-        const selectedCategories = new Map();
-        const selectedSubcategories = new Map();
+    });
 
+    function updatePrices() {
+        const currency = currencySelect.value;
 
-        function handleCategorySelect(select) {
-            const value = select.value;
-            const text = select.options[select.selectedIndex].text;
+        Array.from(packageSelect.options).forEach(option => {
+            const size = option.getAttribute('data-size');
+            const duration = option.getAttribute('data-duration');
+            const lkr = option.getAttribute('data-lkr');
+            const usd = option.getAttribute('data-usd');
 
-            if (value && !selectedCategories.has(value)) {
-                selectedCategories.set(value, text);
-
-                // Show tag
-                const tag = document.createElement('div');
-                tag.className = 'tag';
-                tag.dataset.id = value;
-                tag.innerHTML = `${text} <span class="remove" onclick="removeCategory('${value}')">&times;</span>`;
-                document.getElementById('selected_categories_0').appendChild(tag);
-
-                // Add hidden input
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'job_postings[0][category_ids][]';
-                input.value = value;
-                input.id = `category_input_${value}`;
-                document.getElementById('hidden_category_inputs_0').appendChild(input);
-
-                // Enable subcategory dropdown
-                const subcategorySelect = document.getElementById('subcategory_id_0');
-                subcategorySelect.disabled = false;
-                subcategorySelect.innerHTML = `<option value="">Select subcategory</option>`;
-
-                // Simulate fetching subcategories
-                loadSubcategories(value);
-
-                // select.value = '';
+            if (size && duration) {
+                option.textContent =
+                    currency === 'Local' ?
+                    `${size} ads - (${duration} days) - Rs. ${lkr}` :
+                    `${size} ads - (${duration} days) - $${usd} USD`;
             }
-        }
+        });
 
-        function loadSubcategories(categoryId) {
-            const subcategorySelect = document.getElementById('subcategory_id_0');
-            subcategorySelect.innerHTML = '<option value="">Loading...</option>';
-            subcategorySelect.disabled = true;
+        const selectedOption = packageSelect.options[packageSelect.selectedIndex];
+        if (!selectedOption) return;
 
-            fetch(`/subcategories/${categoryId}`)
-                .then(response => response.json())
-                .then(data => {
-                    subcategorySelect.innerHTML = '<option value="">Select subcategory</option>';
-                    data.forEach(sub => {
-                        const option = document.createElement('option');
-                        option.value = sub.id;
-                        option.text = sub.name;
-                        option.dataset.categoryId = categoryId;
-                        subcategorySelect.appendChild(option);
-                    });
-                    subcategorySelect.disabled = false;
-                })
-                .catch(error => {
-                    console.error("Error loading subcategories:", error);
-                    subcategorySelect.innerHTML = '<option value="">Failed to load subcategories</option>';
-                });
-        }
+        const price = currency === 'Local' ?
+            selectedOption.getAttribute('data-lkr') :
+            selectedOption.getAttribute('data-usd');
 
-
-        function handleSubcategorySelect(select) {
-            const value = select.value;
-            const text = select.options[select.selectedIndex].text;
-            const categoryId = select.options[select.selectedIndex].dataset.categoryId;
-
-            if (value && !selectedSubcategories.has(value)) {
-                selectedSubcategories.set(value, {
-                    name: text,
-                    category_id: categoryId
-                });
-
-                // Add subcategory tag
-                const tag = document.createElement('div');
-                tag.className = 'tag';
-                tag.dataset.id = value;
-                tag.innerHTML = `${text} <span class="remove" onclick="removeSubcategory('${value}')">&times;</span>`;
-                document.getElementById('selected_subcategories_0').appendChild(tag);
-
-                // Add hidden input
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'job_postings[0][subcategory_ids][]';
-                input.value = value;
-                input.id = `subcategory_input_${value}`;
-                document.getElementById('hidden_subcategory_inputs_0').appendChild(input);
-
-                // select.value = '';
+        priceInputs.forEach(input => {
+            if (!input.value || input.dataset.userEdited === 'false') {
+                input.value = price;
+                input.dataset.userEdited = 'false';
             }
-        }
+        });
+    }
 
-        function removeCategory(id) {
-            const hasSubcategory = [...selectedSubcategories.values()].some(s => s.category_id === id);
-            if (hasSubcategory) {
-                alert("Remove related subcategories first.");
-                return;
-            }
+    currencySelect.addEventListener('change', updatePrices);
+    packageSelect.addEventListener('change', updatePrices);
+});
 
-            selectedCategories.delete(id);
-            document.querySelector(`.tag[data-id='${id}']`)?.remove();
-            document.getElementById(`category_input_${id}`)?.remove();
+// Global maps for categories and subcategories
+const selectedCategoriesMap = new Map();
+const selectedSubcategoriesMap = new Map();
 
-            // Disable subcategory select if no categories are left
-            if (selectedCategories.size === 0) {
-                document.getElementById('subcategory_id_0').disabled = true;
-                document.getElementById('subcategory_id_0').innerHTML = '<option value="">Select subcategory</option>';
-            }
-        }
+// Initialize global maps for the first form
+selectedCategoriesMap.set(0, new Map());
+selectedSubcategoriesMap.set(0, new Map());
 
-        function removeSubcategory(id) {
-            selectedSubcategories.delete(id);
-            document.querySelector(`#selected_subcategories_0 .tag[data-id='${id}']`)?.remove();
-            document.getElementById(`subcategory_input_${id}`)?.remove();
-        }
+// Fixed handleCategorySelect function
+function handleCategorySelect(select, index = 0) {
+    const value = select.value;
+    const text = select.options[select.selectedIndex]?.text || 'All Categories';
 
+    const subcategorySelect = document.getElementById(`subcategory_id_${index}`);
+    subcategorySelect.disabled = false;
+    subcategorySelect.innerHTML = `<option value="">Select subcategory</option>`;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            let contactIndex = 1;
+    // Get the appropriate selectedCategories map based on index
+    const selectedCategories = selectedCategoriesMap.get(index) || new Map();
 
-            // Maps to store selected categories and subcategories for each form
-            const selectedCategoriesMap = new Map();
-            const selectedSubcategoriesMap = new Map();
+    if (!value) {
+        // No category selected, load all subcategories
+        loadSubcategories('all', index);
+        return;
+    }
 
-            // Initialize maps for the first form
-            selectedCategoriesMap.set(0, new Map());
-            selectedSubcategoriesMap.set(0, new Map());
+    if (!selectedCategories.has(value)) {
+        selectedCategories.set(value, text);
 
-            const packageSelect = document.getElementById("package_id");
-            const addJobButton = document.getElementById("addContact");
-            const contactsContainer = document.getElementById("contacts-container");
+        // Show tag
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.dataset.id = value;
+        tag.innerHTML =
+            `${text} <span class="remove" onclick="removeCategory('${value}', ${index})">&times;</span>`;
+        document.getElementById(`selected_categories_${index}`).appendChild(tag);
 
-            // Initialize the first form
-            initializeJobForm(0);
+        // Add hidden input
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = `job_postings[${index}][category_ids][]`;
+        input.value = value;
+        input.id = `category_input_${value}_${index}`;
+        document.getElementById(`hidden_category_inputs_${index}`).appendChild(input);
 
-            // Add new job form
-            addJobButton.addEventListener("click", function() {
-                const existingJobs = contactsContainer.querySelectorAll('.job-posting').length;
+        // Load subcategories for selected category
+        loadSubcategories(value, index);
+    }
+}
 
-                // Initialize maps for the new form
-                selectedCategoriesMap.set(contactIndex, new Map());
-                selectedSubcategoriesMap.set(contactIndex, new Map());
+// Fixed loadSubcategories function
+function loadSubcategories(categoryId, index = 0) {
+    const subcategorySelect = document.getElementById(`subcategory_id_${index}`);
+    subcategorySelect.innerHTML = '<option value="">Loading...</option>';
+    subcategorySelect.disabled = true;
 
-                const newContact = document.createElement('div');
-                newContact.className = 'job-posting contact-item';
+    // Use 'all' when no category is selected or categoryId is empty/null
+    const fetchId = categoryId === 'all' || categoryId === '' || !categoryId ? 'all' : categoryId;
 
-                newContact.innerHTML = `
+    fetch(`/subcategories/${fetchId}`)
+        .then(response => response.json())
+        .then(data => {
+            subcategorySelect.innerHTML = '<option value="">Select subcategory</option>';
+            data.forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub.id;
+                // If showing all subcategories, include category name for clarity
+                if (fetchId === 'all' && sub.category_name) {
+                    option.text = `${sub.name} (${sub.category_name})`;
+                } else {
+                    option.text = sub.name;
+                }
+                option.dataset.categoryId = sub.category_id || categoryId;
+                subcategorySelect.appendChild(option);
+            });
+            subcategorySelect.disabled = false;
+        })
+        .catch(error => {
+            console.error("Error loading subcategories:", error);
+            subcategorySelect.innerHTML = '<option value="">Failed to load subcategories</option>';
+            subcategorySelect.disabled = false;
+        });
+}
+
+function handleSubcategorySelect(select, index = 0) {
+    const value = select.value;
+    const text = select.options[select.selectedIndex].text;
+    const categoryId = select.options[select.selectedIndex].dataset.categoryId;
+
+    // Get the appropriate selectedSubcategories map based on index
+    const selectedSubcategories = selectedSubcategoriesMap.get(index) || new Map();
+
+    if (value && !selectedSubcategories.has(value)) {
+        selectedSubcategories.set(value, {
+            name: text,
+            category_id: categoryId
+        });
+
+        // Add subcategory tag
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.dataset.id = value;
+        tag.innerHTML = `${text} <span class="remove" onclick="removeSubcategory('${value}', ${index})">&times;</span>`;
+        document.getElementById(`selected_subcategories_${index}`).appendChild(tag);
+
+        // Add hidden input
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = `job_postings[${index}][subcategory_ids][]`;
+        input.value = value;
+        input.id = `subcategory_input_${value}_${index}`;
+        document.getElementById(`hidden_subcategory_inputs_${index}`).appendChild(input);
+
+        // Reset select value
+        select.value = '';
+    }
+}
+
+function removeCategory(id, index = 0) {
+    const selectedCategories = selectedCategoriesMap.get(index) || new Map();
+    const selectedSubcategories = selectedSubcategoriesMap.get(index) || new Map();
+
+    const hasSubcategory = [...selectedSubcategories.values()].some(s => s.category_id === id);
+    if (hasSubcategory) {
+        alert("Remove related subcategories first.");
+        return;
+    }
+
+    selectedCategories.delete(id);
+    document.querySelector(`#selected_categories_${index} .tag[data-id='${id}']`)?.remove();
+    document.getElementById(`category_input_${id}_${index}`)?.remove();
+
+    // If no categories are left, load all subcategories again
+    if (selectedCategories.size === 0) {
+        loadSubcategories('all', index);
+    }
+}
+
+function removeSubcategory(id, index = 0) {
+    const selectedSubcategories = selectedSubcategoriesMap.get(index) || new Map();
+    selectedSubcategories.delete(id);
+    document.querySelector(`#selected_subcategories_${index} .tag[data-id='${id}']`)?.remove();
+    document.getElementById(`subcategory_input_${id}_${index}`)?.remove();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    let contactIndex = 1;
+
+    // Initialize the first form - load all subcategories initially
+    loadSubcategories('all', 0);
+
+    const packageSelect = document.getElementById("package_id");
+    const addJobButton = document.getElementById("addContact");
+    const contactsContainer = document.getElementById("contacts-container");
+
+    // Initialize the first form
+    initializeJobForm(0);
+
+    // Add new job form
+    addJobButton.addEventListener("click", function() {
+        const existingJobs = contactsContainer.querySelectorAll('.job-posting').length;
+
+        // Initialize maps for the new form
+        selectedCategoriesMap.set(contactIndex, new Map());
+        selectedSubcategoriesMap.set(contactIndex, new Map());
+
+        const newContact = document.createElement('div');
+        newContact.className = 'job-posting contact-item';
+
+        newContact.innerHTML = `
             <span class="remove-contact" onclick="removeContactItem(this)">&times;</span>
 
             <div class="mb-3 mt-3">
@@ -664,15 +683,7 @@
             <label for="package_id_${contactIndex}" class="form-label">Package *</label>
             <select name="job_postings[${contactIndex}][package_id]" id="package_id_${contactIndex}" class="form-control" required>
                 <option value="">Select a package</option>
-                @foreach ($packages as $package)
-                    <option value="{{ $package->id }}"
-                        data-lkr="{{ $package->lkr_price }}"
-                        data-usd="{{ $package->usd_price }}"
-                        data-size="{{ $package->package_size }}"
-                        data-duration="{{ $package->duration->duration }}">
-                        {{ $package->package_size }} ads - ({{ $package->duration->duration }} days) - Rs. {{ $package->lkr_price }} / {{ $package->usd_price }} USD
-                    </option>
-                @endforeach
+                ${getPackageOptions()}
             </select>
         </div>
 
@@ -749,437 +760,253 @@
             <input type="hidden" name="job_postings[${contactIndex}][status]" value="pending">
         `;
 
-                contactsContainer.appendChild(newContact);
+        contactsContainer.appendChild(newContact);
 
-                // Initialize the new form with all required functionality
-                initializeJobForm(contactIndex);
+        // Initialize the new form with all required functionality
+        initializeJobForm(contactIndex);
 
-                contactIndex++;
-                validateJobLimit();
+        // Load all subcategories for the new form initially
+        loadSubcategories('all', contactIndex);
+
+        // Update package display for the new form based on current currency
+        const mainCurrencySelect = document.getElementById('lkr_usd_0');
+        if (mainCurrencySelect.value) {
+            updatePackageOptionsForForm(contactIndex);
+        }
+
+        contactIndex++;
+        validateJobLimit();
+    });
+
+    // Function to initialize all functionality for a job form
+    function initializeJobForm(index) {
+        const currencySelect = document.getElementById(`lkr_usd_${index}`);
+        const packageSelect = document.getElementById(`package_id_${index}`);
+        const priceInput = document.getElementById(`custom_price_${index}`);
+        const imageInput = document.getElementById(`image_${index}`);
+        const imagePreview = document.querySelector(`#image_${index} + .image-preview-container .image-preview`);
+
+        // Currency & package logic
+        if (currencySelect && packageSelect) {
+            updatePackageOptionsForForm(index);
+            updatePricesForForm(index);
+
+            currencySelect.addEventListener('change', () => {
+                updatePackageOptionsForForm(index);
+                updatePricesForForm(index);
             });
 
-            // Function to initialize all functionality for a job form
-            function initializeJobForm(index) {
-                const currencySelect = document.getElementById(`lkr_usd_${index}`);
-                const packageSelect = document.getElementById(`package_id_${index}`);
-                const priceInput = document.getElementById(`custom_price_${index}`);
-                const imageInput = document.getElementById(`image_${index}`);
-                const imagePreview = document.querySelector(
-                    `#image_${index} + .image-preview-container .image-preview`);
-
-                // Currency & package logic
-                if (currencySelect && packageSelect) {
-                    updatePackageOptionsForForm(index);
-                    updatePricesForForm(index);
-
-                    currencySelect.addEventListener('change', () => {
-                        updatePackageOptionsForForm(index);
-                        updatePricesForForm(index);
-                    });
-
-                    packageSelect.addEventListener('change', () => {
-                        updatePricesForForm(index);
-                    });
-                }
-
-                // Price input
-                if (priceInput) {
-                    priceInput.dataset.userEdited = 'false';
-                    priceInput.addEventListener('input', () => {
-                        priceInput.dataset.userEdited = 'true';
-                    });
-                }
-
-                // ✅ Image preview logic
-                if (imageInput && imagePreview) {
-                    imageInput.addEventListener('change', function() {
-                        const file = this.files[0];
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                imagePreview.src = e.target.result;
-                                imagePreview.style.display = 'block';
-                            };
-                            reader.readAsDataURL(file);
-                        } else {
-                            imagePreview.src = '';
-                            imagePreview.style.display = 'none';
-                        }
-                    });
-                }
-            }
-
-
-            // Function to setup price input with currency conversion
-            function setupPriceInput(input) {
-                const currencySelect = document.getElementById('lkr_usd_0');
-
-                input.dataset.userEdited = 'false';
-
-                input.addEventListener('input', async () => {
-                    input.dataset.userEdited = 'true';
-
-                    const usd = parseFloat(input.value);
-                    if (currencySelect.value === 'Foreign' && !isNaN(usd)) {
-                        try {
-                            const response = await fetch(`/convert-usd-to-lkr?usd=${usd}`);
-                            const data = await response.json();
-                            if (data.success) {
-                                input.setAttribute('data-lkr-price', data.lkr);
-                                console.log(
-                                    `Converted ${usd} USD → ${data.lkr} LKR @ rate ${data.rate}`);
-                            }
-                        } catch (e) {
-                            console.error('Conversion failed', e);
-                        }
-                    }
-                });
-            }
-
-            // Function to update prices for a specific form
-            function updatePricesForForm(index) {
-                const currencySelect = document.getElementById(`lkr_usd_${index}`);
-                const packageSelect = document.getElementById(`package_id_${index}`);
-                const priceInput = document.getElementById(`custom_price_${index}`);
-
-                if (!currencySelect || !packageSelect || !priceInput) return;
-
-                const currency = currencySelect.value;
-                const selectedOption = packageSelect.options[packageSelect.selectedIndex];
-
-                if (!selectedOption || !selectedOption.value) return;
-
-                const price = currency === 'Local' ?
-                    selectedOption.getAttribute('data-lkr') :
-                    selectedOption.getAttribute('data-usd');
-
-                if (!priceInput.value || priceInput.dataset.userEdited === 'false') {
-                    priceInput.value = price;
-                    priceInput.dataset.userEdited = 'false';
-                }
-            }
-
-            // Function to update package options for a form
-            function updatePackageOptionsForForm(index) {
-                const currencySelect = document.getElementById(`lkr_usd_${index}`);
-                const packageSelect = document.getElementById(`package_id_${index}`);
-
-                if (!currencySelect || !packageSelect) return;
-
-                const currency = currencySelect.value;
-
-                Array.from(packageSelect.options).forEach(option => {
-                    const size = option.getAttribute('data-size');
-                    const duration = option.getAttribute('data-duration');
-                    const lkr = option.getAttribute('data-lkr');
-                    const usd = option.getAttribute('data-usd');
-
-                    if (size && duration) {
-                        option.textContent = currency === 'Local' ?
-                            `${size} ads - (${duration} days) - Rs. ${lkr}` :
-                            `${size} ads - (${duration} days) - $${usd} USD`;
-                    }
-                });
-            }
-
-
-            // Main currency and package change listeners
-            const currencySelect = document.getElementById('lkr_usd_0');
-            currencySelect.addEventListener('change', function() {
-                updatePrices();
-                // Update all individual form prices
-                for (let i = 0; i < contactIndex; i++) {
-                    updatePricesForForm(i);
-                }
+            packageSelect.addEventListener('change', () => {
+                updatePricesForForm(index);
             });
+        }
 
-            packageSelect.addEventListener('change', function() {
-                updatePrices();
-                // Update all individual form prices
-                for (let i = 0; i < contactIndex; i++) {
-                    updatePricesForForm(i);
-                }
+        // Price input
+        if (priceInput) {
+            priceInput.dataset.userEdited = 'false';
+            priceInput.addEventListener('input', () => {
+                priceInput.dataset.userEdited = 'true';
             });
+        }
 
-            // Original updatePrices function for package display
-            function updatePrices() {
-                const currency = currencySelect.value;
-
-                Array.from(packageSelect.options).forEach(option => {
-                    const size = option.getAttribute('data-size');
-                    const duration = option.getAttribute('data-duration');
-                    const lkr = option.getAttribute('data-lkr');
-                    const usd = option.getAttribute('data-usd');
-
-                    if (size && duration) {
-                        option.textContent =
-                            currency === 'Local' ?
-                            `${size} ads - (${duration} days) - Rs. ${lkr}` :
-                            `${size} ads - (${duration} days) - $${usd} USD`;
-                    }
-                });
-            }
-
-            // Helper function to get category options (you'll need to populate this with your categories)
-            function getCategoryOptions() {
-                // This should return the same category options as in your blade template
-                // You might need to pass this data to JavaScript or fetch it via AJAX
-                const categorySelect = document.getElementById('category_id_0');
-                let options = '';
-                for (let i = 1; i < categorySelect.options.length; i++) {
-                    const option = categorySelect.options[i];
-                    options += `<option value="${option.value}">${option.text}</option>`;
-                }
-                return options;
-            }
-
-            // Helper function to get country options
-            function getCountryOptions() {
-                const countrySelect = document.getElementById('country_0');
-                let options = '';
-                for (let i = 1; i < countrySelect.options.length; i++) {
-                    const option = countrySelect.options[i];
-                    options += `<option value="${option.value}">${option.text}</option>`;
-                }
-                return options;
-            }
-
-            // Setup image preview
-            function setupImagePreview(input) {
-                input.addEventListener('change', function(event) {
-                    const preview = this.nextElementSibling.querySelector('.image-preview');
-                    const file = event.target.files[0];
-
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            preview.src = e.target.result;
-                            preview.style.display = 'block';
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        preview.style.display = 'none';
-                    }
-                });
-            }
-
-            // Setup initial image preview for existing forms
-            document.querySelectorAll('.image-input').forEach(setupImagePreview);
-
-            // Global functions for category and subcategory handling
-            window.handleCategorySelect = function(select, index) {
-                const value = select.value;
-                const text = select.options[select.selectedIndex].text;
-                const selectedCategories = selectedCategoriesMap.get(index);
-
-                if (value && !selectedCategories.has(value)) {
-                    selectedCategories.set(value, text);
-
-                    // Show tag
-                    const tag = document.createElement('div');
-                    tag.className = 'tag';
-                    tag.dataset.id = value;
-                    tag.innerHTML =
-                        `${text} <span class="remove" onclick="removeCategory('${value}', ${index})">&times;</span>`;
-                    document.getElementById(`selected_categories_${index}`).appendChild(tag);
-
-                    // Add hidden input
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = `job_postings[${index}][category_ids][]`;
-                    input.value = value;
-                    input.id = `category_input_${value}_${index}`;
-                    document.getElementById(`hidden_category_inputs_${index}`).appendChild(input);
-
-                    // Enable subcategory dropdown
-                    const subcategorySelect = document.getElementById(`subcategory_id_${index}`);
-                    subcategorySelect.disabled = false;
-                    subcategorySelect.innerHTML = `<option value="">Select subcategory</option>`;
-
-                    // Load subcategories
-                    loadSubcategories(value, index);
-                }
-            };
-
-            window.handleSubcategorySelect = function(select, index) {
-                const value = select.value;
-                const text = select.options[select.selectedIndex].text;
-                const categoryId = select.options[select.selectedIndex].dataset.categoryId;
-                const selectedSubcategories = selectedSubcategoriesMap.get(index);
-
-                if (value && !selectedSubcategories.has(value)) {
-                    selectedSubcategories.set(value, {
-                        name: text,
-                        category_id: categoryId
-                    });
-
-                    // Add subcategory tag
-                    const tag = document.createElement('div');
-                    tag.className = 'tag';
-                    tag.dataset.id = value;
-                    tag.innerHTML =
-                        `${text} <span class="remove" onclick="removeSubcategory('${value}', ${index})">&times;</span>`;
-                    document.getElementById(`selected_subcategories_${index}`).appendChild(tag);
-
-                    // Add hidden input
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = `job_postings[${index}][subcategory_ids][]`;
-                    input.value = value;
-                    input.id = `subcategory_input_${value}_${index}`;
-                    document.getElementById(`hidden_subcategory_inputs_${index}`).appendChild(input);
-                }
-            };
-
-            window.removeCategory = function(id, index) {
-                const selectedCategories = selectedCategoriesMap.get(index);
-                const selectedSubcategories = selectedSubcategoriesMap.get(index);
-
-                const hasSubcategory = [...selectedSubcategories.values()].some(s => s.category_id === id);
-                if (hasSubcategory) {
-                    alert("Remove related subcategories first.");
-                    return;
-                }
-
-                selectedCategories.delete(id);
-                document.querySelector(`#selected_categories_${index} .tag[data-id='${id}']`)?.remove();
-                document.getElementById(`category_input_${id}_${index}`)?.remove();
-
-                // Disable subcategory select if no categories are left
-                if (selectedCategories.size === 0) {
-                    document.getElementById(`subcategory_id_${index}`).disabled = true;
-                    document.getElementById(`subcategory_id_${index}`).innerHTML =
-                        '<option value="">Select subcategory</option>';
-                }
-            };
-
-            window.removeSubcategory = function(id, index) {
-                const selectedSubcategories = selectedSubcategoriesMap.get(index);
-                selectedSubcategories.delete(id);
-                document.querySelector(`#selected_subcategories_${index} .tag[data-id='${id}']`)?.remove();
-                document.getElementById(`subcategory_input_${id}_${index}`)?.remove();
-            };
-
-            function loadSubcategories(categoryId, index) {
-                const subcategorySelect = document.getElementById(`subcategory_id_${index}`);
-                subcategorySelect.innerHTML = '<option value="">Loading...</option>';
-                subcategorySelect.disabled = true;
-
-                fetch(`/subcategories/${categoryId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        subcategorySelect.innerHTML = '<option value="">Select subcategory</option>';
-                        data.forEach(sub => {
-                            const option = document.createElement('option');
-                            option.value = sub.id;
-                            option.text = sub.name;
-                            option.dataset.categoryId = categoryId;
-                            subcategorySelect.appendChild(option);
-                        });
-                        subcategorySelect.disabled = false;
-                    })
-                    .catch(error => {
-                        console.error("Error loading subcategories:", error);
-                        subcategorySelect.innerHTML = '<option value="">Failed to load subcategories</option>';
-                    });
-            }
-
-            // Remove contact item function
-            window.removeContactItem = function(element) {
-                const jobPosting = element.closest('.job-posting');
-                if (jobPosting) {
-                    jobPosting.remove();
-                    validateJobLimit();
-                }
-            };
-        });
-
-        // Payment modal functionality
-        document.addEventListener("DOMContentLoaded", function() {
-            const form = document.getElementById('jobPostingForm');
-            const paymentModal = new bootstrap.Modal(document.getElementById('paymentMethodModal'));
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                if (!validateForm()) {
-                    return;
-                }
-
-                paymentModal.show();
-            });
-
-            document.getElementById('confirmPaymentMethod').addEventListener('click', function() {
-                const selectedPaymentMethodRadio = document.querySelector(
-                    'input[name="paymentMethod"]:checked');
-
-                if (!selectedPaymentMethodRadio) {
-                    alert('Please select a payment method');
-                    return;
-                }
-
-                const selectedPaymentMethod = selectedPaymentMethodRadio.value;
-
-                let existingInput = document.querySelector('input[name="payment_method"]');
-                if (!existingInput) {
-                    const mainPaymentMethodInput = document.createElement('input');
-                    mainPaymentMethodInput.type = 'hidden';
-                    mainPaymentMethodInput.name = 'payment_method';
-                    mainPaymentMethodInput.value = selectedPaymentMethod;
-                    form.appendChild(mainPaymentMethodInput);
+        // Image preview logic
+        if (imageInput && imagePreview) {
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
                 } else {
-                    existingInput.value = selectedPaymentMethod;
-                }
-
-                if (selectedPaymentMethod === 'contact_contributor') {
-                    paymentModal.hide();
-                    form.submit();
-                } else if (selectedPaymentMethod === 'online') {
-                    const formData = new FormData(form);
-
-                    fetch('/store-form-data', {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                window.location.href = '/payment/checkout';
-                            } else {
-                                alert(data.message || 'Error processing form data');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('An error occurred. Please try again.');
-                        });
+                    imagePreview.src = '';
+                    imagePreview.style.display = 'none';
                 }
             });
+        }
+    }
 
-            function validateForm() {
-                let isValid = true;
-                const requiredFields = form.querySelectorAll('[required]');
+    // Function to update prices for a specific form
+    function updatePricesForForm(index) {
+        const currencySelect = document.getElementById(`lkr_usd_${index}`);
+        const packageSelect = document.getElementById(`package_id_${index}`);
+        const priceInput = document.getElementById(`custom_price_${index}`);
 
-                requiredFields.forEach(field => {
-                    if (!field.value) {
-                        field.classList.add('is-invalid');
-                        isValid = false;
-                    } else {
-                        field.classList.remove('is-invalid');
-                    }
-                });
+        if (!currencySelect || !packageSelect || !priceInput) return;
 
-                if (!isValid) {
-                    alert('Please fill in all required fields');
-                }
+        const currency = currencySelect.value;
+        const selectedOption = packageSelect.options[packageSelect.selectedIndex];
 
-                return isValid;
+        if (!selectedOption || !selectedOption.value) return;
+
+        const price = currency === 'Local' ?
+            selectedOption.getAttribute('data-lkr') :
+            selectedOption.getAttribute('data-usd');
+
+        if (!priceInput.value || priceInput.dataset.userEdited === 'false') {
+            priceInput.value = price;
+            priceInput.dataset.userEdited = 'false';
+        }
+    }
+
+    // Function to update package options for a form
+    function updatePackageOptionsForForm(index) {
+        const currencySelect = document.getElementById(`lkr_usd_${index}`);
+        const packageSelect = document.getElementById(`package_id_${index}`);
+
+        if (!currencySelect || !packageSelect) return;
+
+        const currency = currencySelect.value;
+
+        Array.from(packageSelect.options).forEach(option => {
+            const size = option.getAttribute('data-size');
+            const duration = option.getAttribute('data-duration');
+            const lkr = option.getAttribute('data-lkr');
+            const usd = option.getAttribute('data-usd');
+
+            if (size && duration) {
+                option.textContent = currency === 'Local' ?
+                    `${size} ads - (${duration} days) - Rs. ${lkr}` :
+                    `${size} ads - (${duration} days) - $${usd} USD`;
             }
         });
+    }
+
+    // Helper function to get package options
+    function getPackageOptions() {
+        const packageSelect = document.getElementById('package_id');
+        let options = '';
+        for (let i = 1; i < packageSelect.options.length; i++) {
+            const option = packageSelect.options[i];
+            // Copy all data attributes
+            const dataLkr = option.getAttribute('data-lkr') || '';
+            const dataUsd = option.getAttribute('data-usd') || '';
+            const dataSize = option.getAttribute('data-size') || '';
+            const dataDuration = option.getAttribute('data-duration') || '';
+
+            options += `<option value="${option.value}" data-lkr="${dataLkr}" data-usd="${dataUsd}" data-size="${dataSize}" data-duration="${dataDuration}">${option.text}</option>`;
+        }
+        return options;
+    }
+
+    // Helper function to get category options
+    function getCategoryOptions() {
+        const categorySelect = document.getElementById('category_id_0');
+        let options = '';
+        for (let i = 1; i < categorySelect.options.length; i++) {
+            const option = categorySelect.options[i];
+            options += `<option value="${option.value}">${option.text}</option>`;
+        }
+        return options;
+    }
+
+    // Helper function to get country options
+    function getCountryOptions() {
+        const countrySelect = document.getElementById('country_0');
+        let options = '';
+        for (let i = 1; i < countrySelect.options.length; i++) {
+            const option = countrySelect.options[i];
+            options += `<option value="${option.value}">${option.text}</option>`;
+        }
+        return options;
+    }
+
+    // Remove contact item function
+    window.removeContactItem = function(element) {
+        const jobPosting = element.closest('.job-posting');
+        if (jobPosting) {
+            jobPosting.remove();
+            validateJobLimit();
+        }
+    };
+});
+
+// Payment modal functionality
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById('jobPostingForm');
+    const paymentModal = new bootstrap.Modal(document.getElementById('paymentMethodModal'));
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
+
+        paymentModal.show();
+    });
+
+    document.getElementById('confirmPaymentMethod').addEventListener('click', function() {
+        const selectedPaymentMethodRadio = document.querySelector('input[name="paymentMethod"]:checked');
+
+        if (!selectedPaymentMethodRadio) {
+            alert('Please select a payment method');
+            return;
+        }
+
+        const selectedPaymentMethod = selectedPaymentMethodRadio.value;
+
+        let existingInput = document.querySelector('input[name="payment_method"]');
+        if (!existingInput) {
+            const mainPaymentMethodInput = document.createElement('input');
+            mainPaymentMethodInput.type = 'hidden';
+            mainPaymentMethodInput.name = 'payment_method';
+            mainPaymentMethodInput.value = selectedPaymentMethod;
+            form.appendChild(mainPaymentMethodInput);
+        } else {
+            existingInput.value = selectedPaymentMethod;
+        }
+
+        if (selectedPaymentMethod === 'contact_contributor') {
+            paymentModal.hide();
+            form.submit();
+        } else if (selectedPaymentMethod === 'online') {
+            const formData = new FormData(form);
+
+            fetch('/store-form-data', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/payment/checkout';
+                    } else {
+                        alert(data.message || 'Error processing form data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        }
+    });
+
+    function validateForm() {
+        let isValid = true;
+        const requiredFields = form.querySelectorAll('[required]');
+
+        requiredFields.forEach(field => {
+            if (!field.value) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+
+        if (!isValid) {
+            alert('Please fill in all required fields');
+        }
+
+        return isValid;
+    }
+});
     </script>
 @endsection
 @section('script')

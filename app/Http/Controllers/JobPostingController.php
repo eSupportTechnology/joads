@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Mail\JobApprovedMail;
 use App\Models\Application;
 use App\Models\Banner;
@@ -25,35 +26,70 @@ use App\Models\Conversion;
 
 class JobPostingController extends Controller
 {
+
     public function index()
     {
         $today = Carbon::today();
 
-        // 1. Approved and active jobs that have NOT expired
-        $jobPostings = JobPosting::with(['category', 'subcategory', 'employer', 'package.duration'])
+        // Load all categories and subcategories once
+        $allCategories = Category::pluck('name', 'id');
+        $allSubcategories = Subcategory::pluck('name', 'id');
+
+        // Helper to map comma-separated IDs to names
+        $mapIdsToNames = function ($ids, $lookup) {
+            if (!$ids) return '';
+            $idArray = explode(',', $ids);
+            $names = [];
+            foreach ($idArray as $id) {
+                if (isset($lookup[$id])) {
+                    $names[] = $lookup[$id];
+                }
+            }
+            return implode(', ', $names);
+        };
+
+        // Fetch and map jobs
+        $jobPostings = JobPosting::with(['employer', 'package.duration'])
             ->where('status', 'approved')
             ->where('is_active', true)
             ->whereDate('closing_date', '>=', $today)
-            ->get();
+            ->get()
+            ->map(function ($job) use ($mapIdsToNames, $allCategories, $allSubcategories) {
+                $job->category_names = $mapIdsToNames($job->category_id, $allCategories);
+                $job->subcategory_names = $mapIdsToNames($job->subcategory_id, $allSubcategories);
+                return $job;
+            });
 
-        // 2. Pending jobs (regardless of closing date)
-        $pendingJobs = JobPosting::with(['category', 'subcategory', 'employer'])
+        $pendingJobs = JobPosting::with(['employer'])
             ->where('status', 'pending')
             ->where('is_active', true)
-            ->get();
+            ->get()
+            ->map(function ($job) use ($mapIdsToNames, $allCategories, $allSubcategories) {
+                $job->category_names = $mapIdsToNames($job->category_id, $allCategories);
+                $job->subcategory_names = $mapIdsToNames($job->subcategory_id, $allSubcategories);
+                return $job;
+            });
 
-        // 3. Rejected jobs (regardless of closing date)
-        $rejectedJobs = JobPosting::with(['category', 'subcategory', 'employer'])
+        $rejectedJobs = JobPosting::with(['employer'])
             ->where('status', 'reject')
             ->where('is_active', true)
-            ->get();
+            ->get()
+            ->map(function ($job) use ($mapIdsToNames, $allCategories, $allSubcategories) {
+                $job->category_names = $mapIdsToNames($job->category_id, $allCategories);
+                $job->subcategory_names = $mapIdsToNames($job->subcategory_id, $allSubcategories);
+                return $job;
+            });
 
-        // 4. Expired jobs = approved + active + closing_date < today
-        $expireddJobs = JobPosting::with(['category', 'subcategory', 'employer'])
+        $expireddJobs = JobPosting::with(['employer'])
             ->where('status', 'approved')
             ->where('is_active', true)
             ->whereDate('closing_date', '<', $today)
-            ->get();
+            ->get()
+            ->map(function ($job) use ($mapIdsToNames, $allCategories, $allSubcategories) {
+                $job->category_names = $mapIdsToNames($job->category_id, $allCategories);
+                $job->subcategory_names = $mapIdsToNames($job->subcategory_id, $allSubcategories);
+                return $job;
+            });
 
         return view('Admin.jobview', compact('jobPostings', 'pendingJobs', 'rejectedJobs', 'expireddJobs'));
     }
@@ -89,42 +125,42 @@ class JobPostingController extends Controller
     }
 
     public function generateJobAdsReport(Request $request)
-{
-    $hasDateFilter = $request->filled('start_date') && $request->filled('end_date');
+    {
+        $hasDateFilter = $request->filled('start_date') && $request->filled('end_date');
 
-    if ($hasDateFilter) {
-        $startDate = Carbon::parse($request->start_date)->startOfDay();
-        $endDate = Carbon::parse($request->end_date)->endOfDay();
-    } else {
-        // No filter - default to last 30 days
-        $startDate = Carbon::now()->subDays(30)->startOfDay();
-        $endDate = Carbon::now()->endOfDay();
-    }
+        if ($hasDateFilter) {
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+        } else {
+            // No filter - default to last 30 days
+            $startDate = Carbon::now()->subDays(30)->startOfDay();
+            $endDate = Carbon::now()->endOfDay();
+        }
 
-    // Base query for daily counts and earnings
-    $dailyCountQuery = DB::table('job_postings')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
+        // Base query for daily counts and earnings
+        $dailyCountQuery = DB::table('job_postings')
+            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+            ->where('job_postings.status', 'approved')
+            ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
 
-    $dailyCount = $dailyCountQuery->select(
+        $dailyCount = $dailyCountQuery->select(
             DB::raw('DATE(job_postings.created_at) as date'),
             DB::raw('COUNT(*) as count'),
             DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
         )
-        ->groupBy('date')
-        ->orderBy('date', 'desc')
-        ->get();
+            ->groupBy('date')
+            ->orderBy('date', 'desc')
+            ->get();
 
-    // Base query for job details per date (include package price)
-    $jobDetailsQuery = DB::table('job_postings')
-        ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-        ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
+        // Base query for job details per date (include package price)
+        $jobDetailsQuery = DB::table('job_postings')
+            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+            ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+            ->where('job_postings.status', 'approved')
+            ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
 
-    $jobDetailsByDate = $jobDetailsQuery->select(
+        $jobDetailsByDate = $jobDetailsQuery->select(
             DB::raw('DATE(job_postings.created_at) as date'),
             'job_postings.title',
             'employers.company_name',
@@ -132,107 +168,106 @@ class JobPostingController extends Controller
             DB::raw('COALESCE(admins.name, "N/A") as approved_by'),
             DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price')
         )
-        ->orderBy('job_postings.created_at', 'desc')
-        ->get()
-        ->groupBy('date');
+            ->orderBy('job_postings.created_at', 'desc')
+            ->get()
+            ->groupBy('date');
 
-    // Attach jobs to each daily summary record
-    $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
-        $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
-        return $item;
-    });
+        // Attach jobs to each daily summary record
+        $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
+            $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
+            return $item;
+        });
 
-    $today = Carbon::today();
-    $includeToday = $startDate <= $today && $endDate >= $today;
-    if ($includeToday) {
-        $dailyTotalData = DB::table('job_postings')
-            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->where('job_postings.status', 'approved')
-            ->whereDate('job_postings.created_at', $today)
-            ->select(
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-            )
-            ->first();
-    } else {
-        $dailyTotalData = (object) ['count' => 0, 'earnings' => 0];
-    }
-
-    $startOfWeek = Carbon::now()->startOfWeek();
-    $now = Carbon::now();
-    $includeWeek = $startDate <= $now && $endDate >= $startOfWeek;
-
-    if ($includeWeek) {
-        $weeklyTotalData = DB::table('job_postings')
-            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->where('job_postings.status', 'approved')
-            ->whereBetween('job_postings.created_at', [$startOfWeek, $now])
-            ->select(
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-            )
-            ->first();
-
-        // Prepare variables for filtered date range if requested
-        $totalJobs = 0;
-        $totalEarnings = 0;
-        $jobsInRange = collect();
-
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $startDate = Carbon::parse($request->start_date)->startOfDay();
-            $endDate = Carbon::parse($request->end_date)->endOfDay();
-
-            // Total jobs and earnings in range
-            $totals = DB::table('job_postings')
+        $today = Carbon::today();
+        $includeToday = $startDate <= $today && $endDate >= $today;
+        if ($includeToday) {
+            $dailyTotalData = DB::table('job_postings')
                 ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
                 ->where('job_postings.status', 'approved')
-                ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+                ->whereDate('job_postings.created_at', $today)
+                ->select(
+                    DB::raw('COUNT(*) as count'),
+                    DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+                )
+                ->first();
+        } else {
+            $dailyTotalData = (object) ['count' => 0, 'earnings' => 0];
+        }
+
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $now = Carbon::now();
+        $includeWeek = $startDate <= $now && $endDate >= $startOfWeek;
+
+        if ($includeWeek) {
+            $weeklyTotalData = DB::table('job_postings')
+                ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+                ->where('job_postings.status', 'approved')
+                ->whereBetween('job_postings.created_at', [$startOfWeek, $now])
                 ->select(
                     DB::raw('COUNT(*) as count'),
                     DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
                 )
                 ->first();
 
-            $totalJobs = $totals->count ?? 0;
-            $totalEarnings = $totals->earnings ?? 0;
+            // Prepare variables for filtered date range if requested
+            $totalJobs = 0;
+            $totalEarnings = 0;
+            $jobsInRange = collect();
 
-            // Get jobs details in range with views count
-            $jobsInRange = DB::table('job_postings')
-                ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-                ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
-                ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-                ->where('job_postings.status', 'approved')
-                ->whereBetween('job_postings.created_at', [$startDate, $endDate])
-                ->select(
-                    'job_postings.created_at',
-                    'job_postings.title',
-                    'employers.company_name',
-                    DB::raw('COALESCE(job_postings.views, 0) as views_count'),
-                    DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price'),
-                    'job_postings.payment_method',
-                    DB::raw('COALESCE(admins.name, "N/A") as approved_by')
-                )
-                ->orderBy('job_postings.created_at', 'desc')
-                ->get();
-        } else {
-            $weeklyTotalData = (object) ['count' => 0, 'earnings' => 0];
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $startDate = Carbon::parse($request->start_date)->startOfDay();
+                $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+                // Total jobs and earnings in range
+                $totals = DB::table('job_postings')
+                    ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+                    ->where('job_postings.status', 'approved')
+                    ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+                    ->select(
+                        DB::raw('COUNT(*) as count'),
+                        DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+                    )
+                    ->first();
+
+                $totalJobs = $totals->count ?? 0;
+                $totalEarnings = $totals->earnings ?? 0;
+
+                // Get jobs details in range with views count
+                $jobsInRange = DB::table('job_postings')
+                    ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+                    ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+                    ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+                    ->where('job_postings.status', 'approved')
+                    ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+                    ->select(
+                        'job_postings.created_at',
+                        'job_postings.title',
+                        'employers.company_name',
+                        DB::raw('COALESCE(job_postings.views, 0) as views_count'),
+                        DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price'),
+                        'job_postings.payment_method',
+                        DB::raw('COALESCE(admins.name, "N/A") as approved_by')
+                    )
+                    ->orderBy('job_postings.created_at', 'desc')
+                    ->get();
+            } else {
+                $weeklyTotalData = (object) ['count' => 0, 'earnings' => 0];
+            }
+
+            $totalJobs = $dailyCount->sum('count');
+            $totalEarnings = $dailyCount->sum('earnings');
+
+            return view('Admin.report.jobads', [
+                'dailyCount' => $dailyCount,
+                'dailyTotal' => $dailyTotalData->count ?? 0,
+                'weeklyTotal' => $weeklyTotalData->count ?? 0,
+                'totalJobs' => $totalJobs,
+                'totalEarnings' => $totalEarnings,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+            ]);
         }
-
-        $totalJobs = $dailyCount->sum('count');
-        $totalEarnings = $dailyCount->sum('earnings');
-
-        return view('Admin.report.jobads', [
-            'dailyCount' => $dailyCount,
-            'dailyTotal' => $dailyTotalData->count ?? 0,
-            'weeklyTotal' => $weeklyTotalData->count ?? 0,
-            'totalJobs' => $totalJobs,
-            'totalEarnings' => $totalEarnings,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-        ]);
     }
-
-}
 
 
 
@@ -281,7 +316,12 @@ class JobPostingController extends Controller
             })
             ->when($location, fn($query, $location) => $query->where('location', 'like', "%{$location}%"))
             ->when($countryId, fn($query, $countryId) => $query->where('country_id', $countryId))
-            ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
+            ->when($categoryId && $categoryId != 45, function ($query) use ($categoryId) {
+                $query->where(function ($q) use ($categoryId) {
+                    $q->whereRaw("FIND_IN_SET(?, category_id)", [$categoryId]);
+                });
+            })
+
             ->count();
 
 
@@ -299,7 +339,12 @@ class JobPostingController extends Controller
             })
             ->when($location, fn($query) => $query->where('location', 'like', "%{$location}%"))
             ->when($countryId, fn($query) => $query->where('country_id', $countryId))
-            ->when($categoryId && $categoryId != 45, fn($query) => $query->where('category_id', $categoryId))
+            ->when($categoryId && $categoryId != 45, function ($query) use ($categoryId) {
+                $query->where(function ($q) use ($categoryId) {
+                    $q->whereRaw("FIND_IN_SET(?, category_id)", [$categoryId]);
+                });
+            })
+
             ->orderBy('approved_date', 'desc') // Use 'desc' if you want the newest jobs first
             ->paginate(300);
 
@@ -344,9 +389,11 @@ class JobPostingController extends Controller
     }
 
     public function show($id)
-
     {
-        $job = JobPosting::with(['category', 'employer', 'package.duration'])->findOrFail($id);
+        $job = JobPosting::with(['employer', 'package.duration'])->findOrFail($id);
+        $job->category_ids = explode(',', $job->category_id); // handle multiple category IDs
+        $job->subcategory_ids = explode(',', $job->subcategory_id); // handle multiple subcategory IDs
+
         $categories = Category::all();
         $sub_categories = Subcategory::all();
         $emailTemplates = EmailTemplate::all();
@@ -354,6 +401,7 @@ class JobPostingController extends Controller
 
         return view('Admin.showonejob', compact('job', 'categories', 'packages', 'sub_categories', 'emailTemplates'));
     }
+
 
 
 
@@ -451,7 +499,7 @@ class JobPostingController extends Controller
         return response()->json($jobs);
     }
 
-public function generateCustomerReport(Request $request)
+    public function generateCustomerReport(Request $request)
     {
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
@@ -520,7 +568,7 @@ public function generateCustomerReport(Request $request)
     }
 
 
-public function create()
+    public function create()
     {
         $categories = Category::all();
         $subcategories = Subcategory::all();
@@ -558,171 +606,167 @@ public function create()
     }
 
     public function store(Request $request)
-{
-    try {
-        $request->validate([
+    {
+        try {
+            $request->validate([
+                'package_id' => 'required|exists:packages,id',
+                'payment_method' => 'required|in:contact_contributor,online',
+            ]);
+
+            $employerId = auth('employer')->id();
+            $packageId = $request->input('package_id');
+            $jobPostings = $request->input('job_postings', []);
+            $paymentMethod = $request->input('payment_method');
+
+            if (!is_array($jobPostings) || empty($jobPostings)) {
+                return redirect()->back()->withErrors(['job_postings' => 'No job postings provided.'])->withInput();
+            }
+
+            $package = Package::findOrFail($packageId);
+
+            DB::beginTransaction();
+
+            foreach ($jobPostings as $index => $jobData) {
+                $request->validate([
+                    "job_postings.{$index}.title" => 'required|string|max:255',
+                    "job_postings.{$index}.description" => 'nullable|string',
+                    "job_postings.{$index}.category_ids" => 'nullable|array|min:1',
+                    "job_postings.{$index}.category_ids.*" => 'exists:categories,id',
+                    "job_postings.{$index}.subcategory_ids" => 'nullable|array|min:1',
+                    "job_postings.{$index}.subcategory_ids.*" => 'exists:subcategories,id',
+                    "job_postings.{$index}.location" => 'required|string|max:255',
+                    "job_postings.{$index}.country_id" => 'required|exists:countries,id',
+                    "job_postings.{$index}.salary_range" => 'nullable|string',
+                    "job_postings.{$index}.requirements" => 'nullable|string',
+                    "job_postings.{$index}.closing_date" => 'required|date',
+                    "job_postings.{$index}.status" => 'required|in:pending,reject,approved',
+                    "job_postings.{$index}.image" => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
+                    "job_postings.{$index}.custom_price" => 'nullable|numeric|min:0',
+                    "job_postings.{$index}.currency_type" => 'required|in:Local,Foreign',
+                ]);
+
+                $currencyType = $jobData['currency_type'];
+                $categoryIds = $jobData['category_ids'] ?? [];
+                $subcategoryIds = $jobData['subcategory_ids'] ?? [];
+
+                // Generate Job ID
+                $latestJob = JobPosting::where('job_id', 'like', 'J%')
+                    ->lockForUpdate()
+                    ->orderByRaw('CAST(SUBSTRING(job_id, 2) AS UNSIGNED) DESC')
+                    ->first();
+
+                $jobId = $latestJob
+                    ? 'J' . str_pad((int) substr($latestJob->job_id, 1) + 1, 6, '0', STR_PAD_LEFT)
+                    : 'J000001';
+
+                // Calculate Price
+                if ($currencyType === 'Foreign' && isset($jobData['custom_price']) && $jobData['custom_price'] !== '') {
+                    $latestConversion = \App\Models\Conversion::latest()->first();
+
+                    if (!$latestConversion) {
+                        throw new \Exception('No exchange rate found. Please update the conversion table.');
+                    }
+
+                    $usd = floatval($jobData['custom_price']);
+                    $finalPrice = $usd * $latestConversion->exchange_rate;
+                } else {
+                    $finalPrice = isset($jobData['custom_price']) && $jobData['custom_price'] !== ''
+                        ? floatval($jobData['custom_price'])
+                        : ($currencyType === 'Local' ? $package->lkr_price : $package->usd_price);
+                }
+
+                // Save job posting with comma-separated category and subcategory IDs
+                $jobPostingData = [
+                    'job_id' => $jobId,
+                    'employer_id' => $employerId,
+                    'package_id' => $packageId,
+                    'package_price' => $finalPrice,
+                    'title' => $jobData['title'],
+                    'description' => $jobData['description'] ?? 'No Description',
+                    'category_id' => implode(',', $categoryIds),
+                    'subcategory_id' => implode(',', $subcategoryIds),
+                    'location' => $jobData['location'],
+                    'country_id' => $jobData['country_id'],
+                    'salary_range' => $jobData['salary_range'] ?? null,
+                    'requirements' => $jobData['requirements'],
+                    'closing_date' => $jobData['closing_date'],
+                    'status' => $jobData['status'],
+                    'payment_method' => $paymentMethod,
+                    'currency_type' => $currencyType,
+                ];
+
+                $posting = JobPosting::create($jobPostingData);
+
+                // Upload image if provided
+                if ($request->hasFile("job_postings.{$index}.image")) {
+                    $imagePath = $request->file("job_postings.{$index}.image")->store('job_images', 'public');
+                    $posting->image = $imagePath;
+                    $posting->save();
+                }
+            }
+
+            DB::commit();
+
+            return $paymentMethod === 'contact_contributor'
+                ? redirect()->route('employer.job_postings.post.create')->with('success', 'Job postings created successfully!')
+                : response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+
+            return redirect()->back()->withErrors(['error' => $e->getMessage()])->withInput();
+        }
+    }
+
+
+
+    public function storeForAdmin(Request $request)
+    {
+        $validatedData = $request->validate([
             'package_id' => 'required|exists:packages,id',
             'payment_method' => 'required|in:contact_contributor,online',
+            'job_postings.*.currency_type' => 'required|in:Local,Foreign',
+            'job_postings.*.title' => 'required|string|max:255',
+            'job_postings.*.description' => 'nullable|string',
+            'job_postings.*.category_ids' => 'nullable|array',
+            'job_postings.*.category_ids.*' => 'exists:categories,id',
+            'job_postings.*.subcategory_ids' => 'nullable|array',
+            'job_postings.*.subcategory_ids.*' => 'exists:subcategories,id',
+            'job_postings.*.location' => 'required|string|max:255',
+            'job_postings.*.country_id' => 'required|exists:countries,id',
+            'job_postings.*.salary_range' => 'nullable|string|max:255',
+            'job_postings.*.image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
+            'job_postings.*.requirements' => 'nullable|string',
+            'job_postings.*.closing_date' => 'required|date',
+            'job_postings.*.status' => 'required|in:pending,reject,approved',
+            'job_postings.*.employer_id' => 'required|exists:employers,id',
+            'job_postings.*.custom_price' => 'nullable|numeric|min:0',
         ]);
 
-        $employerId = auth('employer')->id();
+        $adminId = auth('admin')->id();
         $packageId = $request->input('package_id');
         $jobPostings = $request->input('job_postings', []);
         $paymentMethod = $request->input('payment_method');
 
-        if (!is_array($jobPostings) || empty($jobPostings)) {
-            return redirect()->back()->withErrors(['job_postings' => 'No job postings provided.'])->withInput();
-        }
-
+        DB::beginTransaction();
         $package = Package::findOrFail($packageId);
 
-        DB::beginTransaction();
+        try {
+            $storedPostings = [];
 
-        foreach ($jobPostings as $index => $jobData) {
-            $request->validate([
-                "job_postings.{$index}.title" => 'required|string|max:255',
-                "job_postings.{$index}.description" => 'nullable|string',
-                "job_postings.{$index}.category_ids" => 'required|array|min:1',
-                "job_postings.{$index}.category_ids.*" => 'exists:categories,id',
-                "job_postings.{$index}.subcategory_ids" => 'required|array|min:1',
-                "job_postings.{$index}.subcategory_ids.*" => 'exists:subcategories,id',
-                "job_postings.{$index}.location" => 'required|string|max:255',
-                "job_postings.{$index}.country_id" => 'required|exists:countries,id',
-                "job_postings.{$index}.salary_range" => 'nullable|string',
-                "job_postings.{$index}.requirements" => 'nullable|string',
-                "job_postings.{$index}.closing_date" => 'required|date',
-                "job_postings.{$index}.status" => 'required|in:pending,reject,approved',
-                "job_postings.{$index}.image" => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
-                "job_postings.{$index}.custom_price" => 'nullable|numeric|min:0',
-                "job_postings.{$index}.currency_type" => 'required|in:Local,Foreign',
-            ]);
+            foreach ($jobPostings as $index => $jobData) {
+                $categoryIds = $jobData['category_ids'] ?? [];
+                $subcategoryIds = $jobData['subcategory_ids'] ?? [];
 
-            $currencyType = $jobData['currency_type'];
-            $categoryIds = $jobData['category_ids'];
-            $subcategoryIds = $jobData['subcategory_ids'];
-
-            foreach ($categoryIds as $catId) {
-                foreach ($subcategoryIds as $subId) {
-                    $latestJob = JobPosting::where('job_id', 'like', 'J%')
-                        ->lockForUpdate()
-                        ->orderByRaw('CAST(SUBSTRING(job_id, 2) AS UNSIGNED) DESC')
-                        ->first();
-
-                    $jobId = $latestJob
-                        ? 'J' . str_pad((int) substr($latestJob->job_id, 1) + 1, 6, '0', STR_PAD_LEFT)
-                        : 'J000001';
-
-                    if ($currencyType === 'Foreign' && isset($jobData['custom_price']) && $jobData['custom_price'] !== '') {
-                        $latestConversion = \App\Models\Conversion::latest()->first();
-
-                        if (!$latestConversion) {
-                            throw new \Exception('No exchange rate found. Please update the conversion table.');
-                        }
-
-                        $usd = floatval($jobData['custom_price']);
-                        $finalPrice = $usd * $latestConversion->exchange_rate;
-                    } else {
-                        $finalPrice = isset($jobData['custom_price']) && $jobData['custom_price'] !== ''
-                            ? floatval($jobData['custom_price'])
-                            : ($currencyType === 'Local' ? $package->lkr_price : $package->usd_price);
-                    }
-
-                    $jobPostingData = [
-                        'job_id' => $jobId,
-                        'employer_id' => $employerId,
-                        'package_id' => $packageId,
-                        'package_price' => $finalPrice,
-                        'title' => $jobData['title'],
-                        'description' => $jobData['description'] ?? 'No Description',
-                        'category_id' => $catId,
-                        'subcategory_id' => $subId,
-                        'location' => $jobData['location'],
-                        'country_id' => $jobData['country_id'],
-                        'salary_range' => $jobData['salary_range'] ?? null,
-                        'requirements' => $jobData['requirements'],
-                        'closing_date' => $jobData['closing_date'],
-                        'status' => $jobData['status'],
-                        'payment_method' => $paymentMethod,
-                        'currency_type' => $currencyType
-                    ];
-
-                    $posting = JobPosting::create($jobPostingData);
-
-                    if ($request->hasFile("job_postings.{$index}.image")) {
-                        $imagePath = $request->file("job_postings.{$index}.image")->store('job_images', 'public');
-                        $posting->image = $imagePath;
-                        $posting->save();
-                    }
+                if (empty($categoryIds) && empty($subcategoryIds)) {
+                    continue; // Skip if both are missing
                 }
-            }
-        }
 
-        DB::commit();
-
-        return $paymentMethod === 'contact_contributor'
-            ? redirect()->route('employer.job_postings.post.create')->with('success', 'Job postings created successfully!')
-            : response()->json(['success' => true]);
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-
-        if ($request->expectsJson()) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
-
-        return redirect()->back()->withErrors(['error' => $e->getMessage()])->withInput();
-    }
-}
-
-
-public function storeForAdmin(Request $request)
-{
-    $validatedData = $request->validate([
-        'package_id' => 'required|exists:packages,id',
-        'payment_method' => 'required|in:contact_contributor,online',
-        'job_postings.*.currency_type' => 'required|in:Local,Foreign',
-        'job_postings.*.title' => 'required|string|max:255',
-        'job_postings.*.description' => 'nullable|string',
-        'job_postings.*.category_ids' => 'required|array|min:1',
-        'job_postings.*.category_ids.*' => 'exists:categories,id',
-        'job_postings.*.subcategory_ids' => 'required|array|min:1',
-        'job_postings.*.subcategory_ids.*' => 'exists:subcategories,id',
-        'job_postings.*.location' => 'required|string|max:255',
-        'job_postings.*.country_id' => 'required|exists:countries,id',
-        'job_postings.*.salary_range' => 'nullable|string|max:255',
-        'job_postings.*.image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4048',
-        'job_postings.*.requirements' => 'nullable|string',
-        'job_postings.*.closing_date' => 'required|date',
-        'job_postings.*.status' => 'required|in:pending,reject,approved',
-        'job_postings.*.employer_id' => 'required|exists:employers,id',
-        'job_postings.*.custom_price' => 'nullable|numeric|min:0',
-    ]);
-
-    $adminId = auth('admin')->id();
-    $packageId = $request->input('package_id');
-    $jobPostings = $request->input('job_postings', []);
-    $paymentMethod = $request->input('payment_method');
-
-    DB::beginTransaction();
-    $package = Package::findOrFail($packageId);
-
-    try {
-        $storedPostings = [];
-
-        foreach ($jobPostings as $index => $jobData) {
-            $categoryIds = $jobData['category_ids'] ?? [];
-            $subcategoryIds = $jobData['subcategory_ids'] ?? [];
-
-            if (empty($categoryIds) || empty($subcategoryIds)) {
-                continue;
-            }
-
-            $subcategories = Subcategory::whereIn('id', $subcategoryIds)->get();
-
-            foreach ($subcategories as $subcategory) {
-                if (!in_array($subcategory->category_id, $categoryIds)) {
-                    continue;
-                }
+                $categoryIdStr = implode(',', $categoryIds);
+                $subcategoryIdStr = implode(',', $subcategoryIds);
 
                 $latestJob = JobPosting::where('job_id', 'like', 'J%')
                     ->lockForUpdate()
@@ -732,16 +776,13 @@ public function storeForAdmin(Request $request)
                 $latestId = $latestJob ? (int) substr($latestJob->job_id, 1) : 0;
                 $jobId = 'J' . str_pad($latestId + 1, 6, '0', STR_PAD_LEFT);
 
-                // Fetch currency per job
+                // Determine price
                 $currencyType = $jobData['currency_type'];
-
                 if ($currencyType === 'Foreign' && isset($jobData['custom_price']) && $jobData['custom_price'] !== '') {
                     $latestConversion = \App\Models\Conversion::latest()->first();
-
                     if (!$latestConversion) {
                         throw new \Exception('No exchange rate found. Please update the conversion table.');
                     }
-
                     $usd = floatval($jobData['custom_price']);
                     $finalPrice = $usd * $latestConversion->exchange_rate;
                 } else {
@@ -758,8 +799,8 @@ public function storeForAdmin(Request $request)
                     'employer_id' => $jobData['employer_id'],
                     'title' => $jobData['title'],
                     'description' => $jobData['description'] ?? 'No Description',
-                    'category_id' => $subcategory->category_id,
-                    'subcategory_id' => $subcategory->id,
+                    'category_id' => $categoryIdStr,
+                    'subcategory_id' => $subcategoryIdStr,
                     'location' => $jobData['location'],
                     'country_id' => $jobData['country_id'],
                     'salary_range' => $jobData['salary_range'] ?? null,
@@ -779,41 +820,73 @@ public function storeForAdmin(Request $request)
 
                 $storedPostings[] = JobPosting::create($jobPostingData);
             }
+
+            DB::commit();
+
+            if ($paymentMethod === 'online') {
+                session(['pending_job_postings' => collect($storedPostings)->pluck('id')]);
+                return redirect()->route('admin.payment.checkout');
+            }
+
+            return redirect()->route('job_postings.index')
+                ->with('success', 'Job postings created successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withErrors(['error' => 'An error occurred while creating job postings: ' . $e->getMessage()])
+                ->withInput();
         }
-
-        DB::commit();
-
-        if ($paymentMethod === 'online') {
-            session(['pending_job_postings' => collect($storedPostings)->pluck('id')]);
-            return redirect()->route('admin.payment.checkout');
-        }
-
-        return redirect()->route('job_postings.index')
-            ->with('success', 'Job postings created successfully!');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()
-            ->withErrors(['error' => 'An error occurred while creating job postings: ' . $e->getMessage()])
-            ->withInput();
     }
-}
-
 
     public function getSubcategories($categoryId)
     {
-        $subcategories = Subcategory::where('category_id', $categoryId)->get();
+        // If categoryId is 0 or 'all', return all subcategories
+        if ($categoryId == 0 || $categoryId === 'all') {
+            $subcategories = Subcategory::with('category')->get()->map(function ($subcategory) {
+                return [
+                    'id' => $subcategory->id,
+                    'name' => $subcategory->name,
+                    'category_id' => $subcategory->category_id,
+                    'category_name' => $subcategory->category->name ?? null
+                ];
+            });
+        } else {
+            // Return subcategories for specific category
+            $subcategories = Subcategory::where('category_id', $categoryId)->get()->map(function ($subcategory) {
+                return [
+                    'id' => $subcategory->id,
+                    'name' => $subcategory->name,
+                    'category_id' => $subcategory->category_id
+                ];
+            });
+        }
+
         return response()->json($subcategories);
     }
 
     public function edit(JobPosting $jobPosting)
     {
-        $categories = Category::all(); // Assuming you have a Category model
+        $categories = Category::all();
+        $subcategories = Subcategory::all(); // ✅ Load all subcategories
         $countries = Country::all();
         $packages = Package::where('package_type', 'Standard')->get();
-        $subcategories = Subcategory::where('category_id', $jobPosting->category_id)->get(); // Assuming you have a Subcategory model
-        return view('employer.jobupdate', compact('packages', 'countries', 'jobPosting', 'categories', 'subcategories'));
-    }
 
+        // Convert comma-separated strings to arrays
+        $categoryIds = array_filter(explode(',', $jobPosting->category_id));
+        $subcategoryIds = array_filter(explode(',', $jobPosting->subcategory_id));
+
+        // Pass selected IDs to Blade
+        $jobPosting->category_ids = $categoryIds;
+        $jobPosting->subcategory_ids = $subcategoryIds;
+
+        return view('employer.jobupdate', compact(
+            'packages',
+            'countries',
+            'jobPosting',
+            'categories',
+            'subcategories'
+        ));
+    }
 
     public function createForAdmin()
     {
@@ -822,7 +895,7 @@ public function storeForAdmin(Request $request)
         $employers = Employer::all(); // Fetch all employers
         $packages = Package::all();
         $countries = Country::all();
-         $jobPostings = [
+        $jobPostings = [
             [
                 'title' => '',
                 'description' => '',
@@ -839,15 +912,17 @@ public function storeForAdmin(Request $request)
             ]
         ];
 
-        return view('Admin.jobcreate', compact('jobPostings','categories', 'subcategories', 'employers', 'packages', 'countries'));
+        return view('Admin.jobcreate', compact('jobPostings', 'categories', 'subcategories', 'employers', 'packages', 'countries'));
     }
 
     public function updatepost(Request $request, $id)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'subcategory_id' => 'required|exists:subcategories,id',
+            'category_id' => 'nullable|array',
+            'category_id.*' => 'exists:categories,id',
+            'subcategory_id' => 'nullable|array',
+            'subcategory_id.*' => 'exists:subcategories,id',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
             'salary_range' => 'nullable|string',
@@ -861,8 +936,8 @@ public function storeForAdmin(Request $request)
 
         // Update basic fields
         $job->title = $request->title;
-        $job->category_id = $request->category_id;
-        $job->subcategory_id = $request->subcategory_id;
+        $job->category_id = implode(',', $request->category_id);
+        $job->subcategory_id = implode(',', $request->subcategory_id);
         $job->description = $request->description;
         $job->location = $request->location;
         $job->salary_range = $request->salary_range;
@@ -885,75 +960,77 @@ public function storeForAdmin(Request $request)
 
 
     public function update(Request $request, JobPosting $jobPosting)
-{
-    try {
-        $validated = $request->validate([
-            'package_id' => 'required|exists:packages,id',
-            'custom_price' => 'nullable|numeric|min:0',
-            'lkr_usd' => 'required|in:Local,Foreign',  // Add currency type validation
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category_id' => 'required|exists:categories,id',
-            'subcategory_id' => 'required|exists:subcategories,id',
-            'location' => 'required|string|max:255',
-            'country_id' => 'required|exists:countries,id',
-            'salary_range' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
-            'requirements' => 'required|string',
-            'closing_date' => 'required|date',
-            'status' => 'nullable|in:pending,reject,approved',
-        ]);
+    {
+        try {
+            $validated = $request->validate([
+                'package_id' => 'required|exists:packages,id',
+                'custom_price' => 'nullable|numeric|min:0',
+                'lkr_usd' => 'required|in:Local,Foreign',  // Add currency type validation
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'category_id' => 'nullable|array',
+                'category_id.*' => 'exists:categories,id',
+                'subcategory_id' => 'nullable|array',
+                'subcategory_id.*' => 'exists:subcategories,id',
+                'location' => 'required|string|max:255',
+                'country_id' => 'required|exists:countries,id',
+                'salary_range' => 'nullable|string',
+                'image' => 'nullable|image|max:2048',
+                'requirements' => 'required|string',
+                'closing_date' => 'required|date',
+                'status' => 'nullable|in:pending,reject,approved',
+            ]);
 
-        $package = \App\Models\Package::findOrFail($validated['package_id']);
-        $currencyType = $validated['lkr_usd'];
+            $package = \App\Models\Package::findOrFail($validated['package_id']);
+            $currencyType = $validated['lkr_usd'];
 
-        // Calculate final price considering currency type and custom price
-        if ($currencyType === 'Foreign' && isset($validated['custom_price']) && $validated['custom_price'] !== '') {
-            // Fetch latest exchange rate for USD → LKR conversion
-            $latestConversion = \App\Models\Conversion::latest()->first();
+            // Calculate final price considering currency type and custom price
+            if ($currencyType === 'Foreign' && isset($validated['custom_price']) && $validated['custom_price'] !== '') {
+                // Fetch latest exchange rate for USD → LKR conversion
+                $latestConversion = \App\Models\Conversion::latest()->first();
 
-            if (!$latestConversion) {
-                throw new \Exception('No exchange rate found. Please update the conversion table.');
+                if (!$latestConversion) {
+                    throw new \Exception('No exchange rate found. Please update the conversion table.');
+                }
+
+                $usd = floatval($validated['custom_price']);
+                $finalPrice = $usd * $latestConversion->exchange_rate;
+            } else {
+                // Local currency or no custom price: use custom or package LKR price
+                $finalPrice = isset($validated['custom_price']) && $validated['custom_price'] !== ''
+                    ? floatval($validated['custom_price'])
+                    : $package->lkr_price;
             }
 
-            $usd = floatval($validated['custom_price']);
-            $finalPrice = $usd * $latestConversion->exchange_rate;
-        } else {
-            // Local currency or no custom price: use custom or package LKR price
-            $finalPrice = isset($validated['custom_price']) && $validated['custom_price'] !== ''
-                ? floatval($validated['custom_price'])
-                : $package->lkr_price;
+            // Handle image upload if exists
+            if ($request->hasFile('image')) {
+                $validated['image'] = $request->file('image')->store('job_images', 'public');
+            }
+
+            $jobPosting->update([
+                'package_id' => $validated['package_id'],
+                'package_price' => $finalPrice,
+                'title' => $validated['title'],
+                'description' => $validated['description'],
+                'category_id' => implode(',', $validated['category_id'] ?? []),
+                'subcategory_id' => implode(',', $validated['subcategory_id'] ?? []),
+                'location' => $validated['location'],
+                'country_id' => $validated['country_id'],
+                'salary_range' => $validated['salary_range'] ?? null,
+                'image' => $validated['image'] ?? $jobPosting->image,
+                'requirements' => $validated['requirements'],
+                'closing_date' => $validated['closing_date'],
+                'status' => $validated['status'] ?? $jobPosting->status,
+                'currency_type' => $currencyType, // save currency type for reference if needed
+            ]);
+
+            return redirect()->route('employer.job_postings.employer.jobs')
+                ->with('success', 'Job Posting updated successfully.');
+        } catch (\Exception $e) {
+            return back()->withInput()
+                ->with('error', 'An error occurred while updating the job posting: ' . $e->getMessage());
         }
-
-        // Handle image upload if exists
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('job_images', 'public');
-        }
-
-        $jobPosting->update([
-            'package_id' => $validated['package_id'],
-            'package_price' => $finalPrice,
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'category_id' => $validated['category_id'],
-            'subcategory_id' => $validated['subcategory_id'],
-            'location' => $validated['location'],
-            'country_id' => $validated['country_id'],
-            'salary_range' => $validated['salary_range'] ?? null,
-            'image' => $validated['image'] ?? $jobPosting->image,
-            'requirements' => $validated['requirements'],
-            'closing_date' => $validated['closing_date'],
-            'status' => $validated['status'] ?? $jobPosting->status,
-            'currency_type' => $currencyType, // save currency type for reference if needed
-        ]);
-
-        return redirect()->route('employer.job_postings.employer.jobs')
-            ->with('success', 'Job Posting updated successfully.');
-    } catch (\Exception $e) {
-        return back()->withInput()
-            ->with('error', 'An error occurred while updating the job posting: ' . $e->getMessage());
     }
-}
 
 
     public function generateJobAdsReportByDateRange(Request $request)
