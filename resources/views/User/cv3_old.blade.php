@@ -61,13 +61,12 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         }
 
         .sidebar {
-            /* width: 75mm; */
+            width: 75mm;
             background-color: var(--sidebar-color);
             padding: 10mm;
-            color: #000000;
+            color: #fff;
             box-sizing: border-box;
-            height: 16.5rem;
-            width: 48rem;
+            height: 3z00%;
         }
 
         .main-content {
@@ -85,28 +84,25 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             color: #000;
         }
 
-        /* .profile-image-container {
-            width: 200px;
-            height: 200px;
+        .profile-image-container {
+            width: 150px;
+            height: 150px;
             margin: 0 auto 20px;
             border-radius: 50%;
             overflow: hidden;
             border: 3px solid var(--primary-color);
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
-        } */
+        }
 
-        /* .profile-image {
+        .profile-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
-        } */
+        }
 
         .section-title {
             font-size: 14px;
             font-weight: bold;
-            color: #000000;
+            color: #eee;
             margin: 15px 0;
             border-bottom: 2px solid var(--primary-color);
             page-break-inside: avoid;
@@ -154,13 +150,11 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             word-break: break-word;
         }
 
-        /* .name-title {
+        .name-title {
             font-size: 24px;
-            color: #ffffff;
+            color: #2c3e50;
             font-weight: bold;
-            position: absolute;
-            top: -12.5rem;
-        } */
+        }
 
         .profile-text {
             background-color: white;
@@ -242,9 +236,6 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         }
 
         .signature-section {
-            position: relative;
-            top: 3rem;
-            /* left: 1rem; */
             margin-top: 20px;
             padding-top: 30px;
             text-align: center;
@@ -282,90 +273,13 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             margin-top: 5px;
         }
 
-        .main-content-area {
-            position: absolute;
-            top: 28rem;
-            left: 20rem;
-        }
-
-        .header {
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-            position: relative;
-            /* top: 5rem; */
-            /* left: 23rem; */
-            z-index: 1000;
-        }
-
-        .left {
-            flex-shrink: 0;
-        }
-
-        .profile-image-container {
-            width: 200px;
-            height: 200px;
-            overflow: hidden;
-            border-radius: 50%;
-        }
-
-        .profile-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .right {
-            position: relative;
-            top: 2rem;
-            left: 2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-        }
-
-        .name-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ffffff;
-            text-transform: uppercase;
-        }
-
-        .title-section {
-            font-size: 1rem;
-            color: #555;
-        }
-
-        .section1 {
-            position: relative;
-            top: 1.5rem;
-            left: -2rem;
-            text-align: wrap;
-            width: 17rem;
-            page-break-inside: avoid;
-
-        }
-
-        .section2 {
-            position: relative;
-            page-break-inside: avoid;
-        }
-
-        .title-section {
-            position: relative;
-            top: 1.5rem;
-            width: 100%;
-            color: #ffffff;
-            text-align: wrap;
-            page-break-inside: avoid;
-        }
-
         @media print {
             @page {
                 size: A4;
-                margin-top: 5mm;
+                /* margin-top: 5mm; */
             }
-            @page :first {
+
+            @page :first  {
                 margin-top: 0;
             }
 
@@ -386,20 +300,20 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             }
 
             .sidebar {
-                /* padding: 10mm; */
+                padding: 10mm;
                 /* height: auto !important; */
                 break-inside: avoid-page;
             }
 
             .main-content {
-                /* margin-top: 5mm; */
+                margin-top: 5mm;
                 height: auto !important;
                 padding-left: 10px;
             }
 
             .section-title {
                 margin: 6mm 0;
-                /* page-break-after: avoid; */
+                page-break-after: avoid;
             }
 
             .download-btn,
@@ -412,11 +326,40 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 page-break-before: always;
                 margin-top: 10mm;
             }
+        }
 
+        @media print {
+            .sidebar {
+                height: 1063px;
+                /* Default height for shorter content */
+            }
+
+            .sidebar.tall {
+                height: 2185px;
+                /* Taller version */
+            }
+
+            .sidebar.tall2 {
+                height: 3277px;
+                /* Taller version */
+            }
+
+            .sidebar.tall3 {
+                height: 4370.5px;
+                /* Taller version */
+            }
+
+            .content-wrapper {
+                margin-top: 25px !important;
+            }
+
+            .sidebar-color-selection {
+                margin 0;
+            }
         }
 
         .content-wrapper {
-            margin-top: -14rem !important;
+            margin-top: -35px !important;
         }
     </style>
 </head>
@@ -522,157 +465,143 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         <div class="main-grid">
             <div class="main-sidear-area">
                 <div class="sidebar">
-                    <div class="header">
-                        <div class="left">
-                            @if ($imageSrc)
-                                <div class="profile-image-container">
-                                    <img src="{{ $imageSrc }}" alt="Profile Image" class="profile-image">
-                                </div>
-                            @endif
+                    @if ($imageSrc)
+                        <div class="profile-image-container">
+                            <img src="{{ $imageSrc }}" alt="Profile Image" class="profile-image">
                         </div>
-                        <div class="right">
-                            <h1 class="name-title">{{ $user->name }}</h1>
-                            <div class="title-section">
-                                {!! $user->title !!}
-                            </div>
+                    @endif
+
+                    <div class="contact-section">
+                        <h2 class="section-title">CONTACT</h2>
+                        <div class="contact-info">
+                            <ul>
+                                <li>
+                                    @if ($user->address)
+                                        <div class="contact-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <div class="contact-text">{{ $user->address }}</div>
+                                        </div>
+                                    @endif
+                                </li>
+                                <li>
+                                    @if ($user->phone_number)
+                                        <div class="contact-item">
+                                            <i class="fas fa-phone"></i>
+                                            <div class="contact-text">{{ $user->phone_number }}</div>
+                                        </div>
+                                    @endif
+                                </li>
+                                <li>
+                                    @if ($user->email)
+                                        <div class="contact-item">
+                                            <i class="fas fa-envelope"></i>
+                                            <div class="contact-text">{{ $user->email }}</div>
+                                        </div>
+                                    @endif
+                                </li>
+                                <li>
+                                    @if ($user->linkedin)
+                                        <div class="contact-item">
+                                            <i class="fab fa-linkedin"></i>
+                                            <div class="contact-text">{{ $user->linkedin }}</div>
+                                        </div>
+                                    @endif
+                                </li>
+                                <li>
+                                    @if ($user->portfolio_link)
+                                        <div class="contact-item">
+                                            <i class="fas fa-globe"></i>
+                                            <div class="contact-text">{{ $user->portfolio_link }}</div>
+                                        </div>
+                                    @endif
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="section1">
-                        <div class="contact-section">
-                            <h2 class="section-title">CONTACT</h2>
-                            <div class="contact-info">
-                                <ul>
-                                    <li>
-                                        @if ($user->address)
-                                            <div class="contact-item">
-                                                <i class="fas fa-map-marker-alt"></i>
-                                                <div class="contact-text">{{ $user->address }}</div>
-                                            </div>
-                                        @endif
-                                    </li>
-                                    <li>
-                                        @if ($user->phone_number)
-                                            <div class="contact-item">
-                                                <i class="fas fa-phone"></i>
-                                                <div class="contact-text">{{ $user->phone_number }}</div>
-                                            </div>
-                                        @endif
-                                    </li>
-                                    <li>
-                                        @if ($user->email)
-                                            <div class="contact-item">
-                                                <i class="fas fa-envelope"></i>
-                                                <div class="contact-text">{{ $user->email }}</div>
-                                            </div>
-                                        @endif
-                                    </li>
-                                    <li>
-                                        @if ($user->linkedin)
-                                            <div class="contact-item">
-                                                <i class="fab fa-linkedin"></i>
-                                                <div class="contact-text">{{ $user->linkedin }}</div>
-                                            </div>
-                                        @endif
-                                    </li>
-                                    <li>
-                                        @if ($user->portfolio_link)
-                                            <div class="contact-item">
-                                                <i class="fas fa-globe"></i>
-                                                <div class="contact-text">{{ $user->portfolio_link }}</div>
-                                            </div>
-                                        @endif
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
 
-                        @if (
-                            $user->fullname ||
-                                $user->marital_status ||
-                                $user->date_of_birth ||
-                                $user->gender ||
-                                $user->nationality ||
-                                $user->nic_no)
-                            <div class="personal-details-section">
-                                <h2 class="section-title">PERSONAL DETAILS</h2>
-                                <div class="personal-details-list">
-                                    @if ($user->fullname)
-                                        <div class="contact-item">
-                                            <i class="fas fa-user"></i>
-                                            <div class="contact-text"><strong>Full Name:</strong>
-                                                {{ $user->fullname }}
-                                            </div>
+                    @if (
+                        $user->fullname ||
+                            $user->marital_status ||
+                            $user->date_of_birth ||
+                            $user->gender ||
+                            $user->nationality ||
+                            $user->nic_no)
+                        <div class="personal-details-section">
+                            <h2 class="section-title">PERSONAL DETAILS</h2>
+                            <div class="personal-details-list">
+                                @if ($user->fullname)
+                                    <div class="contact-item">
+                                        <i class="fas fa-user"></i>
+                                        <div class="contact-text"><strong>Full Name:</strong> {{ $user->fullname }}
                                         </div>
-                                    @endif
-                                    @if ($user->marital_status)
-                                        <div class="contact-item">
-                                            <i class="fas fa-heart"></i>
-                                            <div class="contact-text"><strong>Marital:</strong>
-                                                {{ $user->marital_status }}
-                                            </div>
+                                    </div>
+                                @endif
+                                @if ($user->marital_status)
+                                    <div class="contact-item">
+                                        <i class="fas fa-heart"></i>
+                                        <div class="contact-text"><strong>Marital:</strong>
+                                            {{ $user->marital_status }}
                                         </div>
-                                    @endif
-                                    @if ($user->date_of_birth)
-                                        <div class="contact-item">
-                                            <i class="fas fa-birthday-cake"></i>
-                                            <div class="contact-text"><strong>DOB:</strong>
-                                                {{ \Carbon\Carbon::parse($user->date_of_birth)->format('d M, Y') }}
-                                            </div>
+                                    </div>
+                                @endif
+                                @if ($user->date_of_birth)
+                                    <div class="contact-item">
+                                        <i class="fas fa-birthday-cake"></i>
+                                        <div class="contact-text"><strong>DOB:</strong>
+                                            {{ \Carbon\Carbon::parse($user->date_of_birth)->format('d M, Y') }}</div>
+                                    </div>
+                                @endif
+                                @if ($user->gender)
+                                    <div class="contact-item">
+                                        <i class="fas fa-venus-mars"></i>
+                                        <div class="contact-text"><strong>Gender:</strong> {{ $user->gender }}</div>
+                                    </div>
+                                @endif
+                                @if ($user->nationality)
+                                    <div class="contact-item">
+                                        <i class="fas fa-flag"></i>
+                                        <div class="contact-text"><strong>Nationality:</strong>
+                                            {{ $user->nationality }}
                                         </div>
-                                    @endif
-                                    @if ($user->gender)
-                                        <div class="contact-item">
-                                            <i class="fas fa-venus-mars"></i>
-                                            <div class="contact-text"><strong>Gender:</strong> {{ $user->gender }}
-                                            </div>
-                                        </div>
-                                    @endif
-                                    @if ($user->nationality)
-                                        <div class="contact-item">
-                                            <i class="fas fa-flag"></i>
-                                            <div class="contact-text"><strong>Nationality:</strong>
-                                                {{ $user->nationality }}
-                                            </div>
-                                        </div>
-                                    @endif
-                                    @if ($user->nic_no)
-                                        <div class="contact-item">
-                                            <i class="fas fa-id-card"></i>
-                                            <div class="contact-text"><strong>NIC:</strong> {{ $user->nic_no }}</div>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        @endif
-
-                        <div class="expertise-section">
-                            <h2 class="section-title">EXPERTISE</h2>
-                            <div class="expertise-list">
-                                @if ($user->skills)
-                                    {!! $user->skills !!}
+                                    </div>
+                                @endif
+                                @if ($user->nic_no)
+                                    <div class="contact-item">
+                                        <i class="fas fa-id-card"></i>
+                                        <div class="contact-text"><strong>NIC:</strong> {{ $user->nic_no }}</div>
+                                    </div>
                                 @endif
                             </div>
                         </div>
+                    @endif
 
-                        <div class="certifications-section">
-                            <h2 class="section-title">IT & COMPUTER SKILLS</h2>
-                            <div class="expertise-list">
-                                @if ($user->certifications)
-                                    {!! $user->certifications !!}
-                                @endif
-                            </div>
+                    <div class="expertise-section">
+                        <h2 class="section-title">EXPERTISE</h2>
+                        <div class="expertise-list">
+                            @if ($user->skills)
+                                {!! $user->skills !!}
+                            @endif
                         </div>
+                    </div>
 
-                        <div class="expertise-section">
-                            <h2 class="section-title">REFEREES</h2>
-                            <div class="expertise-list">
-                                @if ($user->referees)
-                                    {!! $user->referees !!}
-                                @endif
-                                @if ($user->referees2)
-                                    {!! $user->referees2 !!}
-                                @endif
-                            </div>
+                    <div class="certifications-section">
+                        <h2 class="section-title">IT & COMPUTER SKILLS</h2>
+                        <div class="expertise-list">
+                            @if ($user->certifications)
+                                {!! $user->certifications !!}
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="expertise-section">
+                        <h2 class="section-title">REFEREES</h2>
+                        <div class="expertise-list">
+                            @if ($user->referees)
+                                {!! $user->referees !!}
+                            @endif
+                            @if ($user->referees2)
+                                {!! $user->referees2 !!}
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -680,6 +609,10 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             <div class="main-content-area">
                 <div class="main-content">
                     <div class="content-wrapper">
+                        <h1 class="name-title" style="text-transform: uppercase;">{{ $user->name }}</h1>
+                        <div class="title-section">
+                            {!! $user->title !!}
+                        </div>
                         @if ($user->summary)
                             <div class="profile-section">
                                 <h2 style="margin-bottom: 5px;" class="section-title">PROFILE</h2>
@@ -714,8 +647,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
                         @if (isset($educations) && $educations->count() > 0)
                             <div class="education-section">
-                                <h2 style="margin-bottom: 5px;" class="section-title">Professional Qualification
-                                </h2>
+                                <h2 style="margin-bottom: 5px;" class="section-title">Professional Qualification</h2>
                                 @foreach ($educations as $education)
                                     <div class="education-item">
                                         <div class="degree job-title">{{ $education->degree }} in
@@ -745,28 +677,27 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                             </div>
                         @endif
                     </div>
-                </div>
 
-                <div class="signature-section">
-                    <p style="text-align: left; margin-bottom: 25px; margin-top:-40px;">I hereby certify that the
-                        particulars given
-                        above are true and correct to the best of my knowledge.</p>
-                    <div class="signature-container">
-                        <div class="signature-block">
-                            <div class="signature-value">{{ $user->name }}</div>
-                            <div style="width: auto;" class="signature-line"></div>
-                            <div class="signature-label">Name and Signature</div>
-                        </div>
-                        <div class="signature-block">
-                            <div class="signature-value">{{ date('d/m/Y') }}</div>
-                            <div class="signature-line"></div>
-                            <div class="signature-label">Date</div>
+                    <div class="signature-section">
+                        <p style="text-align: left; margin-bottom: 25px; margin-top:-40px;">I hereby certify that the
+                            particulars given
+                            above are true and correct to the best of my knowledge.</p>
+                        <div class="signature-container">
+                            <div class="signature-block">
+                                <div class="signature-value">{{ $user->name }}</div>
+                                <div style="width: auto;" class="signature-line"></div>
+                                <div class="signature-label">Name and Signature</div>
+                            </div>
+                            <div class="signature-block">
+                                <div class="signature-value">{{ date('d/m/Y') }}</div>
+                                <div class="signature-line"></div>
+                                <div class="signature-label">Date</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
     <script>
