@@ -27,7 +27,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
         @page {
             size: A4;
-            margin: 4mm 0;
+            margin: 0;
             background: var(--primary-color);
         }
 
@@ -61,11 +61,13 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         }
 
         .sidebar {
-            width: 75mm;
+            /* width: 75mm; */
             background-color: var(--sidebar-color);
             padding: 10mm;
-            color: #fff;
+            color: #000000;
             box-sizing: border-box;
+            height: 16.5rem;
+            width: 237%;
         }
 
         .main-content {
@@ -84,12 +86,15 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         }
 
         .profile-image-container {
-            width: 150px;
-            height: 150px;
+            width: 200px;
+            height: 200px;
             margin: 0 auto 20px;
             border-radius: 50%;
             overflow: hidden;
             border: 3px solid var(--primary-color);
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
         }
 
         .profile-image {
@@ -101,7 +106,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         .section-title {
             font-size: 14px;
             font-weight: bold;
-            color: #eee;
+            color: #000000;
             margin: 15px 0;
             border-bottom: 2px solid var(--primary-color);
             page-break-inside: avoid;
@@ -151,8 +156,11 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
         .name-title {
             font-size: 24px;
-            color: #2c3e50;
+            color: #ffffff;
             font-weight: bold;
+            position: absolute;
+            top: -12.5rem;
+            /* left: 1.5rem; */
         }
 
         .profile-text {
@@ -235,6 +243,9 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         }
 
         .signature-section {
+            position: relative;
+            top: 3rem;
+            /* left: 1rem; */
             margin-top: 20px;
             padding-top: 30px;
             text-align: center;
@@ -272,9 +283,46 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             margin-top: 5px;
         }
 
+        .main-content-area {
+            position: relative;
+            top: 14rem;
+        }
+
+        .section1 {
+            position: relative;
+            top: 14rem;
+            left: -2rem;
+            text-align: wrap;
+            width: 40%;
+            page-break-inside: avoid;
+
+        }
+
+        .section2 {
+            position: relative;
+            /* top: -1.5rem; */
+            /* width: 105%; */
+            page-break-inside: avoid;
+        }
+        .title-section{
+            position: relative;
+            top: 1.5rem;
+            width: 100%;
+            color: #ffffff;
+            margin-bottom: 4rem;
+            text-align: wrap;
+            page-break-inside: avoid;
+        }
+
         @media print {
+            @page {
+                size: A4;
+                margin-top: 11mm;
+                margin-bottom: 11mm;
+            }
+
             body {
-                margin: 0;
+                margin: 0 4mm;
                 padding: 0;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -296,12 +344,10 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             }
 
             .main-content {
-                padding: 10mm;
+                /* margin-top: 5mm; */
                 height: auto !important;
-                padding-left:10px;
+                padding-left: 10px;
             }
-
-
 
             .section-title {
                 margin: 6mm 0;
@@ -318,32 +364,42 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 page-break-before: always;
                 margin-top: 10mm;
             }
+
         }
+
         @media print {
             .sidebar {
-                height: 1063px; /* Default height for shorter content */
+                height: 10rem;
+                /* Default height for shorter content */
             }
 
             .sidebar.tall {
-                height: 2185px; /* Taller version */
+                height: 17rem;
+                /* Taller version */
             }
+
             .sidebar.tall2 {
-                height: 3277px; /* Taller version */
+                height: 27rem;
+                /* Taller version */
             }
+
             .sidebar.tall3 {
-                height: 4370.5px; /* Taller version */
+                height: 37rem;
+                /* Taller version */
             }
+
             .content-wrapper {
-                margin-top:25px !important;
+                margin-top: 25px !important;
             }
+
             .sidebar-color-selection {
                 margin 0;
             }
         }
-        .content-wrapper {
-                margin-top:-35px !important;
-            }
 
+        .content-wrapper {
+            margin-top: -14rem !important;
+        }
     </style>
 </head>
 
@@ -453,135 +509,142 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                             <img src="{{ $imageSrc }}" alt="Profile Image" class="profile-image">
                         </div>
                     @endif
-
-                    <div class="contact-section">
-                        <h2 class="section-title">CONTACT</h2>
-                        <div class="contact-info">
-                            <ul>
-                                <li>
-                                    @if ($user->address)
-                                        <div class="contact-item">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                            <div class="contact-text">{{ $user->address }}</div>
-                                        </div>
-                                    @endif
-                                </li>
-                                <li>
-                                    @if ($user->phone_number)
-                                        <div class="contact-item">
-                                            <i class="fas fa-phone"></i>
-                                            <div class="contact-text">{{ $user->phone_number }}</div>
-                                        </div>
-                                    @endif
-                                </li>
-                                <li>
-                                    @if ($user->email)
-                                        <div class="contact-item">
-                                            <i class="fas fa-envelope"></i>
-                                            <div class="contact-text">{{ $user->email }}</div>
-                                        </div>
-                                    @endif
-                                </li>
-                                <li>
-                                    @if ($user->linkedin)
-                                        <div class="contact-item">
-                                            <i class="fab fa-linkedin"></i>
-                                            <div class="contact-text">{{ $user->linkedin }}</div>
-                                        </div>
-                                    @endif
-                                </li>
-                                <li>
-                                    @if ($user->portfolio_link)
-                                        <div class="contact-item">
-                                            <i class="fas fa-globe"></i>
-                                            <div class="contact-text">{{ $user->portfolio_link }}</div>
-                                        </div>
-                                    @endif
-                                </li>
-                            </ul>
+                    <div class="section1">
+                        <div class="contact-section">
+                            <h2 class="section-title">CONTACT</h2>
+                            <div class="contact-info">
+                                <ul>
+                                    <li>
+                                        @if ($user->address)
+                                            <div class="contact-item">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <div class="contact-text">{{ $user->address }}</div>
+                                            </div>
+                                        @endif
+                                    </li>
+                                    <li>
+                                        @if ($user->phone_number)
+                                            <div class="contact-item">
+                                                <i class="fas fa-phone"></i>
+                                                <div class="contact-text">{{ $user->phone_number }}</div>
+                                            </div>
+                                        @endif
+                                    </li>
+                                    <li>
+                                        @if ($user->email)
+                                            <div class="contact-item">
+                                                <i class="fas fa-envelope"></i>
+                                                <div class="contact-text">{{ $user->email }}</div>
+                                            </div>
+                                        @endif
+                                    </li>
+                                    <li>
+                                        @if ($user->linkedin)
+                                            <div class="contact-item">
+                                                <i class="fab fa-linkedin"></i>
+                                                <div class="contact-text">{{ $user->linkedin }}</div>
+                                            </div>
+                                        @endif
+                                    </li>
+                                    <li>
+                                        @if ($user->portfolio_link)
+                                            <div class="contact-item">
+                                                <i class="fas fa-globe"></i>
+                                                <div class="contact-text">{{ $user->portfolio_link }}</div>
+                                            </div>
+                                        @endif
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
 
-                    @if (
-                        $user->fullname ||
-                            $user->marital_status ||
-                            $user->date_of_birth ||
-                            $user->gender ||
-                            $user->nationality ||
-                            $user->nic_no)
-                        <div class="personal-details-section">
-                            <h2 class="section-title">PERSONAL DETAILS</h2>
-                            <div class="personal-details-list">
-                                @if ($user->fullname)
-                                    <div class="contact-item">
-                                        <i class="fas fa-user"></i>
-                                        <div class="contact-text"><strong>Full Name:</strong> {{ $user->fullname }}</div>
-                                    </div>
-                                @endif
-                                @if ($user->marital_status)
-                                    <div class="contact-item">
-                                        <i class="fas fa-heart"></i>
-                                        <div class="contact-text"><strong>Marital:</strong> {{ $user->marital_status }}
+                        @if (
+                            $user->fullname ||
+                                $user->marital_status ||
+                                $user->date_of_birth ||
+                                $user->gender ||
+                                $user->nationality ||
+                                $user->nic_no)
+                            <div class="personal-details-section">
+                                <h2 class="section-title">PERSONAL DETAILS</h2>
+                                <div class="personal-details-list">
+                                    @if ($user->fullname)
+                                        <div class="contact-item">
+                                            <i class="fas fa-user"></i>
+                                            <div class="contact-text"><strong>Full Name:</strong>
+                                                {{ $user->fullname }}
+                                            </div>
                                         </div>
-                                    </div>
-                                @endif
-                                @if ($user->date_of_birth)
-                                    <div class="contact-item">
-                                        <i class="fas fa-birthday-cake"></i>
-                                        <div class="contact-text"><strong>DOB:</strong>
-                                            {{ \Carbon\Carbon::parse($user->date_of_birth)->format('d M, Y') }}</div>
-                                    </div>
-                                @endif
-                                @if ($user->gender)
-                                    <div class="contact-item">
-                                        <i class="fas fa-venus-mars"></i>
-                                        <div class="contact-text"><strong>Gender:</strong> {{ $user->gender }}</div>
-                                    </div>
-                                @endif
-                                @if ($user->nationality)
-                                    <div class="contact-item">
-                                        <i class="fas fa-flag"></i>
-                                        <div class="contact-text"><strong>Nationality:</strong> {{ $user->nationality }}
+                                    @endif
+                                    @if ($user->marital_status)
+                                        <div class="contact-item">
+                                            <i class="fas fa-heart"></i>
+                                            <div class="contact-text"><strong>Marital:</strong>
+                                                {{ $user->marital_status }}
+                                            </div>
                                         </div>
-                                    </div>
-                                @endif
-                                @if ($user->nic_no)
-                                    <div class="contact-item">
-                                        <i class="fas fa-id-card"></i>
-                                        <div class="contact-text"><strong>NIC:</strong> {{ $user->nic_no }}</div>
-                                    </div>
+                                    @endif
+                                    @if ($user->date_of_birth)
+                                        <div class="contact-item">
+                                            <i class="fas fa-birthday-cake"></i>
+                                            <div class="contact-text"><strong>DOB:</strong>
+                                                {{ \Carbon\Carbon::parse($user->date_of_birth)->format('d M, Y') }}
+                                            </div>
+                                        </div>
+                                    @endif
+                                    @if ($user->gender)
+                                        <div class="contact-item">
+                                            <i class="fas fa-venus-mars"></i>
+                                            <div class="contact-text"><strong>Gender:</strong> {{ $user->gender }}
+                                            </div>
+                                        </div>
+                                    @endif
+                                    @if ($user->nationality)
+                                        <div class="contact-item">
+                                            <i class="fas fa-flag"></i>
+                                            <div class="contact-text"><strong>Nationality:</strong>
+                                                {{ $user->nationality }}
+                                            </div>
+                                        </div>
+                                    @endif
+                                    @if ($user->nic_no)
+                                        <div class="contact-item">
+                                            <i class="fas fa-id-card"></i>
+                                            <div class="contact-text"><strong>NIC:</strong> {{ $user->nic_no }}</div>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="expertise-section">
+                            <h2 class="section-title">EXPERTISE</h2>
+                            <div class="expertise-list">
+                                @if ($user->skills)
+                                    {!! $user->skills !!}
                                 @endif
                             </div>
                         </div>
-                    @endif
 
-                    <div class="expertise-section">
-                        <h2 class="section-title">EXPERTISE</h2>
-                        <div class="expertise-list">
-                            @if ($user->skills)
-                                {!! $user->skills !!}
-                            @endif
+                        <div class="certifications-section">
+                            <h2 class="section-title">IT & COMPUTER SKILLS</h2>
+                            <div class="expertise-list">
+                                @if ($user->certifications)
+                                    {!! $user->certifications !!}
+                                @endif
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="certifications-section">
-                        <h2 class="section-title">IT & COMPUTER SKILLS</h2>
-                        <div class="expertise-list">
-                            @if ($user->certifications)
-                                {!! $user->certifications !!}
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="expertise-section">
-                        <h2 class="section-title">REFEREES</h2>
-                        <div class="expertise-list">
-                            @if ($user->referees)
-                                {!! $user->referees !!}
-                            @endif
-                            @if ($user->referees2)
-                                {!! $user->referees2 !!}
-                            @endif
+                        <div class="expertise-section">
+                            <h2 class="section-title">REFEREES</h2>
+                            <div class="expertise-list">
+                                @if ($user->referees)
+                                    {!! $user->referees !!}
+                                @endif
+                                @if ($user->referees2)
+                                    {!! $user->referees2 !!}
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -593,73 +656,78 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                         <div class="title-section">
                             {!! $user->title !!}
                         </div>
-                        @if ($user->summary)
-                            <div class="profile-section">
-                                <h2 style="margin-bottom: 5px;" class="section-title">PROFILE</h2>
-                                <div class="experience-item">
-                                    <div class="profile-text">
-                                        <p style="text-align: justify;">{{ $user->summary }}</p>
+                        <div class="section2">
+                            @if ($user->summary)
+                                <div class="profile-section">
+                                    <h2 style="margin-bottom: 5px;" class="section-title">PROFILE</h2>
+                                    <div class="experience-item">
+                                        <div class="profile-text">
+                                            <p style="text-align: justify;">{{ $user->summary }}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endif
+                            @endif
 
-                        @if (isset($experiences) && $experiences->count() > 0)
-                            <div class="experience-section">
-                                <h2 style="margin-bottom: 5px;" class="section-title">WORK EXPERIENCE</h2>
-                                @foreach ($experiences as $experience)
-                                    <div class="experience-item">
-                                        <div class="job-title">{{ $experience->job_title }}</div>
-                                        <div class="" style="display: flex; justify-content: space-between;">
-                                            <div class="company-name">{{ $experience->company_name }}</div>
-                                            <div class="date-range" style="white-space: nowrap;">
-                                                {{ \Carbon\Carbon::parse($experience->start_date)->format('Y') }} -
-                                                {{ $experience->end_date ? \Carbon\Carbon::parse($experience->end_date)->format('Y') : 'Present' }}
+                            @if (isset($experiences) && $experiences->count() > 0)
+                                <div class="experience-section">
+                                    <h2 style="margin-bottom: 5px;" class="section-title">WORK EXPERIENCE</h2>
+                                    @foreach ($experiences as $experience)
+                                        <div class="experience-item">
+                                            <div class="job-title">{{ $experience->job_title }}</div>
+                                            <div class=""
+                                                style="display: flex; justify-content: space-between;">
+                                                <div class="company-name">{{ $experience->company_name }}</div>
+                                                <div class="date-range" style="white-space: nowrap;">
+                                                    {{ \Carbon\Carbon::parse($experience->start_date)->format('Y') }} -
+                                                    {{ $experience->end_date ? \Carbon\Carbon::parse($experience->end_date)->format('Y') : 'Present' }}
+                                                </div>
+                                            </div>
+                                            <div class="job-description" style="text-align: justify;">
+                                                {!! $experience->job_description !!}
                                             </div>
                                         </div>
-                                        <div class="job-description" style="text-align: justify;">
-                                            {!! $experience->job_description !!}
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            @if (isset($educations) && $educations->count() > 0)
+                                <div class="education-section">
+                                    <h2 style="margin-bottom: 5px;" class="section-title">Professional Qualification
+                                    </h2>
+                                    @foreach ($educations as $education)
+                                        <div class="education-item">
+                                            <div class="degree job-title">{{ $education->degree }} in
+                                                {{ $education->institution_name }}</div>
+                                            @if ($education->field_of_study)
+                                                <div class="job-description">{!! $education->field_of_study !!}</div>
+                                            @endif
+                                            <div class="institution">{{ $education->institution_name }}</div>
                                         </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
+                                    @endforeach
+                                </div>
+                            @endif
 
-                        @if (isset($educations) && $educations->count() > 0)
-                            <div class="education-section">
-                                <h2 style="margin-bottom: 5px;" class="section-title">Professional Qualification</h2>
-                                @foreach ($educations as $education)
-                                    <div class="education-item">
-                                        <div class="degree job-title">{{ $education->degree }} in
-                                            {{ $education->institution_name }}</div>
-                                        @if ($education->field_of_study)
-                                            <div class="job-description">{!! $education->field_of_study !!}</div>
-                                        @endif
-                                        <div class="institution">{{ $education->institution_name }}</div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
-
-                        @if (isset($academicEducations) && $academicEducations->count() > 0)
-                            <div class="education-section">
-                                <h2 style="margin-bottom: 5px;" class="section-title">Academic Qualifications</h2>
-                                @foreach ($academicEducations as $education)
-                                    <div class="education-item">
-                                        <div class="degree job-title">{{ $education->degree }} in
-                                            {{ $education->institution_name }}</div>
-                                        @if ($education->field_of_study)
-                                            <div class="job-description">{!! $education->field_of_study !!}</div>
-                                        @endif
-                                        <div class="institution">{{ $education->institution_name }}</div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
+                            @if (isset($academicEducations) && $academicEducations->count() > 0)
+                                <div class="education-section">
+                                    <h2 style="margin-bottom: 5px;" class="section-title">Academic Qualifications</h2>
+                                    @foreach ($academicEducations as $education)
+                                        <div class="education-item">
+                                            <div class="degree job-title">{{ $education->degree }} in
+                                                {{ $education->institution_name }}</div>
+                                            @if ($education->field_of_study)
+                                                <div class="job-description">{!! $education->field_of_study !!}</div>
+                                            @endif
+                                            <div class="institution">{{ $education->institution_name }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
                     </div>
 
                     <div class="signature-section">
-                        <p style="text-align: left; margin-bottom: 25px; margin-top:-40px;">I hereby certify that the particulars given
+                        <p style="text-align: left; margin-bottom: 25px; margin-top:-40px;">I hereby certify that the
+                            particulars given
                             above are true and correct to the best of my knowledge.</p>
                         <div class="signature-container">
                             <div class="signature-block">
@@ -686,15 +754,15 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             const totalHeight = mainContent.offsetHeight;
             if (totalHeight <= 1122) {
                 sidebar.classList.remove('tall');
-            } else if(totalHeight > 1122 && totalHeight < 2244) {
+            } else if (totalHeight > 1122 && totalHeight < 2244) {
                 sidebar.classList.remove('tall2');
                 sidebar.classList.remove('tall3');
                 sidebar.classList.add('tall');
-            } else if(totalHeight > 2244 && totalHeight < 3300) {
+            } else if (totalHeight > 2244 && totalHeight < 3300) {
                 sidebar.classList.add('tall2');
                 sidebar.classList.remove('tall');
                 sidebar.classList.remove('tall3');
-            } else if(totalHeight > 3300 && totalHeight < 4488) {
+            } else if (totalHeight > 3300 && totalHeight < 4488) {
                 sidebar.classList.remove('tall2');
                 sidebar.classList.remove('tall');
                 sidebar.classList.add('tall3');
