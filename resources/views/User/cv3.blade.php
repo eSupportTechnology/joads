@@ -244,7 +244,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         .signature-section {
             position: relative;
             top: 3rem;
-            /* left: 1rem; */
+            left: 0.5rem;
             margin-top: 20px;
             padding-top: 30px;
             text-align: center;
@@ -284,7 +284,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
         .main-content-area {
             position: absolute;
-            top: 28rem;
+            top: 27.5rem;
             left: 20rem;
         }
 
@@ -338,8 +338,8 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
         .section1 {
             position: relative;
-            top: 1.5rem;
-            left: -1rem;
+            top: 1rem;
+            left: -1.5rem;
             text-align: wrap;
             width: 17rem;
             page-break-inside: avoid;
@@ -347,6 +347,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         }
 
         .section2 {
+            top: 0.5rem;
             position: relative;
             page-break-inside: avoid;
         }
@@ -393,9 +394,8 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             }
 
             .main-content {
-                /* margin-top: 5mm; */
                 height: auto !important;
-                /* padding-left: 4rem; */
+                top: -0.3rem;
                 width: 50rem;
             }
 
@@ -414,6 +414,13 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 page-break-before: always;
                 margin-top: 10mm;
             }
+            .section1{
+                top: 0.7rem;
+            }
+            .signature-section{
+                left: 0.6rem;
+            }
+
 
         }
 
@@ -752,7 +759,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 <div class="signature-section">
                     <p style="text-align: left; margin-bottom: 25px; margin-top:-40px;">I hereby certify that the
                         particulars given
-                        above are true and correct to the best of my knowledge.</p>
+                        above are true and <br>correct to the best of my knowledge.</p>
                     <div class="signature-container">
                         <div class="signature-block">
                             <div class="signature-value">{{ $user->name }}</div>
