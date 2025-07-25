@@ -453,7 +453,7 @@
                 <a href="https://www.linkedin.com/company/jobads-lk/?viewAsMember=true" target="_blank">
                     <img src="{{ asset('linkedin.jpeg') }}" alt="LinkedIn">
                 </a>
-                <a href="https://www.facebook.com/jobads.lkJSG" target="_blank">
+                <a href="https://web.facebook.com/jobads.lk.official" target="_blank">
                     <img src="{{ asset('facebook.jpeg') }}" alt="Facebook">
                 </a>
                 <a href="https://www.instagram.com/jobadslk/" target="_blank">
@@ -461,6 +461,9 @@
                 </a>
                 <a href="https://www.tiktok.com/@jobads.lk" target="_blank">
                     <img src="{{ asset('tiktok.jpeg') }}" alt="TikTok">
+                </a>
+                <a href="https://www.youtube.com/@JobAdsLk" target="_blank">
+                    <img src="{{ asset('youtube.png') }}" alt="TikTok">
                 </a>
 
                 <div class="menu">
