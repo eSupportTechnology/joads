@@ -463,7 +463,7 @@
                     <img src="{{ asset('tiktok.jpeg') }}" alt="TikTok">
                 </a>
                 <a href="https://www.youtube.com/@JobAdsLk" target="_blank">
-                    <img src="{{ asset('youtube.png') }}" alt="TikTok">
+                    <img src="{{ asset('youtube.jpg') }}" style="width: 2.2rem; height: 2.2rem;" alt="TikTok">
                 </a>
 
                 <div class="menu">
