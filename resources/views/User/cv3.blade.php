@@ -339,7 +339,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         .section1 {
             position: relative;
             top: 1.5rem;
-            left: -2rem;
+            left: -1rem;
             text-align: wrap;
             width: 17rem;
             page-break-inside: avoid;
@@ -370,7 +370,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             }
 
             body {
-                margin: 0;
+                margin: -1rem;
                 padding: 0;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -388,13 +388,15 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             .sidebar {
                 /* padding: 10mm; */
                 /* height: auto !important; */
+                width:52rem;
                 break-inside: avoid-page;
             }
 
             .main-content {
                 /* margin-top: 5mm; */
                 height: auto !important;
-                padding-left: 10px;
+                /* padding-left: 4rem; */
+                width: 50rem;
             }
 
             .section-title {
