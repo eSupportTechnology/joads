@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="{{ asset('css/education.css') }}">
     <link rel="stylesheet" href="{{ asset('css/myapplication.css') }}">
     <style>
-        <style>
         .cvbutton {
             width: 260px;
             text-align: center;
@@ -47,7 +46,6 @@
             padding: 10px 15px;
             text-decoration: none;
             color: #333;
-            text-align: center;
         }
 
         .dropdown-item:hover {
@@ -65,7 +63,6 @@
             border-right: 5px solid transparent;
             border-left: 5px solid transparent;
         }
-    </style>
     </style>
 </head>
 
@@ -106,9 +103,9 @@
                     Create CV
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="preferred">
-                    <li><a class="dropdown-item" href="{{ route('generate.index') }}">1 - Template A</a></li>
-                    <li><a class="dropdown-item" href="{{ route('generate.index2') }}">2 - Template B</a></li>
-                    <li><a class="dropdown-item" href="{{ route('generate.index3') }}">3 - Template C</a></li>
+                    <a class="dropdown-item" href="{{ route('generate.index') }}">1 - Template A</a>
+                    <a class="dropdown-item" href="{{ route('generate.index2') }}">2 - Template B</a>
+                    <a class="dropdown-item" href="{{ route('generate.index3') }}">3 - Template C</a>
                 </ul>
             </div>
             {{-- <a href="/mainprofileview/recentjob" class="btn btn-common" id="recent">Recent Jobs</a> --}}
