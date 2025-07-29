@@ -80,9 +80,6 @@
                                             <div id="hidden_category_inputs"></div>
                                         </div>
 
-
-
-
                                         <div class="detail-item mb-3 border-bottom pb-2">
                                             <h6 class="text-primary mb-1"><i class="fas fa-tag me-2"></i>Sub Category</h6>
 
@@ -299,57 +296,89 @@
 
     <script>
         const categories = @json($categories);
-        const subcategories = @json($sub_categories);
+    const subcategories = @json($sub_categories);
 
-        const categorySelect = document.getElementById('category_select');
-        const subcategorySelect = document.getElementById('subcategory_select');
+    const categorySelect = document.getElementById('category_select');
+    const subcategorySelect = document.getElementById('subcategory_select');
 
-        const categoryTagContainer = document.getElementById('selected_categories');
-        const subcategoryTagContainer = document.getElementById('selected_subcategories');
+    const categoryTagContainer = document.getElementById('selected_categories');
+    const subcategoryTagContainer = document.getElementById('selected_subcategories');
 
-        const hiddenCategoryInputs = document.getElementById('hidden_category_inputs');
-        const hiddenSubcategoryInputs = document.getElementById('hidden_subcategory_inputs');
+    const hiddenCategoryInputs = document.getElementById('hidden_category_inputs');
+    const hiddenSubcategoryInputs = document.getElementById('hidden_subcategory_inputs');
 
-        function renderSelectedItems(selectEl, tagContainer, hiddenContainer, sourceList, inputName) {
-            tagContainer.innerHTML = '';
-            hiddenContainer.innerHTML = '';
+    function renderSelectedItems(selectEl, tagContainer, hiddenContainer, sourceList, inputName) {
+        tagContainer.innerHTML = '';
+        hiddenContainer.innerHTML = '';
 
-            const selectedIds = Array.from(selectEl.selectedOptions).map(option => option.value);
+        const selectedIds = Array.from(selectEl.selectedOptions).map(option => option.value);
 
-            selectedIds.forEach(id => {
-                const item = sourceList.find(c => c.id == id);
+        selectedIds.forEach(id => {
+            const item = sourceList.find(c => c.id == id);
 
-                // Tag display
-                const tag = document.createElement('span');
-                tag.className = 'badge bg-success text-white me-1 mb-1';
-                tag.innerText = item?.name || 'Unknown';
-                tagContainer.appendChild(tag);
+            // Tag display
+            const tag = document.createElement('span');
+            tag.className = 'badge bg-success text-white me-1 mb-1';
+            tag.innerText = item?.name || 'Unknown';
+            tagContainer.appendChild(tag);
 
-                // Hidden input
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = inputName + '[]';
-                input.value = id;
-                hiddenContainer.appendChild(input);
-            });
+            // Hidden input
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = inputName + '[]';
+            input.value = id;
+            hiddenContainer.appendChild(input);
+        });
+    }
+
+    function handleCategoryChange() {
+    renderSelectedItems(categorySelect, categoryTagContainer, hiddenCategoryInputs, categories, 'category_id');
+
+    const selectedCategoryIds = Array.from(categorySelect.selectedOptions).map(option => option.value);
+
+    let filteredSubcategories;
+
+    if (selectedCategoryIds.length > 0) {
+        // Filter subcategories by selected categories
+        filteredSubcategories = subcategories.filter(sc =>
+            selectedCategoryIds.includes(sc.category_id.toString())
+        );
+    } else {
+        // No category selected → show all subcategories
+        filteredSubcategories = subcategories;
+    }
+
+    // Save previously selected subcategory IDs
+    const prevSelected = Array.from(subcategorySelect.selectedOptions).map(opt => opt.value);
+
+    // Clear and repopulate subcategory select
+    subcategorySelect.innerHTML = '';
+    filteredSubcategories.forEach(sc => {
+        const option = document.createElement('option');
+        option.value = sc.id;
+        option.text = sc.name;
+
+        // Retain previous selection if applicable
+        if (prevSelected.includes(sc.id.toString())) {
+            option.selected = true;
         }
 
-        function handleCategoryChange() {
-            renderSelectedItems(categorySelect, categoryTagContainer, hiddenCategoryInputs, categories, 'category_id');
-        }
+        subcategorySelect.appendChild(option);
+    });
 
-        function handleSubcategoryChange() {
-            renderSelectedItems(subcategorySelect, subcategoryTagContainer, hiddenSubcategoryInputs, subcategories,
-                'subcategory_id');
-        }
+    handleSubcategoryChange();
+}
 
-        // Initial rendering
-        handleCategoryChange();
-        handleSubcategoryChange();
+    function handleSubcategoryChange() {
+        renderSelectedItems(subcategorySelect, subcategoryTagContainer, hiddenSubcategoryInputs, subcategories, 'subcategory_id');
+    }
 
-        // Event listeners
-        categorySelect.addEventListener('change', handleCategoryChange);
-        subcategorySelect.addEventListener('change', handleSubcategoryChange);
+    // Initial rendering
+    handleCategoryChange();
+
+    // Event listeners
+    categorySelect.addEventListener('change', handleCategoryChange);
+    subcategorySelect.addEventListener('change', handleSubcategoryChange);
         // Form validation
         (function() {
             'use strict'
