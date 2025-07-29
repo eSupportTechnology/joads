@@ -66,7 +66,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             padding: 10mm;
             color: #000000;
             box-sizing: border-box;
-            height: 16.5rem;
+            height: 13rem;
             width: 48rem;
         }
 
@@ -79,6 +79,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             width: 125mm;
             box-sizing: border-box;
             padding-left: 10px;
+            break-inside: avoid-page;
         }
 
         .main-content .section-title {
@@ -243,8 +244,8 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
         .signature-section {
             position: relative;
-            top: 3rem;
-            left: 0.5rem;
+            top: 1rem;
+            left: -18rem;
             margin-top: 20px;
             padding-top: 30px;
             text-align: center;
@@ -284,7 +285,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
         .main-content-area {
             position: absolute;
-            top: 27.5rem;
+            top: 24.2rem;
             left: 20rem;
         }
 
@@ -293,7 +294,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             align-items: flex-start;
             gap: 20px;
             position: relative;
-            /* top: 5rem; */
+            top: -1rem;
             /* left: 23rem; */
             z-index: 1000;
         }
@@ -303,8 +304,8 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         }
 
         .profile-image-container {
-            width: 200px;
-            height: 200px;
+            width: 170px;
+            height: 170px;
             overflow: hidden;
             border-radius: 50%;
         }
@@ -338,8 +339,8 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
         .section1 {
             position: relative;
-            top: 1rem;
-            left: -1.5rem;
+            top: -0.5rem;
+            left: -1rem;
             text-align: wrap;
             width: 17rem;
             page-break-inside: avoid;
@@ -361,11 +362,36 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             page-break-inside: avoid;
         }
 
+        .referees-list {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 5rem;
+            padding-left: 16px;
+            /* width: 150%; */
+            text-align: justify
+        }
+        .second{
+            position: relative;
+            left: 15rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .referees-section{
+            position: relative;
+            left:-11rem;
+        }
+
         @media print {
             @page {
                 size: A4;
-                margin-top: 5mm;
+                margin-top: 4rem;
+                /* margin-bottom: 5mm; */
+                break-inside: avoid-page;
+                page-break-before: avoid;
             }
+
             @page :first {
                 margin-top: 0;
             }
@@ -389,7 +415,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             .sidebar {
                 /* padding: 10mm; */
                 /* height: auto !important; */
-                width:52rem;
+                width: 52rem;
                 break-inside: avoid-page;
             }
 
@@ -397,10 +423,12 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 height: auto !important;
                 top: -0.3rem;
                 width: 50rem;
+                break-inside: avoid-page;
             }
 
             .section-title {
                 margin: 6mm 0;
+                page-break-before: avoid;
                 /* page-break-after: avoid; */
             }
 
@@ -412,16 +440,32 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
             .page-break {
                 page-break-before: always;
+                break-before: page;
                 margin-top: 10mm;
             }
-            .section1{
-                top: 0.7rem;
-            }
-            .signature-section{
-                left: 0.6rem;
+
+            .section1 {
+                top: -0.6rem;
             }
 
+            .signature-section {
+                left: -18rem;
+            }
 
+            .referees-list {
+                position: relative;
+                display: flex;
+                flex-direction: row;
+                gap: 2rem;
+                margin-bottom: 5rem;
+                padding-left: 16px;
+                text-align: justify
+            }
+            .referees-section{
+            position: relative;
+            left:-12.3rem;
+
+        }
         }
 
         .content-wrapper {
@@ -672,17 +716,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                             </div>
                         </div>
 
-                        <div class="expertise-section">
-                            <h2 class="section-title">REFEREES</h2>
-                            <div class="expertise-list">
-                                @if ($user->referees)
-                                    {!! $user->referees !!}
-                                @endif
-                                @if ($user->referees2)
-                                    {!! $user->referees2 !!}
-                                @endif
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -757,9 +791,21 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 </div>
 
                 <div class="signature-section">
-                    <p style="text-align: left; margin-bottom: 25px; margin-top:-40px;">I hereby certify that the
-                        particulars given
-                        above are true and <br>correct to the best of my knowledge.</p>
+                    <h4 class="referees-section">REFEREES</h4>
+                    <div class="referees-list">
+                        <div class="first">
+                            @if ($user->referees)
+                                {!! $user->referees !!}
+                            @endif
+                        </div>
+                        <div class="second">
+                            @if ($user->referees2)
+                                {!! $user->referees2 !!}
+                            @endif
+                        </div>
+                    </div>
+                    <p style="text-align: left; width: 155%; margin-bottom: 25px; margin-top:-40px; margin-left: 18px;">I hereby certify that the
+                        particulars given above are true and correct to the best of my knowledge.</p>
                     <div class="signature-container">
                         <div class="signature-block">
                             <div class="signature-value">{{ $user->name }}</div>
