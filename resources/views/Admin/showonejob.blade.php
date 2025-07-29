@@ -42,8 +42,6 @@
                                 <div class="position-relative overflow-hidden rounded-3 shadow-sm hover-zoom">
                                     <img src="{{ asset('storage/' . $job->image) }}" alt="Job Image"
                                         class="img-fluid w-100 transition-transform">
-
-
                                 </div>
                             </div>
 
@@ -63,40 +61,52 @@
                                         <div class="detail-item mb-3 border-bottom pb-2">
                                             <h6 class="text-primary mb-1"><i class="fas fa-tag me-2"></i>Category</h6>
 
-                                            {{-- Multi-select for categories --}}
-                                            <select id="category_select" class="form-control" multiple>
-                                                @foreach ($categories as $category)
-                                                    <option value="{{ $category->id }}"
-                                                        {{ isset($job->category_ids) && in_array($category->id, $job->category_ids) ? 'selected' : '' }}>
-                                                        {{ $category->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <!-- Custom Category Dropdown -->
+                                            <div class="dropdown-container">
+                                                <div class="dropdown-input" id="category_dropdown_input">
+                                                    <span class="dropdown-placeholder">Select Categories</span>
+                                                    <i class="fas fa-chevron-down dropdown-arrow" id="category_arrow"></i>
+                                                </div>
+                                                <div class="dropdown-menu-custom" id="category_dropdown_menu">
+                                                    @foreach ($categories as $category)
+                                                        <div class="dropdown-item-custom" data-value="{{ $category->id }}" data-text="{{ $category->name }}">
+                                                            {{ $category->name }}
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
 
-                                            {{-- Tag display --}}
+                                            <!-- Selected Categories Display -->
                                             <div id="selected_categories" class="tag-container mt-2"></div>
 
-                                            {{-- Hidden inputs for submission --}}
+                                            <!-- Hidden inputs for form submission -->
                                             <div id="hidden_category_inputs"></div>
                                         </div>
 
                                         <div class="detail-item mb-3 border-bottom pb-2">
                                             <h6 class="text-primary mb-1"><i class="fas fa-tag me-2"></i>Sub Category</h6>
 
-                                            <select id="subcategory_select" class="form-control" style="height: 150px"
-                                                multiple>
-                                                @foreach ($sub_categories as $sub_category)
-                                                    <option value="{{ $sub_category->id }}"
-                                                        {{ in_array($sub_category->id, $job->subcategory_ids ?? []) ? 'selected' : '' }}>
-                                                        {{ $sub_category->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <!-- Custom Subcategory Dropdown -->
+                                            <div class="dropdown-container">
+                                                <div class="dropdown-input" id="subcategory_dropdown_input">
+                                                    <span class="dropdown-placeholder">Select Subcategories</span>
+                                                    <i class="fas fa-chevron-down dropdown-arrow" id="subcategory_arrow"></i>
+                                                </div>
+                                                <div class="dropdown-menu-custom" id="subcategory_dropdown_menu">
+                                                    @foreach ($sub_categories as $sub_category)
+                                                        <div class="dropdown-item-custom" data-value="{{ $sub_category->id }}" data-text="{{ $sub_category->name }}" data-category="{{ $sub_category->category_id }}">
+                                                            {{ $sub_category->name }}
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
 
+                                            <!-- Selected Subcategories Display -->
                                             <div id="selected_subcategories" class="tag-container mt-2"></div>
+
+                                            <!-- Hidden inputs for form submission -->
                                             <div id="hidden_subcategory_inputs"></div>
                                         </div>
-
 
                                         <div class="detail-item mb-3 border-bottom pb-2">
                                             <h6 class="text-primary mb-1"><i class="fas fa-building me-2"></i>Employer</h6>
@@ -164,7 +174,6 @@
                                         <button type="submit" class="btn btn-primary mt-3">Update Job</button>
                                     </form>
 
-
                                     @if ($job->status == 'rejected')
                                         <div class="detail-item mb-3 bg-danger-subtle p-3 rounded">
                                             <h6 class="text-danger mb-1"><i
@@ -183,8 +192,6 @@
                     <div class="card-header bg-gradient-secondary text-white py-3">
                         <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Update Job Status</h5>
                     </div>
-
-
 
                     <div class="card-body">
                         <form action="{{ route('job_postings.updateStatus', $job->id) }}" method="POST"
@@ -226,8 +233,6 @@
                             <button type="submit" class="btn btn-primary btn-lg px-4 shadow-sm hover-lift">
                                 <i class="fas fa-save me-2"></i>Update Status
                             </button>
-
-
                         </form>
                     </div>
                 </div>
@@ -292,93 +297,311 @@
             padding: 6px 10px;
             border-radius: 12px;
         }
+
+        /* Custom Dropdown Styles */
+        .dropdown-container {
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+
+        .dropdown-input {
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+            background-color: white;
+            cursor: pointer;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-input:hover {
+            border-color: #86b7fe;
+        }
+
+        .dropdown-input.active {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .dropdown-arrow {
+            position: relative;
+            left:1rem;
+            transition: transform 0.2s ease;
+            color: #6c757d;
+        }
+
+        .dropdown-arrow.rotated {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu-custom {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .dropdown-menu-custom.show {
+            display: block;
+        }
+
+        .dropdown-item-custom {
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-item-custom:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item-custom:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item-custom.selected {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .tag-container .badge {
+            position: relative;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+            padding-right: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tag-remove {
+            position: absolute;
+            top: 50%;
+            right: 0.3rem;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 0.7rem;
+            opacity: 0.8;
+            z-index: 1001;
+            background: transparent;
+            border: none;
+            color: white;
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .tag-remove:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .tag-remove:active {
+            transform: translateY(-50%) scale(0.95);
+        }
     </style>
 
     <script>
         const categories = @json($categories);
-    const subcategories = @json($sub_categories);
+        const subcategories = @json($sub_categories);
 
-    const categorySelect = document.getElementById('category_select');
-    const subcategorySelect = document.getElementById('subcategory_select');
+        // Initialize selected items from backend data
+        const initialCategoryIds = @json($job->category_ids ?? []);
+        const initialSubcategoryIds = @json($job->subcategory_ids ?? []);
 
-    const categoryTagContainer = document.getElementById('selected_categories');
-    const subcategoryTagContainer = document.getElementById('selected_subcategories');
+        let selectedCategories = [...initialCategoryIds];
+        let selectedSubcategories = [...initialSubcategoryIds];
 
-    const hiddenCategoryInputs = document.getElementById('hidden_category_inputs');
-    const hiddenSubcategoryInputs = document.getElementById('hidden_subcategory_inputs');
+        // Dropdown functionality
+        function initializeDropdown(inputId, menuId, arrowId, selectedItems, sourceList, onSelectionChange) {
+            const input = document.getElementById(inputId);
+            const menu = document.getElementById(menuId);
+            const arrow = document.getElementById(arrowId);
 
-    function renderSelectedItems(selectEl, tagContainer, hiddenContainer, sourceList, inputName) {
-        tagContainer.innerHTML = '';
-        hiddenContainer.innerHTML = '';
+            // Toggle dropdown
+            input.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isOpen = menu.classList.contains('show');
 
-        const selectedIds = Array.from(selectEl.selectedOptions).map(option => option.value);
+                // Close all other dropdowns
+                document.querySelectorAll('.dropdown-menu-custom').forEach(m => m.classList.remove('show'));
+                document.querySelectorAll('.dropdown-arrow').forEach(a => a.classList.remove('rotated'));
+                document.querySelectorAll('.dropdown-input').forEach(i => i.classList.remove('active'));
 
-        selectedIds.forEach(id => {
-            const item = sourceList.find(c => c.id == id);
+                if (!isOpen) {
+                    menu.classList.add('show');
+                    arrow.classList.add('rotated');
+                    input.classList.add('active');
+                }
+            });
 
-            // Tag display
-            const tag = document.createElement('span');
-            tag.className = 'badge bg-success text-white me-1 mb-1';
-            tag.innerText = item?.name || 'Unknown';
-            tagContainer.appendChild(tag);
+            // Handle item selection
+            menu.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item-custom')) {
+                    const value = e.target.getAttribute('data-value');
+                    const text = e.target.getAttribute('data-text');
 
-            // Hidden input
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = inputName + '[]';
-            input.value = id;
-            hiddenContainer.appendChild(input);
-        });
-    }
-
-    function handleCategoryChange() {
-    renderSelectedItems(categorySelect, categoryTagContainer, hiddenCategoryInputs, categories, 'category_id');
-
-    const selectedCategoryIds = Array.from(categorySelect.selectedOptions).map(option => option.value);
-
-    let filteredSubcategories;
-
-    if (selectedCategoryIds.length > 0) {
-        // Filter subcategories by selected categories
-        filteredSubcategories = subcategories.filter(sc =>
-            selectedCategoryIds.includes(sc.category_id.toString())
-        );
-    } else {
-        // No category selected → show all subcategories
-        filteredSubcategories = subcategories;
-    }
-
-    // Save previously selected subcategory IDs
-    const prevSelected = Array.from(subcategorySelect.selectedOptions).map(opt => opt.value);
-
-    // Clear and repopulate subcategory select
-    subcategorySelect.innerHTML = '';
-    filteredSubcategories.forEach(sc => {
-        const option = document.createElement('option');
-        option.value = sc.id;
-        option.text = sc.name;
-
-        // Retain previous selection if applicable
-        if (prevSelected.includes(sc.id.toString())) {
-            option.selected = true;
+                    if (!selectedItems.includes(value)) {
+                        selectedItems.push(value);
+                        onSelectionChange();
+                    }
+                }
+            });
         }
 
-        subcategorySelect.appendChild(option);
-    });
+        // Render selected items with remove functionality
+        function renderSelectedItems(container, hiddenContainer, selectedItems, sourceList, inputName) {
+            container.innerHTML = '';
+            hiddenContainer.innerHTML = '';
 
-    handleSubcategoryChange();
-}
+            selectedItems.forEach(id => {
+                const item = sourceList.find(c => c.id == id);
+                if (!item) return;
 
-    function handleSubcategoryChange() {
-        renderSelectedItems(subcategorySelect, subcategoryTagContainer, hiddenSubcategoryInputs, subcategories, 'subcategory_id');
-    }
+                // Create badge wrapper
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-success text-white me-1 mb-1';
 
-    // Initial rendering
-    handleCategoryChange();
+                // Create text content
+                const textNode = document.createTextNode(item.name);
+                badge.appendChild(textNode);
 
-    // Event listeners
-    categorySelect.addEventListener('change', handleCategoryChange);
-    subcategorySelect.addEventListener('change', handleSubcategoryChange);
+                // Create remove button as a simple clickable element
+                const removeBtn = document.createElement('span');
+                removeBtn.className = 'tag-remove';
+                removeBtn.innerHTML = '&times;'; // Using HTML entity for multiplication sign
+                removeBtn.setAttribute('data-id', id);
+                removeBtn.setAttribute('data-type', inputName);
+                removeBtn.title = 'Remove ' + item.name;
+
+                // Add click handler with improved event handling
+                removeBtn.onclick = function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const idToRemove = this.getAttribute('data-id');
+                    const dataType = this.getAttribute('data-type');
+
+                    console.log('Attempting to remove:', idToRemove, 'Type:', dataType);
+
+                    // Find and remove the item
+                    const index = selectedItems.findIndex(item => item.toString() === idToRemove.toString());
+                    if (index !== -1) {
+                        selectedItems.splice(index, 1);
+                        console.log('Item removed. Remaining items:', selectedItems);
+
+                        // Trigger appropriate refresh
+                        if (dataType === 'category_id') {
+                            handleCategoryChange();
+                        } else {
+                            handleSubcategoryChange();
+                        }
+                    } else {
+                        console.log('Item not found in array:', selectedItems);
+                    }
+                };
+
+                badge.appendChild(removeBtn);
+                container.appendChild(badge);
+
+                // Create hidden input for form submission
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = inputName + '[]';
+                hiddenInput.value = id;
+                hiddenContainer.appendChild(hiddenInput);
+            });
+        }
+
+        // Filter and display subcategories based on selected categories
+        function filterSubcategories() {
+            const subcategoryMenu = document.getElementById('subcategory_dropdown_menu');
+            const items = subcategoryMenu.querySelectorAll('.dropdown-item-custom');
+
+            items.forEach(item => {
+                const categoryId = item.getAttribute('data-category');
+                if (selectedCategories.length === 0 || selectedCategories.includes(categoryId)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                    // Remove from selection if no longer visible
+                    const value = item.getAttribute('data-value');
+                    const index = selectedSubcategories.indexOf(value);
+                    if (index > -1) {
+                        selectedSubcategories.splice(index, 1);
+                    }
+                }
+            });
+        }
+
+        function handleCategoryChange() {
+            renderSelectedItems(
+                document.getElementById('selected_categories'),
+                document.getElementById('hidden_category_inputs'),
+                selectedCategories,
+                categories,
+                'category_id'
+            );
+            filterSubcategories();
+            handleSubcategoryChange();
+        }
+
+        function handleSubcategoryChange() {
+            renderSelectedItems(
+                document.getElementById('selected_subcategories'),
+                document.getElementById('hidden_subcategory_inputs'),
+                selectedSubcategories,
+                subcategories,
+                'subcategory_id'
+            );
+        }
+
+        // Initialize dropdowns
+        initializeDropdown(
+            'category_dropdown_input',
+            'category_dropdown_menu',
+            'category_arrow',
+            selectedCategories,
+            categories,
+            handleCategoryChange
+        );
+
+        initializeDropdown(
+            'subcategory_dropdown_input',
+            'subcategory_dropdown_menu',
+            'subcategory_arrow',
+            selectedSubcategories,
+            subcategories,
+            handleSubcategoryChange
+        );
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.dropdown-menu-custom').forEach(menu => menu.classList.remove('show'));
+            document.querySelectorAll('.dropdown-arrow').forEach(arrow => arrow.classList.remove('rotated'));
+            document.querySelectorAll('.dropdown-input').forEach(input => input.classList.remove('active'));
+        });
+
+        // Initial rendering
+        handleCategoryChange();
+
         // Form validation
         (function() {
             'use strict'
