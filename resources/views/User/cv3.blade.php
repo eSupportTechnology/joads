@@ -245,7 +245,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         .signature-section {
             position: relative;
             top: 1rem;
-            left: -18rem;
+            left: -19.5rem;
             margin-top: 20px;
             padding-top: 30px;
             text-align: center;
@@ -267,20 +267,23 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
         .signature-line {
             border-bottom: 1px solid #000;
-            width: auto;
-            margin: 10px 0;
-            height: 2px;
+            width: fit-content;
+            min-width: 50px;
+            align-self: flex-start;
+            margin: 4px 0;
+            height: 1px;
         }
 
         .signature-value {
             font-size: 16px;
             color: #333;
+            display: inline-block;
         }
 
         .signature-label {
             font-size: 14px;
             color: #2c3e50;
-            margin-top: 5px;
+            /* margin-top: 5px; */
         }
 
         .main-content-area {
@@ -372,28 +375,45 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             /* width: 150%; */
             text-align: justify
         }
-        .second{
+
+        .second {
             position: relative;
-            left: 15rem;
+            left: 17rem;
             display: flex;
             flex-direction: column;
         }
-        .referees-section{
+
+        .referees-section {
             position: relative;
-            left:-11rem;
+            left: -11rem;
+        }
+
+        .third {
+            position: relative;
+            text-align: left;
+            left: 0.35rem;
+        }
+
+        .fourth {
+            position: relative;
+            left: 17rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         @media print {
             @page {
                 size: A4;
                 margin-top: 4rem;
-                /* margin-bottom: 5mm; */
+                margin-bottom: 5mm;
                 break-inside: avoid-page;
                 page-break-before: avoid;
             }
 
             @page :first {
                 margin-top: 0;
+                margin-bottom: 5mm;
             }
 
             body {
@@ -449,7 +469,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             }
 
             .signature-section {
-                left: -18rem;
+                left: -19.5rem;
             }
 
             .referees-list {
@@ -461,11 +481,12 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                 padding-left: 16px;
                 text-align: justify
             }
-            .referees-section{
-            position: relative;
-            left:-12.3rem;
 
-        }
+            .referees-section {
+                position: relative;
+                left: -12.3rem;
+
+            }
         }
 
         .content-wrapper {
@@ -804,18 +825,24 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                             @endif
                         </div>
                     </div>
-                    <p style="text-align: left; width: 155%; margin-bottom: 25px; margin-top:-40px; margin-left: 18px;">I hereby certify that the
+                    <p
+                        style="text-align: left; width: 155%; margin-bottom: 25px; margin-top:-40px; margin-left: 18px;">
+                        I hereby certify that the
                         particulars given above are true and correct to the best of my knowledge.</p>
                     <div class="signature-container">
                         <div class="signature-block">
-                            <div class="signature-value">{{ $user->name }}</div>
-                            <div style="width: auto;" class="signature-line"></div>
-                            <div class="signature-label">Name and Signature</div>
+                            <div class="third">
+                                <div class="signature-value">{{ $user->name }}</div>
+                                <div class="signature-line"></div>
+                                <div class="signature-label">Name and Signature</div>
+                            </div>
                         </div>
                         <div class="signature-block">
-                            <div class="signature-value">{{ date('d/m/Y') }}</div>
-                            <div class="signature-line"></div>
-                            <div class="signature-label">Date</div>
+                            <div class="fourth">
+                                <div class="signature-value">{{ date('d/m/Y') }}</div>
+                                <div class="signature-line"></div>
+                                <div class="signature-label">Date</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -868,7 +895,20 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
             document.documentElement.style.setProperty('--sidebar-color', newColor);
             document.getElementById('sidebarColorInput').value = newColor;
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const signatureBlocks = document.querySelectorAll('.signature-value');
+            const signatureLines = document.querySelectorAll('.signature-line');
+
+            signatureBlocks.forEach((el, index) => {
+                if (signatureLines[index]) {
+                    signatureLines[index].style.width = el.offsetWidth + 'px';
+                }
+            });
+        });
     </script>
+
+
 </body>
 
 </html>
