@@ -343,7 +343,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
         .section1 {
             position: relative;
             top: -0.5rem;
-            left: -1rem;
+            left: -0.4rem;
             text-align: wrap;
             width: 17rem;
             page-break-inside: avoid;
@@ -358,7 +358,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
 
         .title-section {
             position: relative;
-            top: 1.5rem;
+            top: 0.3rem;
             width: 100%;
             color: #ffffff;
             text-align: wrap;
@@ -826,7 +826,7 @@ $sidebarColor = request()->query('sidebar_color', $user->sidebar_color ?? '#0A4D
                         </div>
                     </div>
                     <p
-                        style="text-align: left; width: 155%; margin-bottom: 25px; margin-top:-40px; margin-left: 18px;">
+                        style="text-align: left; width: 155%; margin-bottom: 25px; margin-top:-60px; margin-left: 18px;">
                         I hereby certify that the
                         particulars given above are true and correct to the best of my knowledge.</p>
                     <div class="signature-container">
