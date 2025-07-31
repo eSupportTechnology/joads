@@ -36,6 +36,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>ID</th>
+                                    <th>Logo</th>
                                     <th>Message</th>
                                     <th>Rating</th>
                                     <th>User</th>
@@ -48,6 +49,10 @@
                                     @if ($status === 'all' || $item->status === $status)
                                         <tr>
                                             <td>{{ $item->id }}</td>
+                                            <td>
+                                                <img src="{{ optional($item->employer)->logo ? asset('storage/' . $item->employer->logo) : asset('assets/images/dashboard/profile.jpg') }}"
+                                                    alt="Logo" width="50">
+                                            </td>
                                             <td>{{ $item->message }}</td>
                                             <td>
                                                 <div class="star-rating">

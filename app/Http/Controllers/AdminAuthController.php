@@ -425,11 +425,20 @@ public function updateProfile(Request $request)
 
     public function assignPermissions(Request $request)
     {
-        
+
         $admin = Admin::findOrFail($request->admin_id);
-       
+
         $admin->permissions()->sync($request->permissions ?? []);
         return redirect()->route('superadmin.show.permissions', ['admin_id' => $admin->id])
             ->with('success', 'Permissions updated.');
+    }
+
+    public function destroy($id){
+    $admin = Admin::findOrFail($id);
+    if ($admin->role === 'super_admin') {
+        return redirect()->back()->withErrors(['error' => 'Cannot delete super admin.']);
+    }
+    $admin->delete();
+    return redirect()->route('admin.list')->with('success', 'Admin deleted successfully.');
     }
 }

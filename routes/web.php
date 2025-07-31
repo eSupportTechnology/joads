@@ -252,6 +252,7 @@ Route::middleware('admin')->group(function () {
 
     Route::put('/admin/profile', [AdminAuthController::class, 'updateProfile'])->name('admin.profile.update');
     Route::get('/admin/list', [AdminAuthController::class, 'adminList'])->name('admin.list');
+    Route::delete('/admin/delete/{id}', [AdminAuthController::class, 'destroy'])->name('admin.delete');
 
     Route::delete('/employer/delete/{id}', function ($id) {
         $employer = \App\Models\Employer::findOrFail($id);

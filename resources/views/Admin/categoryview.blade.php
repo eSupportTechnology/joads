@@ -31,7 +31,8 @@
                                 <h3>Category List</h3>
                             </div>
                             <div class="col-md-2 mb-4">
-                                <a href="{{ route('admin.categories.create') }}" class="btn btn-primary btn-sm rounded">Create new</a>
+                                <a href="{{ route('admin.categories.create') }}"
+                                    class="btn btn-primary btn-sm rounded">Create new</a>
                             </div>
                         </div>
 
@@ -69,11 +70,14 @@
                                             <td>{{ $category->today_views ?? 0 }}</td>
                                             <td>{{ ucfirst($category->status) }}</td>
                                             <td>
-                                                <a href="{{ route('admin.categories.edit', $category->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                                <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" style="display:inline-block;">
+                                                <a href="{{ route('admin.categories.edit', $category->id) }}"
+                                                    class="btn btn-warning btn-sm">Edit</a>
+                                                <form action="{{ route('admin.categories.destroy', $category->id) }}"
+                                                    method="POST" style="display:inline-block;">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="return confirm('Are you sure?')">Delete</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -86,11 +90,14 @@
                                                     <td>{{ ucfirst($sub->status) }}</td>
                                                     <td colspan="4"></td>
                                                     <td>
-                                                        <a href="{{ route('admin.categories.edit', $sub->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                                        <form action="{{ route('admin.categories.destroy', $sub->id) }}" method="POST" style="display:inline-block;">
+                                                        <a href="{{ route('admin.categories.edit', $sub->id) }}"
+                                                            class="btn btn-warning btn-sm">Edit</a>
+                                                        <form action="{{ route('admin.categories.destroy', $sub->id) }}"
+                                                            method="POST" style="display:inline-block;">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                                onclick="return confirm('Are you sure?')">Delete</button>
                                                         </form>
                                                     </td>
                                                 </tr>
@@ -133,12 +140,13 @@
             let table = document.getElementById('keytable');
             let newWin = window.open('', '', 'width=900,height=700');
             let html = '<html><head><title>Print Table</title>';
-            html += '<style>table {border-collapse: collapse; width: 100%;} th, td {border: 1px solid #ccc; padding: 8px; text-align: left;} </style>';
+            html +=
+                '<style>table {border-collapse: collapse; width: 100%;} th, td {border: 1px solid #ccc; padding: 8px; text-align: left;} </style>';
             html += '</head><body><h3>Category List</h3><table><thead><tr>';
 
             // Get header except last column
             let headers = table.querySelectorAll('thead tr th');
-            for(let i=0; i<headers.length-1; i++){
+            for (let i = 0; i < headers.length - 1; i++) {
                 html += '<th>' + headers[i].innerText + '</th>';
             }
             html += '</tr></thead><tbody>';
@@ -148,7 +156,7 @@
             rows.forEach(row => {
                 html += '<tr>';
                 let cells = row.querySelectorAll('td');
-                for(let i=0; i<cells.length-1; i++){
+                for (let i = 0; i < cells.length - 1; i++) {
                     html += '<td>' + cells[i].innerText + '</td>';
                 }
                 html += '</tr>';
@@ -163,26 +171,30 @@
             newWin.close();
         }
 
-        // Export Excel function excluding last column
         function exportExcel() {
-            let table = document.getElementById('keytable');
+            let dataTable = $('#keytable').DataTable();
             let wb = XLSX.utils.book_new();
 
-            // Build array of arrays for XLSX
-            let data = [];
-            let headers = table.querySelectorAll('thead tr th');
-            let headerRow = [];
-            for(let i=0; i<headers.length-1; i++){
-                headerRow.push(headers[i].innerText.trim());
-            }
-            data.push(headerRow);
+            // Get headers (excluding last column)
+            let headers = [];
+            $('#keytable thead tr th').each(function(index, th) {
+                if (index !== $('#keytable thead tr th').length - 1) {
+                    headers.push($(th).text().trim());
+                }
+            });
 
-            let rows = table.querySelectorAll('tbody tr');
-            rows.forEach(row => {
+            let data = [headers];
+
+            // Get all data rows
+            let allData = dataTable.rows().data();
+
+            allData.each(function(row) {
                 let rowData = [];
-                let cells = row.querySelectorAll('td');
-                for(let i=0; i<cells.length-1; i++){
-                    rowData.push(cells[i].innerText.trim());
+                for (let i = 0; i < row.length - 1; i++) {
+                    // Try to extract plain text from HTML if needed
+                    let tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = row[i];
+                    rowData.push(tempDiv.innerText.trim());
                 }
                 data.push(rowData);
             });
@@ -192,39 +204,52 @@
             XLSX.writeFile(wb, 'categories.xlsx');
         }
 
-        // Export PDF function excluding last column
+
+
         async function exportPDF() {
-            const { jsPDF } = window.jspdf;
+            const {
+                jsPDF
+            } = window.jspdf;
             let doc = new jsPDF('landscape');
 
-            let table = document.getElementById('keytable');
+            let dataTable = $('#keytable').DataTable();
 
-            // Prepare headers
+            // Get headers (excluding last column)
             let headers = [];
-            let ths = table.querySelectorAll('thead tr th');
-            for(let i=0; i<ths.length-1; i++){
-                headers.push(ths[i].innerText.trim());
-            }
+            $('#keytable thead tr th').each(function(index, th) {
+                if (index !== $('#keytable thead tr th').length - 1) {
+                    headers.push($(th).text().trim());
+                }
+            });
 
-            // Prepare data rows
             let data = [];
-            let rows = table.querySelectorAll('tbody tr');
-            rows.forEach(row => {
+
+            // Get all data rows
+            let allData = dataTable.rows().data();
+
+            allData.each(function(row) {
                 let rowData = [];
-                let tds = row.querySelectorAll('td');
-                for(let i=0; i<tds.length-1; i++){
-                    rowData.push(tds[i].innerText.trim());
+                for (let i = 0; i < row.length - 1; i++) {
+                    // Extract plain text from potential HTML
+                    let tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = row[i];
+                    rowData.push(tempDiv.innerText.trim());
                 }
                 data.push(rowData);
             });
 
-            // AutoTable plugin for jsPDF to create tables
             doc.autoTable({
                 head: [headers],
                 body: data,
-                styles: { fontSize: 8 },
-                headStyles: { fillColor: [22, 160, 133] },
-                margin: { top: 20 }
+                styles: {
+                    fontSize: 8
+                },
+                headStyles: {
+                    fillColor: [22, 160, 133]
+                },
+                margin: {
+                    top: 20
+                }
             });
 
             doc.save('categories.pdf');
