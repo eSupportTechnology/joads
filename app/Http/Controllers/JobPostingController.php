@@ -107,7 +107,7 @@ class JobPostingController extends Controller
                 $query->where('status', 'approved');
             }, '>', 3)
             ->orderBy('approved_job_postings_count', 'desc')
-            ->take(8)
+            // ->take(8)
             ->get();
 
         return view('User.topemployees', compact('topEmployers', 'contacts'));
