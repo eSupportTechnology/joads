@@ -129,111 +129,123 @@ class JobPostingController extends Controller
     }
 
     public function generateJobAdsReport(Request $request)
-    {
-        $hasDateFilter = $request->filled('start_date') && $request->filled('end_date');
+{
+    $hasDateFilter = $request->filled('start_date') && $request->filled('end_date');
 
-        if ($hasDateFilter) {
-            $startDate = Carbon::parse($request->start_date)->startOfDay();
-            $endDate = Carbon::parse($request->end_date)->endOfDay();
-        } else {
-            $startDate = Carbon::now()->subDays(30)->startOfDay();
-            $endDate = Carbon::now()->endOfDay();
-        }
+    if ($hasDateFilter) {
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+    } else {
+        $startDate = Carbon::now()->subDays(30)->startOfDay();
+        $endDate = Carbon::now()->endOfDay();
+    }
 
-        // DAILY SUMMARY
-        $dailyCountQuery = DB::table('job_postings')
-            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->where('job_postings.status', 'approved')
-            ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
+    // DAILY SUMMARY
+    $dailyCountQuery = DB::table('job_postings')
+        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+        ->where('job_postings.status', 'approved')
+        ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
 
-        $dailyCount = $dailyCountQuery->select(
-            DB::raw('DATE(job_postings.created_at) as date'),
+    $dailyCount = $dailyCountQuery->select(
+        DB::raw('DATE(job_postings.created_at) as date'),
+        DB::raw('COUNT(*) as count'),
+        DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+    )
+        ->groupBy('date')
+        ->orderBy('date', 'desc')
+        ->get();
+
+    // JOB DETAILS BY DATE
+    $jobDetailsQuery = DB::table('job_postings')
+        ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+        ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+        ->where('job_postings.status', 'approved')
+        ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
+
+    $jobDetailsByDate = $jobDetailsQuery->select(
+        DB::raw('DATE(job_postings.created_at) as date'),
+        'job_postings.title',
+        'employers.company_name',
+        DB::raw('COALESCE(job_postings.view_count, 0) as views_count'),
+        DB::raw('COALESCE(admins.name, "N/A") as approved_by'),
+        DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price')
+    )
+        ->orderBy('job_postings.created_at', 'desc')
+        ->get()
+        ->groupBy('date');
+
+    // ATTACH JOBS TO EACH DAY
+    $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
+        $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
+        return $item;
+    });
+
+    // TODAY TOTALS
+    $todayStart = Carbon::today()->startOfDay();
+    $todayEnd = Carbon::today()->endOfDay();
+
+    Log::info('Today Start: ' . $todayStart->toDateTimeString());
+    Log::info('Today End: ' . $todayEnd->toDateTimeString());
+
+    $dailyTotalData = (object)['count' => 0, 'earnings' => 0];
+
+    // Build the query for today total
+    $todayQuery = DB::table('job_postings')
+        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+        ->where('job_postings.status', 'approved')
+        ->whereBetween('job_postings.created_at', [$todayStart, $todayEnd])
+        ->select(
+            DB::raw('COUNT(*) as count'),
+            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+        );
+
+    Log::info('Today Total SQL: ' . $todayQuery->toSql());
+    Log::info('Today Total Bindings: ', $todayQuery->getBindings());
+
+    $todayTotal = $todayQuery->first();
+
+    Log::info('Today Total Result:', [
+        'count' => $todayTotal->count ?? 0,
+        'earnings' => $todayTotal->earnings ?? 0
+    ]);
+
+    $dailyTotalData->count = $todayTotal->count ?? 0;
+    $dailyTotalData->earnings = $todayTotal->earnings ?? 0;
+
+    // WEEKLY TOTALS (based on filter or this week fallback)
+    if ($hasDateFilter) {
+        $weeklyStart = $startDate;
+        $weeklyEnd = $endDate;
+    } else {
+        $weeklyStart = Carbon::now()->startOfWeek();
+        $weeklyEnd = Carbon::now()->endOfDay();
+    }
+
+    $weeklyTotalData = DB::table('job_postings')
+        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+        ->where('job_postings.status', 'approved')
+        ->whereBetween('job_postings.created_at', [$weeklyStart, $weeklyEnd])
+        ->select(
             DB::raw('COUNT(*) as count'),
             DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
         )
-            ->groupBy('date')
-            ->orderBy('date', 'desc')
-            ->get();
+        ->first();
 
-        // JOB DETAILS BY DATE
-        $jobDetailsQuery = DB::table('job_postings')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-            ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
-            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->where('job_postings.status', 'approved')
-            ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
+    // RANGE TOTALS (also used for bar chart if needed)
+    $totalJobs = $dailyCount->sum('count');
+    $totalEarnings = $dailyCount->sum('earnings');
 
-        $jobDetailsByDate = $jobDetailsQuery->select(
-            DB::raw('DATE(job_postings.created_at) as date'),
-            'job_postings.title',
-            'employers.company_name',
-            DB::raw('COALESCE(job_postings.view_count, 0) as views_count'),
-            DB::raw('COALESCE(admins.name, "N/A") as approved_by'),
-            DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price')
-        )
-            ->orderBy('job_postings.created_at', 'desc')
-            ->get()
-            ->groupBy('date');
-
-        // ATTACH JOBS TO EACH DAY
-        $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
-            $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
-            return $item;
-        });
-
-        // TODAY TOTALS
-        $todayStart = Carbon::today()->startOfDay();
-        $todayEnd = Carbon::today()->endOfDay();
-
-        $dailyTotalData = (object)['count' => 0, 'earnings' => 0];
-
-        $todayTotal = DB::table('job_postings')
-            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->where('job_postings.status', 'approved')
-            ->whereBetween('job_postings.created_at', [$todayStart, $todayEnd])
-            ->select(
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-            )
-            ->first();
-
-        $dailyTotalData->count = $todayTotal->count ?? 0;
-        $dailyTotalData->earnings = $todayTotal->earnings ?? 0;
-
-
-        // WEEKLY TOTALS (based on filter or this week fallback)
-        if ($hasDateFilter) {
-            $weeklyStart = $startDate;
-            $weeklyEnd = $endDate;
-        } else {
-            $weeklyStart = Carbon::now()->startOfWeek();
-            $weeklyEnd = Carbon::now()->endOfDay();
-        }
-
-        $weeklyTotalData = DB::table('job_postings')
-            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->where('job_postings.status', 'approved')
-            ->whereBetween('job_postings.created_at', [$weeklyStart, $weeklyEnd])
-            ->select(
-                DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-            )
-            ->first();
-
-        // RANGE TOTALS (also used for bar chart if needed)
-        $totalJobs = $dailyCount->sum('count');
-        $totalEarnings = $dailyCount->sum('earnings');
-
-        return view('Admin.report.jobads', [
-            'dailyCount' => $dailyCount,
-            'dailyTotal' => $dailyTotalData->count ?? 0,
-            'weeklyTotal' => $weeklyTotalData->count ?? 0,
-            'totalJobs' => $totalJobs,
-            'totalEarnings' => $totalEarnings,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-        ]);
-    }
+    return view('Admin.report.jobads', [
+        'dailyCount' => $dailyCount,
+        'dailyTotal' => $dailyTotalData->count ?? 0,
+        'weeklyTotal' => $weeklyTotalData->count ?? 0,
+        'totalJobs' => $totalJobs,
+        'totalEarnings' => $totalEarnings,
+        'startDate' => $startDate,
+        'endDate' => $endDate,
+    ]);
+}
 
 
 
