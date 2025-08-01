@@ -34,10 +34,11 @@
             <!-- Loop through each feedback -->
             <div class="feedback-card">
                 <div class="quote-date">
-                    
+
                     <p>{{ $feedbackItem->created_at->format('Y-m-d') }}</p> <!-- Display the date -->
                 </div>
-                <p class="feedback-message"><span class="quote-icon">❝</span>{{ $feedbackItem->message }}<span class="quote-icon">❞</span></p> <!-- Display feedback message -->
+                <p class="feedback-message"><span class="quote-icon">❝</span>{{ $feedbackItem->message }}<span
+                        class="quote-icon">❞</span></p> <!-- Display feedback message -->
 
                 <div class="star-rating">
                     @for ($i = 1; $i <= 5; $i++)
@@ -50,7 +51,12 @@
                 </div>
 
                 <div class="profile">
-                    <img src="{{ asset('assets/images/dashboard/profile.jpg') }}" alt="User Avatar">
+
+                    <img src="{{ optional($feedbackItem->employer)->logo
+                        ? asset('storage/' . $feedbackItem->employer->logo)
+                        : asset('assets/images/dashboard/profile.jpg') }}"
+                        alt="User Avatar">
+
                     <p class="user-info">
                         <span class="name">
                             @if ($feedbackItem->user)
@@ -64,16 +70,16 @@
 
                         <!-- <span class="position">
                             @if ($feedbackItem->user && isset($feedbackItem->user->position))
-                                {{ $feedbackItem->user->position }}
-                            @endif
+{{ $feedbackItem->user->position }}
+@endif
                         </span><br>
 
                         <span class="company">
                             @if ($feedbackItem->user && isset($feedbackItem->user->company))
-                                {{ $feedbackItem->user->company }}
-                            @elseif ($feedbackItem->employer)
-                                {{ $feedbackItem->employer->company_name }}
-                            @endif
+{{ $feedbackItem->user->company }}
+@elseif ($feedbackItem->employer)
+{{ $feedbackItem->employer->company_name }}
+@endif
                         </span> -->
                     </p>
                 </div>

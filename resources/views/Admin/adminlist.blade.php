@@ -67,6 +67,13 @@
                                                         {{ $admin->is_active ? 'Deactivate' : 'Activate' }}
                                                     </button>
                                                 </form>
+
+                                                <form action="{{ route('admin.delete', $admin->id) }}" method="POST"
+                                                    style="display:inline;" onsubmit="return confirm('Are you sure?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                </form>
                                             </td>
                                         </tr>
                                     @endforeach

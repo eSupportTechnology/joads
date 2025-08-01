@@ -93,70 +93,83 @@ class EmployerAuthController extends Controller
 
 
 
-public function getFilteredJobPostings(Request $request)
-{
-    $query = DB::table('job_postings')
-        ->join('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-        ->select(
-            'job_postings.title',
-            'job_postings.approved_date',
-            'job_postings.created_at',
-            'employers.company_name',
-            'job_postings.view_count',
-            'job_postings.update_count',
-            'packages.lkr_price'
-        );
+    public function getFilteredJobPostings(Request $request)
+    {
+        $query = DB::table('job_postings')
+            ->join('packages', 'job_postings.package_id', '=', 'packages.id')
+            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+            ->select(
+                'job_postings.title',
+                'job_postings.approved_date',
+                'job_postings.created_at',
+                'employers.company_name',
+                'job_postings.view_count',
+                'job_postings.update_count',
+                'packages.lkr_price'
+            );
 
-    // Filter by date range if provided
-    if ($request->filled('start_date') && $request->filled('end_date')) {
-        $query->whereBetween('job_postings.created_at', [$request->start_date, $request->end_date]);
+        // Filter by date range if provided
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('job_postings.created_at', [$request->start_date, $request->end_date]);
+        }
+
+        $results = $query->orderBy('job_postings.created_at', 'desc')->get();
+
+        // Calculate total LKR price for all filtered posts
+        $totalLkr = $results->sum('lkr_price');
+
+        // Group by created_at date and sum lkr_price per date
+        $dailyTotals = $results->groupBy(function ($item) {
+            return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
+        })->map(function ($group) {
+            return $group->sum('lkr_price');
+        });
+
+        // Group by created_at date and sum view_count per date (Daily Views)
+        $dailyViews = $results->groupBy(function ($item) {
+            return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
+        })->map(function ($group) {
+            return $group->sum('view_count');
+        });
+
+
+        // Get today's and weekly employer counts
+        $today = Carbon::today();
+
+        $startOfWeek = (clone $today)->startOfWeek()->toDateString();
+        $endOfWeek = (clone $today)->endOfWeek()->toDateString();
+
+
+        $dailyEmployerCount = DB::table('job_postings')
+            ->select('employer_id')
+            ->groupBy('employer_id')
+            ->havingRaw('DATE(MIN(created_at)) = ?', [$today->toDateString()])
+            ->count();
+
+        $weeklyEmployerCount = DB::table('job_postings')
+            ->select('employer_id')
+            ->groupBy('employer_id')
+            ->havingRaw('DATE(MIN(created_at)) BETWEEN ? AND ?', [$startOfWeek, $endOfWeek])
+            ->count();
+
+
+        $todayViewCount = DB::table('job_postings')->sum('view_count');
+        $todayUpdateCount = DB::table('job_postings')->sum('update_count');
+
+
+        return view('Admin.report.employer', [
+            'todayViewCount' => $todayViewCount,
+            'todayUpdateCount' => $todayUpdateCount,
+            'jobPostings' => $results,
+            'totalEarningsLkr' => $totalLkr,
+            'dailyTotals' => $dailyTotals,
+            'dailyViews' => $dailyViews,
+            'startDate' => $request->start_date,
+            'endDate' => $request->end_date,
+            'dailyEmployerCount' => $dailyEmployerCount,
+            'weeklyEmployerCount' => $weeklyEmployerCount,
+        ]);
     }
-
-    $results = $query->orderBy('job_postings.created_at', 'desc')->get();
-
-    // Calculate total LKR price for all filtered posts
-    $totalLkr = $results->sum('lkr_price');
-
-    // Group by created_at date and sum lkr_price per date
-    $dailyTotals = $results->groupBy(function ($item) {
-        return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
-    })->map(function ($group) {
-        return $group->sum('lkr_price');
-    });
-
-    // Group by created_at date and sum view_count per date (Daily Views)
-    $dailyViews = $results->groupBy(function ($item) {
-        return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
-    })->map(function ($group) {
-        return $group->sum('view_count');
-    });
- 
-
-    // Get today's and weekly employer counts
-    $today = \Carbon\Carbon::today();
-    $dailyEmployerCount = DB::table('job_postings')->whereDate('created_at', $today)->count();
-
-    $weeklyEmployerCount = DB::table('job_postings')
-        ->whereBetween('created_at', [$today->copy()->subDays(6), $today])
-        ->count();
-    $todayViewCount = DB::table('job_postings')->sum('view_count');
-    $todayUpdateCount=DB::table('job_postings')->sum('update_count');
-
-
-    return view('Admin.report.employer', [
-        'todayViewCount'=>$todayViewCount,
-        'todayUpdateCount'=>$todayUpdateCount,
-        'jobPostings' => $results,
-        'totalEarningsLkr' => $totalLkr,
-        'dailyTotals' => $dailyTotals,
-        'dailyViews' => $dailyViews,
-        'startDate' => $request->start_date,
-        'endDate' => $request->end_date,
-        'dailyEmployerCount' => $dailyEmployerCount,
-        'weeklyEmployerCount' => $weeklyEmployerCount,
-    ]);
-}
 
     // Handle logout
     public function logout()

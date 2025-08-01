@@ -22,13 +22,13 @@
                         <form action="{{ route('reports.performance') }}" method="GET" class="row g-3">
                             <div class="col-md-4">
                                 <label for="start_date" class="form-label">Start Date</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date" 
-                                       value="{{ request('start_date', \Carbon\Carbon::parse($startDate)->format('Y-m-d')) }}">
+                                <input type="date" class="form-control" id="start_date" name="start_date"
+                                    value="{{ request('start_date') }}">
                             </div>
                             <div class="col-md-4">
                                 <label for="end_date" class="form-label">End Date</label>
-                                <input type="date" class="form-control" id="end_date" name="end_date" 
-                                       value="{{ request('end_date', \Carbon\Carbon::parse($endDate)->format('Y-m-d')) }}">
+                                <input type="date" class="form-control" id="end_date" name="end_date"
+                                    value="{{ request('end_date') }}">
                             </div>
                             <div class="col-md-4 align-self-end">
                                 <button type="submit" class="btn btn-primary">Filter</button>
@@ -50,13 +50,14 @@
                                     @forelse ($results as $result)
                                         <tr>
                                             <td></td>
-                                            <td>{{ $result->company_name }}</td>
-                                            <td>{{ $result->title }}</td>
-                                            <td>{{ $result->total_daily_count }}</td>
+                                            <td>{{ $result->company_name ?? 'N/A' }}</td>
+                                            <td>{{ $result->title ?? 'N/A' }}</td>
+                                            <td>{{ $result->total_daily_count ?? 'N/A' }}</td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center">No records found for the selected date range.</td>
+                                            <td colspan="4" class="text-center">No records found for the selected date
+                                                range.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -78,98 +79,106 @@
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 
-<script>
-    $(document).ready(function() {
-        $('#performance-table').DataTable({
-            dom: 'Bfrtip',
-            pageLength: 100,
-            columns: [
-                { searchable: false, orderable: false }, // Serial number column
-                null,
-                null,
-                null
-            ],
-            order: [],
-            buttons: [
-                {
-                    extend: 'copy',
-                    exportOptions: {
-                        columns: ':visible',
-                        format: {
-                            body: function(data, row, column, node) {
-                                // For first column (serial number), return row index + 1 + page offset
-                                if(column === 0) {
-                                    return row + 1;
+    <script>
+        $(document).ready(function() {
+            $('#performance-table').DataTable({
+                dom: 'Bfrtip',
+                pageLength: 100,
+                columns: [{
+                        searchable: false,
+                        orderable: false
+                    }, // Serial number column
+                    null,
+                    null,
+                    null
+                ],
+                order: [],
+                buttons: [{
+                        extend: 'copy',
+                        className: 'btn btn-primary',
+                        exportOptions: {
+                            columns: ':visible',
+                            format: {
+                                body: function(data, row, column, node) {
+                                    // For first column (serial number), return row index + 1 + page offset
+                                    if (column === 0) {
+                                        return row + 1;
+                                    }
+                                    return data;
                                 }
-                                return data;
+                            }
+                        }
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'btn btn-success',
+                        exportOptions: {
+                            columns: ':visible',
+                            format: {
+                                body: function(data, row, column, node) {
+                                    if (column === 0) {
+                                        return row + 1;
+                                    }
+                                    return data;
+                                }
+                            }
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-info',
+                        exportOptions: {
+                            columns: ':visible',
+                            format: {
+                                body: function(data, row, column, node) {
+                                    if (column === 0) {
+                                        return row + 1;
+                                    }
+                                    return data;
+                                }
+                            }
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'btn btn-danger',
+                        exportOptions: {
+                            columns: ':visible',
+                            format: {
+                                body: function(data, row, column, node) {
+                                    if (column === 0) {
+                                        return row + 1;
+                                    }
+                                    return data;
+                                }
+                            }
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-warning',
+                        exportOptions: {
+                            columns: ':visible',
+                            format: {
+                                body: function(data, row, column, node) {
+                                    if (column === 0) {
+                                        return row + 1;
+                                    }
+                                    return data;
+                                }
                             }
                         }
                     }
-                },
-                {
-                    extend: 'csv',
-                    exportOptions: {
-                        columns: ':visible',
-                        format: {
-                            body: function(data, row, column, node) {
-                                if(column === 0) {
-                                    return row + 1;
-                                }
-                                return data;
-                            }
-                        }
-                    }
-                },
-                {
-                    extend: 'excel',
-                    exportOptions: {
-                        columns: ':visible',
-                        format: {
-                            body: function(data, row, column, node) {
-                                if(column === 0) {
-                                    return row + 1;
-                                }
-                                return data;
-                            }
-                        }
-                    }
-                },
-                {
-                    extend: 'pdf',
-                    exportOptions: {
-                        columns: ':visible',
-                        format: {
-                            body: function(data, row, column, node) {
-                                if(column === 0) {
-                                    return row + 1;
-                                }
-                                return data;
-                            }
-                        }
-                    }
-                },
-                {
-                    extend: 'print',
-                    exportOptions: {
-                        columns: ':visible',
-                        format: {
-                            body: function(data, row, column, node) {
-                                if(column === 0) {
-                                    return row + 1;
-                                }
-                                return data;
-                            }
-                        }
-                    }
+                ],
+                drawCallback: function(settings) {
+                    var api = this.api();
+                    api.column(0, {
+                        page: 'current'
+                    }).nodes().each(function(cell, i) {
+                        cell.innerHTML = i + 1 + api.page.info().start;
+                    });
                 }
-            ],
-            drawCallback: function(settings) {
-                var api = this.api();
-                api.column(0, { page: 'current' }).nodes().each(function(cell, i) {
-                    cell.innerHTML = i + 1 + api.page.info().start;
-                });
-            }
+            });
         });
-    });
-</script>
+    </script>
 @endsection
