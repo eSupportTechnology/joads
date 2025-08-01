@@ -59,11 +59,12 @@
                                                 </span>
                                             </td>
                                             <td>
+                                                <div class="d-flex gap-2">
                                                 <form action="{{ route('admin.toggleStatus', $admin->id) }}" method="POST"
                                                     style="display:inline;">
                                                     @csrf
                                                     <button type="submit"
-                                                        class="btn btn-sm {{ $admin->is_active ? 'btn-danger' : 'btn-success' }}">
+                                                        class="btn btn-sm {{ $admin->is_active ? 'btn-warning' : 'btn-success' }}">
                                                         {{ $admin->is_active ? 'Deactivate' : 'Activate' }}
                                                     </button>
                                                 </form>
@@ -74,6 +75,7 @@
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                                 </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
