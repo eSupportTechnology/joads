@@ -99,16 +99,20 @@ class JobPostingController extends Controller
     public function topEmployers()
     {
         $contacts = ContactUs::all();
-        // Fetch top 28 employers based on job postings count and filter those with a logo
-        $topEmployers = Employer::withCount('jobPostings') // Assuming 'jobPostings' is the relationship
 
-            ->orderBy('job_postings_count', 'desc') // Sort by the number of job postings
-            ->take(8) // Limit to top 28
+        $topEmployers = Employer::withCount(['jobPostings as approved_job_postings_count' => function ($query) {
+            $query->where('status', 'approved');
+        }])
+            ->whereHas('jobPostings', function ($query) {
+                $query->where('status', 'approved');
+            }, '>', 3)
+            ->orderBy('approved_job_postings_count', 'desc')
+            ->take(8)
             ->get();
 
-        // Pass data to the view
         return view('User.topemployees', compact('topEmployers', 'contacts'));
     }
+
     public function showtopemployerJobs($employerId)
     {
         // Fetch the employer
@@ -178,24 +182,24 @@ class JobPostingController extends Controller
         });
 
         // TODAY TOTALS
-        $today = Carbon::today();
-        $includeToday = $startDate <= $today && $endDate >= $today;
+        $todayStart = Carbon::today()->startOfDay();
+        $todayEnd = Carbon::today()->endOfDay();
 
         $dailyTotalData = (object)['count' => 0, 'earnings' => 0];
-        if ($includeToday) {
-            $todayTotal = DB::table('job_postings')
-                ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-                ->where('job_postings.status', 'approved')
-                ->whereDate('job_postings.created_at', $today)
-                ->select(
-                    DB::raw('COUNT(*) as count'),
-                    DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
-                )
-                ->first();
 
-            $dailyTotalData->count = $todayTotal->count ?? 0;
-            $dailyTotalData->earnings = $todayTotal->earnings ?? 0;
-        }
+        $todayTotal = DB::table('job_postings')
+            ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
+            ->where('job_postings.status', 'approved')
+            ->whereBetween('job_postings.created_at', [$todayStart, $todayEnd])
+            ->select(
+                DB::raw('COUNT(*) as count'),
+                DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+            )
+            ->first();
+
+        $dailyTotalData->count = $todayTotal->count ?? 0;
+        $dailyTotalData->earnings = $todayTotal->earnings ?? 0;
+
 
         // WEEKLY TOTALS (based on filter or this week fallback)
         if ($hasDateFilter) {
