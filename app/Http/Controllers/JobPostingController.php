@@ -400,6 +400,29 @@ class JobPostingController extends Controller
         $jobPosting->updated_at = now();
         $jobPosting->save();
 
+        $today = Carbon::today();
+
+        $existingView = DB::table('job_views')
+        ->where('job_posting_id', $job->id)
+        ->whereDate('view_date', $today)
+        ->first();
+
+    if ($existingView) {
+        // If exists, increment view_count
+        DB::table('job_views')
+            ->where('id', $existingView->id)
+            ->increment('view_count');
+    } else {
+        // If not exists, insert and increment update_count
+        DB::table('job_views')->insert([
+            'job_posting_id' => $job->id,
+            'view_date' => $today,
+            'view_count' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
 
         // Save the changes
 
