@@ -149,7 +149,7 @@ class JobPostingController extends Controller
     $dailyCount = $dailyCountQuery->select(
         DB::raw('DATE(job_postings.created_at) as date'),
         DB::raw('COUNT(*) as count'),
-        DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+        DB::raw('SUM(COALESCE(job_postings.package_price, 0)) as earnings')
     )
         ->groupBy('date')
         ->orderBy('date', 'desc')
@@ -169,7 +169,7 @@ class JobPostingController extends Controller
         'employers.company_name',
         DB::raw('COALESCE(job_postings.view_count, 0) as views_count'),
         DB::raw('COALESCE(admins.name, "N/A") as approved_by'),
-        DB::raw('COALESCE(packages.lkr_price, 0) as lkr_price')
+        DB::raw('COALESCE(job_postings.package_price, 0) as lkr_price')
     )
         ->orderBy('job_postings.created_at', 'desc')
         ->get()
@@ -197,7 +197,7 @@ class JobPostingController extends Controller
         ->whereBetween('job_postings.created_at', [$todayStart, $todayEnd])
         ->select(
             DB::raw('COUNT(*) as count'),
-            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+            DB::raw('SUM(COALESCE(job_postings.package_price, 0)) as earnings')
         );
 
     Log::info('Today Total SQL: ' . $todayQuery->toSql());
@@ -228,7 +228,7 @@ class JobPostingController extends Controller
         ->whereBetween('job_postings.created_at', [$weeklyStart, $weeklyEnd])
         ->select(
             DB::raw('COUNT(*) as count'),
-            DB::raw('SUM(COALESCE(packages.lkr_price, 0)) as earnings')
+            DB::raw('SUM(COALESCE(job_postings.package_price, 0)) as earnings')
         )
         ->first();
 
