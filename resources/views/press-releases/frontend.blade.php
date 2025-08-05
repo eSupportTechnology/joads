@@ -137,7 +137,7 @@
 
     .press-image img {
         width: 100%;
-        height: auto;
+        height: 18rem;
         border-bottom: 4px solid #ff5722;
     }
 
