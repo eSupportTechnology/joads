@@ -25,28 +25,33 @@ class PressReleaseController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video' => 'nullable|file|mimes:mp4,avi,mov|max:20480',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:10048',
+            'video' => 'nullable|file|mimes:mp4,avi,mov|max:200480',
             'link' => 'nullable|url',
         ]);
 
-        $imagePath = $request->file('image')->store('press-releases', 'public');
-        if ($request->hasFile('video')) {
-            $videoPath = $request->file('video')->store('press-releases/videos', 'public');
-            // You can handle the video path as needed, e.g., save it to the database
+        try {
+            $imagePath = $request->file('image')->store('press-releases', 'public');
+            $videoPath = null;
+
+            if ($request->hasFile('video')) {
+                $videoPath = $request->file('video')->store('press-releases/videos', 'public');
+            }
+
+            PressRelease::create([
+                'title' => $request->title,
+                'description' => $request->description,
+                'image' => $imagePath,
+                'video' => $videoPath,
+                'link' => $request->link,
+            ]);
+
+            return redirect()->route('press-releases.index')->with('success', 'Press release created successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to upload files: ' . $e->getMessage()]);
         }
-
-
-        PressRelease::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'image' => $imagePath,
-            'video' => $request->hasFile('video') ? $videoPath : null,
-            'link' => $request->link,
-        ]);
-
-        return redirect()->route('press-releases.index')->with('success', 'Press release created successfully!');
     }
+
 
     public function show(PressRelease $pressRelease)
     {
@@ -63,30 +68,36 @@ class PressReleaseController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video' => 'nullable|file|mimes:mp4,avi,mov|max:20480',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10048',
+            'video' => 'nullable|file|mimes:mp4,avi,mov|max:200480',
             'link' => 'nullable|url',
         ]);
 
-        if ($request->hasFile('image')) {
-            Storage::delete('public/' . $pressRelease->image);
-            $imagePath = $request->file('image')->store('press-releases', 'public');
-            $pressRelease->image = $imagePath;
-        }
-        if ($request->hasFile('video')) {
-            Storage::delete('public/' . $pressRelease->video);
-            $videoPath = $request->file('video')->store('press-releases/videos', 'public');
-            $pressRelease->video = $videoPath;
-        }
+        try {
+            if ($request->hasFile('image')) {
+                Storage::delete('public/' . $pressRelease->image);
+                $imagePath = $request->file('image')->store('press-releases', 'public');
+                $pressRelease->image = $imagePath;
+            }
 
-        $pressRelease->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'link' => $request->link,
-        ]);
+            if ($request->hasFile('video')) {
+                Storage::delete('public/' . $pressRelease->video);
+                $videoPath = $request->file('video')->store('press-releases/videos', 'public');
+                $pressRelease->video = $videoPath;
+            }
 
-        return redirect()->route('press-releases.index')->with('success', 'Press release updated successfully!');
+            $pressRelease->update([
+                'title' => $request->title,
+                'description' => $request->description,
+                'link' => $request->link,
+            ]);
+
+            return redirect()->route('press-releases.index')->with('success', 'Press release updated successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to update press release: ' . $e->getMessage()]);
+        }
     }
+
 
     public function destroy(PressRelease $pressRelease)
     {
@@ -100,40 +111,44 @@ class PressReleaseController extends Controller
     }
 
     public function storeMultiple(Request $request)
-{
-    $request->validate([
-        'press_releases' => 'required|array',
-        'press_releases.*.title' => 'required|string|max:255',
-        'press_releases.*.description' => 'required|string',
-        'press_releases.*.image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'press_releases.*.video' => 'nullable|file|mimes:mp4,avi,mov|max:20480',
-        'press_releases.*.link' => 'nullable|url',
-    ]);
-
-    foreach ($request->press_releases as $pressReleaseData) {
-        $imagePath = $pressReleaseData['image']->store('press-releases', 'public');
-        if ($pressReleaseData['video']) {
-            $videoPath = $pressReleaseData['video']->store('press-releases/videos', 'public');
-            // You can handle the video path as needed, e.g., save it to the database
-        } else {
-            $videoPath = null; // Handle case where video is not provided
-        }
-
-        PressRelease::create([
-            'title' => $pressReleaseData['title'],
-            'description' => $pressReleaseData['description'],
-            'image' => $imagePath,
-            'video' => $videoPath,
-            'link' => $pressReleaseData['link'],
+    {
+        $request->validate([
+            'press_releases' => 'required|array',
+            'press_releases.*.title' => 'required|string|max:255',
+            'press_releases.*.description' => 'required|string',
+            'press_releases.*.image' => 'required|image|mimes:jpeg,png,jpg,gif|max:10048',
+            'press_releases.*.video' => 'nullable|file|mimes:mp4,avi,mov|max:200480',
+            'press_releases.*.link' => 'nullable|url',
         ]);
+
+        try {
+            foreach ($request->press_releases as $pressReleaseData) {
+                $imagePath = $pressReleaseData['image']->store('press-releases', 'public');
+
+                $videoPath = null;
+                if (isset($pressReleaseData['video']) && $pressReleaseData['video'] instanceof \Illuminate\Http\UploadedFile) {
+                    $videoPath = $pressReleaseData['video']->store('press-releases/videos', 'public');
+                }
+
+                PressRelease::create([
+                    'title' => $pressReleaseData['title'],
+                    'description' => $pressReleaseData['description'],
+                    'image' => $imagePath,
+                    'video' => $videoPath,
+                    'link' => $pressReleaseData['link'] ?? null,
+                ]);
+            }
+
+            return redirect()->route('press-releases.index')->with('success', 'Multiple press releases created successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to upload multiple press releases: ' . $e->getMessage()]);
+        }
     }
 
-    return redirect()->route('press-releases.index')->with('success', 'Multiple press releases created successfully!');
-}
 
-public function frontendIndex()
-{
-    $pressReleases = PressRelease::latest()->get(); // Fetch all press releases ordered by latest
-    return view('press-releases.frontend', compact('pressReleases'));
-}
+    public function frontendIndex()
+    {
+        $pressReleases = PressRelease::latest()->get(); // Fetch all press releases ordered by latest
+        return view('press-releases.frontend', compact('pressReleases'));
+    }
 }

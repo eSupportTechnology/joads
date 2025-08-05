@@ -71,8 +71,8 @@ class ServiceController extends Controller
     public function storegallary(Request $request)
     {
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video' => 'nullable|mimes:mp4,avi,mov|max:20480',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10048',
+            'video' => 'nullable|mimes:mp4,avi,mov|max:200480',
         ]);
 
         $image = $request->file('image');
@@ -95,8 +95,8 @@ class ServiceController extends Controller
     public function updategallary(Request $request, $id)
     {
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video' => 'nullable|mimes:mp4,avi,mov|max:20480',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10048',
+            'video' => 'nullable|mimes:mp4,avi,mov|max:200480',
         ]);
 
         $data = [];
