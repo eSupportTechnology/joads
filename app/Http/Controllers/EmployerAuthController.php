@@ -105,7 +105,8 @@ class EmployerAuthController extends Controller
             'job_postings.created_at',
             'employers.company_name',
             'job_postings.update_count',
-            'packages.lkr_price'
+            'packages.lkr_price',
+            'job_postings.package_price'
         );
 
     if ($request->filled('start_date') && $request->filled('end_date')) {
@@ -132,12 +133,12 @@ class EmployerAuthController extends Controller
     }
 
     // Calculate total LKR earnings
-    $totalLkr = $results->sum('lkr_price');
+    $totalLkr = $results->sum('package_price');
 
     // Daily LKR earnings
     $dailyTotals = $results->groupBy(function ($item) {
         return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
-    })->map(fn($group) => $group->sum('lkr_price'));
+    })->map(fn($group) => $group->sum('package_price'));
 
     // Daily views from job_views table
     $dailyViews = DB::table('job_views')

@@ -164,7 +164,7 @@
                             <td class="text-left">{{ $job->title }}</td>
                             <td class="text-left">{{ $job->view_count }}</td>
                             <td class="text-left">{{ $job->update_count }}</td>
-                            <td class="text-right" style="text-align: right">{{ number_format($job->lkr_price, 2) }}</td>
+                            <td class="text-right" style="text-align: right">{{ number_format($job->package_price, 2) }}</td>
 
                             @if ($firstJob)
                                 <td class="text-right" style="text-align: right; vertical-align: bottom;" rowspan="{{ count($jobs) }}">
