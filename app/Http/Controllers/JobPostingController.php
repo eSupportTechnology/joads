@@ -641,7 +641,7 @@ class JobPostingController extends Controller
                     "job_postings.{$index}.requirements" => 'nullable|string',
                     "job_postings.{$index}.closing_date" => 'required|date',
                     "job_postings.{$index}.status" => 'required|in:pending,reject,approved',
-                    "job_postings.{$index}.image" => 'nullable|file|mimes:jpeg,png,jpg,gif|max:404800',
+                    "job_postings.{$index}.image" => 'nullable|file|mimes:jpeg,png,jpg,gif|max:10240',
                     "job_postings.{$index}.custom_price" => 'nullable|numeric|min:0',
                     "job_postings.{$index}.currency_type" => 'required|in:Local,Foreign',
                 ]);
@@ -739,7 +739,7 @@ class JobPostingController extends Controller
             'job_postings.*.location' => 'required|string|max:255',
             'job_postings.*.country_id' => 'required|exists:countries,id',
             'job_postings.*.salary_range' => 'nullable|string|max:255',
-            'job_postings.*.image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:404800',
+            'job_postings.*.image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:10240',
             'job_postings.*.requirements' => 'nullable|string',
             'job_postings.*.closing_date' => 'required|date',
             'job_postings.*.status' => 'required|in:pending,reject,approved',
