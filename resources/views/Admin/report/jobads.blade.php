@@ -49,14 +49,15 @@
         /* Align amount column right */
         #daily-table tbody td.amount-col {
             text-align: right;
-             vertical-align: bottom;
-            
+            vertical-align: bottom;
+
         }
 
         /* Export buttons styling */
         .export-buttons {
             margin-bottom: 1rem;
         }
+
         .export-buttons button {
             margin-right: 10px;
         }
@@ -72,136 +73,138 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+    <div class="container-fluid">
 
-    <div class="row">
-        <!-- Summary Cards -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Today's Ads</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $dailyTotal }}
+        <div class="row">
+            <!-- Summary Cards -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Today's Ads</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {{ $dailyTotal }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">This Week's Ads</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $weeklyTotal }}
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">This Week's Ads</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {{ $weeklyTotal }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-chart-bar fa-2x text-gray-300"></i>
+                            <div class="col-auto">
+                                <i class="fas fa-chart-bar fa-2x text-gray-300"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        {{-- Date filter form --}}
-        <form method="GET" action="{{ route('reports.job-ads') }}" class="mb-4 row g-3 align-items-center">
-            <div class="col-auto">
-                <label for="start_date" class="col-form-label">Start Date:</label>
-            </div>
-            <div class="col-auto">
-                <input type="date" id="start_date" name="start_date" class="form-control"
-                    value="{{ old('start_date', $startDate) }}">
-            </div>
-            <div class="col-auto">
-                <label for="end_date" class="col-form-label">End Date:</label>
-            </div>
-            <div class="col-auto">
-                <input type="date" id="end_date" name="end_date" class="form-control"
-                    value="{{ old('end_date', $endDate) }}">
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Filter</button>
-                <a href="{{ route('reports.job-ads') }}" class="btn btn-secondary">Reset</a>
-            </div>
-        </form>
-
-        <!-- Export buttons -->
-        <div class="col-12 export-buttons">
-            <button class="btn btn-success" onclick="exportTableToExcel()">Excel</button>
-            <button class="btn btn-danger" onclick="exportTableToPDF()">PDF</button>
-            <button class="btn btn-primary" onclick="printTable()">Print</button>
-        </div>
-
-        <!-- Detailed Reports: Daily -->
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Detailed Daily Reports</h6>
+            {{-- Date filter form --}}
+            <form method="GET" action="{{ route('reports.job-ads') }}" class="mb-4 row g-3 align-items-center">
+                <div class="col-auto">
+                    <label for="start_date" class="col-form-label">Start Date:</label>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="display" id="daily-table" style="width:100%">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th  style="width: 120px">Date</th>
-                                    <th>Title</th>
-                                    <th>Company</th>
-                                    <th>Approved By</th>
-                                    <th>Total Views</th>
-                                    <th>Total Amount (LKR)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php $serialNumber = 1; @endphp
-                                @foreach ($dailyCount as $daily)
-                                    @if ($daily->jobs->isEmpty())
-                                        <tr>
-                                            <td>{{ $serialNumber++ }}</td>
-                                            <td>{{ $daily->date }}</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>0</td>
-                                            <td class="amount-col">{{ number_format($daily->earnings, 2) }}</td>
-                                        </tr>
-                                    @else
-                                        @php $firstJob = true; @endphp
-                                        @foreach ($daily->jobs as $job)
+                <div class="col-auto">
+                    <input type="date" id="start_date" name="start_date" class="form-control"
+                        value="{{ old('start_date', $startDate) }}">
+                </div>
+                <div class="col-auto">
+                    <label for="end_date" class="col-form-label">End Date:</label>
+                </div>
+                <div class="col-auto">
+                    <input type="date" id="end_date" name="end_date" class="form-control"
+                        value="{{ old('end_date', $endDate) }}">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a href="{{ route('reports.job-ads') }}" class="btn btn-secondary">Reset</a>
+                </div>
+            </form>
+
+            <!-- Export buttons -->
+            <div class="col-12 export-buttons">
+                <button class="btn btn-success" onclick="exportTableToExcel()">Excel</button>
+                <button class="btn btn-danger" onclick="exportTableToPDF()">PDF</button>
+                <button class="btn btn-primary" onclick="printTable()">Print</button>
+            </div>
+
+            <!-- Detailed Reports: Daily -->
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold text-primary">Detailed Daily Reports</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="display" id="daily-table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th style="width: 120px">Date</th>
+                                        <th>Title</th>
+                                        <th>Company</th>
+                                        <th>Approved By</th>
+                                        <th>Total Views</th>
+                                        <th>Total Amount (LKR)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php $serialNumber = 1; @endphp
+                                    @foreach ($dailyCount as $daily)
+                                        @if ($daily->jobs->isEmpty())
                                             <tr>
                                                 <td>{{ $serialNumber++ }}</td>
                                                 <td>{{ $daily->date }}</td>
-                                                <td>{{ $job->title }}</td>
-                                                <td>{{ $job->company_name }}</td>
-                                                <td>{{ $job->approved_by }}</td>
-                                                <td>{{ $job->views_count }}</td>
-                                                @if ($firstJob)
-                                                    <td class="amount-col" rowspan="{{ $daily->jobs->count() }}">
-                                                        {{ number_format($daily->earnings, 2) }}
-                                                    </td>
-                                                    @php $firstJob = false; @endphp
-                                                @endif
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>0</td>
+                                                <td class="amount-col">{{ number_format($daily->earnings, 2) }}</td>
                                             </tr>
-                                        @endforeach
-                                    @endif
-                                @endforeach
-                            </tbody>
-                        </table>
+                                        @else
+                                            @php $firstJob = true; @endphp
+                                            @foreach ($daily->jobs as $job)
+                                                <tr>
+                                                    <td>{{ $serialNumber++ }}</td>
+                                                    @if ($firstJob)
+                                                        <td rowspan="{{ $daily->jobs->count() }}">{{ $daily->date }}</td>
+                                                    @endif
+                                                    <td>{{ $job->title }}</td>
+                                                    <td>{{ $job->company_name }}</td>
+                                                    <td>{{ $job->approved_by }}</td>
+                                                    <td>{{ $job->views_count }}</td>
+                                                    @if ($firstJob)
+                                                        <td class="amount-col" rowspan="{{ $daily->jobs->count() }}">
+                                                            {{ number_format($daily->earnings, 2) }}
+                                                        </td>
+                                                        @php $firstJob = false; @endphp
+                                                    @endif
+                                                </tr>
+                                            @endforeach
+                                        @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('script')
@@ -224,7 +227,9 @@
                 searching: true,
                 ordering: true,
                 info: true,
-                order: [[1, 'desc']] // Order by date descending by default
+                order: [
+                    [1, 'desc']
+                ] // Order by date descending by default
             });
         });
 
@@ -267,7 +272,9 @@
         }
 
         function exportTableToPDF(filename = 'job-ads-report.pdf') {
-            const { jsPDF } = window.jspdf;
+            const {
+                jsPDF
+            } = window.jspdf;
             const doc = new jsPDF('landscape', 'pt', 'A4');
 
             doc.setFontSize(18);
@@ -276,10 +283,19 @@
             doc.autoTable({
                 html: '#daily-table',
                 startY: 60,
-                styles: { fontSize: 10 },
-                headStyles: { fillColor: [198, 217, 238] },
-                alternateRowStyles: { fillColor: [248, 249, 250] },
-                margin: { left: 40, right: 40 },
+                styles: {
+                    fontSize: 10
+                },
+                headStyles: {
+                    fillColor: [198, 217, 238]
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 249, 250]
+                },
+                margin: {
+                    left: 40,
+                    right: 40
+                },
             });
 
             doc.save(filename);
