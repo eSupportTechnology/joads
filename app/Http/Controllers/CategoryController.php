@@ -18,31 +18,72 @@ public function index(Request $request)
 {
     $startDate = $request->query('start_date');
     $endDate = $request->query('end_date');
+    $hasDateRange = $startDate || $endDate;
 
     $categories = Category::with('subcategories')->get();
 
     foreach ($categories as $category) {
-        // Base query
-        $query = DB::table('job_postings')
+        // Get all approved job postings for this category
+        $jobQuery = DB::table('job_postings')
             ->where('status', 'approved')
             ->where('category_id', $category->id);
 
+        // Apply date filters if provided
         if ($startDate) {
-            $query->whereDate('updated_at', '>=', $startDate);
+            $jobQuery->whereDate('created_at', '>=', $startDate);
         }
 
         if ($endDate) {
-            $query->whereDate('updated_at', '<=', $endDate);
+            $jobQuery->whereDate('created_at', '<=', $endDate);
         }
 
-        // Total jobs within date range
-        $category->approved_job_postings_count = $query->count();
+        // If date range is specified, only include active jobs
+        if ($hasDateRange) {
+            $jobQuery->where('closing_date', '>=', Carbon::now());
+        }
 
-        // Sum of view_count for approved jobs within date range
-        $category->approved_view_count = $query->sum('view_count');
+        // Get job IDs for this category
+        $jobIds = $jobQuery->pluck('id');
 
-        // Sum of update_count as "daily views"
-        $category->today_views = $query->sum('update_count');
+        // Count of approved job postings
+        $category->approved_job_postings_count = $jobIds->count();
+
+        // Calculate total views for the category
+        if ($hasDateRange) {
+            // Use job_views table with date filtering
+            // Join with job_postings to get category_id and filter by category
+            $viewQuery = DB::table('job_views')
+                ->join('job_postings', 'job_views.job_posting_id', '=', 'job_postings.id')
+                ->where('job_postings.status', 'approved')
+                ->where('job_postings.category_id', $category->id)
+                ->where('job_views.view_count', '>', 0); // Only non-zero views
+
+            if ($startDate) {
+                $viewQuery->whereDate('job_views.view_date', '>=', $startDate);
+            }
+
+            if ($endDate) {
+                $viewQuery->whereDate('job_views.view_date', '<=', $endDate);
+            }
+
+            $category->approved_view_count = $viewQuery->sum('job_views.view_count');
+        } else {
+            // Use job_postings.view_count (all-time views) for the category
+            $category->approved_view_count = DB::table('job_postings')
+                ->where('status', 'approved')
+                ->where('category_id', $category->id)
+                ->sum('view_count');
+        }
+
+        // Daily views (today) for the category
+        // Join job_views with job_postings to get category_id
+        $category->today_views = DB::table('job_views')
+            ->join('job_postings', 'job_views.job_posting_id', '=', 'job_postings.id')
+            ->where('job_postings.status', 'approved')
+            ->where('job_postings.category_id', $category->id)
+            ->whereDate('job_views.view_date', Carbon::today())
+            ->where('job_views.view_count', '>', 0) // Only non-zero views
+            ->sum('job_views.view_count');
     }
 
     return view('Admin.categoryview', compact('categories', 'startDate', 'endDate'));

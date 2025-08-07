@@ -150,7 +150,7 @@ class AdminAuthController extends Controller
                     ->count();
 
                 // Calculate total views
-                $totalViews = JobPosting::sum('view_count');
+                $totalViews = JobPosting::where('status', 'approved')->sum('view_count');
 
                 $today = Carbon::today(); // Today at 00:00:00
 
