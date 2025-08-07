@@ -185,7 +185,8 @@
                     <td colspan="5" class="text-right"><strong>Totals:</strong></td>
                     <td><strong>{{ $totalViewCount }}</strong></td>
                     <td><strong>{{ $totalUpdateCount }}</strong></td>
-                    <td colspan="2"></td>
+                    <td colspan="1"></td>
+                    <td><strong>{{ number_format($dailyTotals->sum(), 2) }}</strong></td>
                 </tr>
             </tbody>
         </table>

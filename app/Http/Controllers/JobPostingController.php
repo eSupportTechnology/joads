@@ -135,117 +135,122 @@ class JobPostingController extends Controller
     if ($hasDateFilter) {
         $startDate = Carbon::parse($request->start_date)->startOfDay();
         $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+        // Step 1: Get all unique job postings that have views in the date range
+        $jobsWithViews = DB::table('job_views')
+            ->join('job_postings', 'job_views.job_posting_id', '=', 'job_postings.id')
+            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+            ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+            ->where('job_postings.status', 'approved')
+            ->whereBetween('job_views.view_date', [$startDate, $endDate])
+            ->select(
+                'job_postings.id',
+                'job_postings.title',
+                'job_postings.created_at',
+                'job_postings.package_price',
+                'employers.company_name',
+                DB::raw('COALESCE(admins.name, "N/A") as approved_by'),
+                DB::raw('SUM(job_views.view_count) as total_views')
+            )
+            ->groupBy(
+                'job_postings.id',
+                'job_postings.title',
+                'job_postings.created_at',
+                'job_postings.package_price',
+                'employers.company_name',
+                'admins.name'
+            )
+            ->having('total_views', '>', 0)
+            ->get();
+
+        // Step 2: Group jobs by their creation date and calculate daily metrics
+        $jobsByDate = $jobsWithViews->groupBy(function($job) {
+            return Carbon::parse($job->created_at)->format('Y-m-d');
+        });
+
+        // Step 3: Create daily count with proper structure
+        $dailyCount = $jobsByDate->map(function($jobs, $date) {
+            return (object) [
+                'date' => $date,
+                'count' => $jobs->count(),
+                'earnings' => $jobs->sum('package_price') ?? 0,
+                'jobs' => $jobs->map(function($job) {
+                    return (object) [
+                        'title' => $job->title,
+                        'company_name' => $job->company_name,
+                        'approved_by' => $job->approved_by,
+                        'views_count' => $job->total_views,
+                        'lkr_price' => $job->package_price ?? 0
+                    ];
+                })
+            ];
+        })->sortByDesc('date')->values();
+
     } else {
+        // Default date range fallback (last 30 days)
         $startDate = Carbon::now()->subDays(30)->startOfDay();
         $endDate = Carbon::now()->endOfDay();
+
+        // Get daily counts based on job_postings creation date
+        $dailyCount = DB::table('job_postings')
+            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+            ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
+            ->where('job_postings.status', 'approved')
+            ->whereBetween('job_postings.created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw('DATE(job_postings.created_at) as date'),
+                'job_postings.title',
+                'employers.company_name',
+                DB::raw('COALESCE(job_postings.view_count, 0) as views_count'),
+                DB::raw('COALESCE(admins.name, "N/A") as approved_by'),
+                DB::raw('COALESCE(job_postings.package_price, 0) as lkr_price')
+            )
+            ->orderBy('job_postings.created_at', 'desc')
+            ->get()
+            ->groupBy('date')
+            ->map(function($jobs, $date) {
+                return (object) [
+                    'date' => $date,
+                    'count' => $jobs->count(),
+                    'earnings' => $jobs->sum('lkr_price'),
+                    'jobs' => $jobs
+                ];
+            })->sortByDesc('date')->values();
     }
 
-    // DAILY SUMMARY
-    $dailyCountQuery = DB::table('job_postings')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
-
-    $dailyCount = $dailyCountQuery->select(
-        DB::raw('DATE(job_postings.created_at) as date'),
-        DB::raw('COUNT(*) as count'),
-        DB::raw('SUM(COALESCE(job_postings.package_price, 0)) as earnings')
-    )
-        ->groupBy('date')
-        ->orderBy('date', 'desc')
-        ->get();
-
-    // JOB DETAILS BY DATE
-    $jobDetailsQuery = DB::table('job_postings')
-        ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-        ->leftJoin('admins', 'job_postings.admin_id', '=', 'admins.id')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->whereBetween('job_postings.created_at', [$startDate, $endDate]);
-
-    $jobDetailsByDate = $jobDetailsQuery->select(
-        DB::raw('DATE(job_postings.created_at) as date'),
-        'job_postings.title',
-        'employers.company_name',
-        DB::raw('COALESCE(job_postings.view_count, 0) as views_count'),
-        DB::raw('COALESCE(admins.name, "N/A") as approved_by'),
-        DB::raw('COALESCE(job_postings.package_price, 0) as lkr_price')
-    )
-        ->orderBy('job_postings.created_at', 'desc')
-        ->get()
-        ->groupBy('date');
-
-    // ATTACH JOBS TO EACH DAY
-    $dailyCount = $dailyCount->map(function ($item) use ($jobDetailsByDate) {
-        $item->jobs = $jobDetailsByDate->get($item->date) ?? collect();
-        return $item;
-    });
-
-    // TODAY TOTALS
+    // Today Totals
     $todayStart = Carbon::today()->startOfDay();
     $todayEnd = Carbon::today()->endOfDay();
 
-    Log::info('Today Start: ' . $todayStart->toDateTimeString());
-    Log::info('Today End: ' . $todayEnd->toDateTimeString());
+    $todayTotal = DB::table('job_postings')
+        ->where('status', 'approved')
+        ->whereBetween('created_at', [$todayStart, $todayEnd])
+        ->count();
 
-    $dailyTotalData = (object)['count' => 0, 'earnings' => 0];
+    // Weekly Totals (always use current week regardless of date filter)
+    $weeklyStart = Carbon::now()->startOfWeek();
+    $weeklyEnd = Carbon::now()->endOfDay();
 
-    // Build the query for today total
-    $todayQuery = DB::table('job_postings')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->whereBetween('job_postings.created_at', [$todayStart, $todayEnd])
-        ->select(
-            DB::raw('COUNT(*) as count'),
-            DB::raw('SUM(COALESCE(job_postings.package_price, 0)) as earnings')
-        );
+    $weeklyTotal = DB::table('job_postings')
+        ->where('status', 'approved')
+        ->whereBetween('created_at', [$weeklyStart, $weeklyEnd])
+        ->count();
 
-    Log::info('Today Total SQL: ' . $todayQuery->toSql());
-    Log::info('Today Total Bindings: ', $todayQuery->getBindings());
-
-    $todayTotal = $todayQuery->first();
-
-    Log::info('Today Total Result:', [
-        'count' => $todayTotal->count ?? 0,
-        'earnings' => $todayTotal->earnings ?? 0
-    ]);
-
-    $dailyTotalData->count = $todayTotal->count ?? 0;
-    $dailyTotalData->earnings = $todayTotal->earnings ?? 0;
-
-    // WEEKLY TOTALS (based on filter or this week fallback)
-    if ($hasDateFilter) {
-        $weeklyStart = $startDate;
-        $weeklyEnd = $endDate;
-    } else {
-        $weeklyStart = Carbon::now()->startOfWeek();
-        $weeklyEnd = Carbon::now()->endOfDay();
-    }
-
-    $weeklyTotalData = DB::table('job_postings')
-        ->leftJoin('packages', 'job_postings.package_id', '=', 'packages.id')
-        ->where('job_postings.status', 'approved')
-        ->whereBetween('job_postings.created_at', [$weeklyStart, $weeklyEnd])
-        ->select(
-            DB::raw('COUNT(*) as count'),
-            DB::raw('SUM(COALESCE(job_postings.package_price, 0)) as earnings')
-        )
-        ->first();
-
-    // RANGE TOTALS (also used for bar chart if needed)
+    // Calculate totals from daily count collection
     $totalJobs = $dailyCount->sum('count');
     $totalEarnings = $dailyCount->sum('earnings');
 
     return view('Admin.report.jobads', [
         'dailyCount' => $dailyCount,
-        'dailyTotal' => $dailyTotalData->count ?? 0,
-        'weeklyTotal' => $weeklyTotalData->count ?? 0,
+        'dailyTotal' => $todayTotal,
+        'weeklyTotal' => $weeklyTotal,
         'totalJobs' => $totalJobs,
         'totalEarnings' => $totalEarnings,
-        'startDate' => $startDate,
-        'endDate' => $endDate,
+        'startDate' => $startDate->format('Y-m-d'),
+        'endDate' => $endDate->format('Y-m-d'),
     ]);
 }
+
 
 
 
@@ -403,25 +408,25 @@ class JobPostingController extends Controller
         $today = Carbon::today();
 
         $existingView = DB::table('job_views')
-        ->where('job_posting_id', $job->id)
-        ->whereDate('view_date', $today)
-        ->first();
+            ->where('job_posting_id', $job->id)
+            ->whereDate('view_date', $today)
+            ->first();
 
-    if ($existingView) {
-        // If exists, increment view_count
-        DB::table('job_views')
-            ->where('id', $existingView->id)
-            ->increment('view_count');
-    } else {
-        // If not exists, insert and increment update_count
-        DB::table('job_views')->insert([
-            'job_posting_id' => $job->id,
-            'view_date' => $today,
-            'view_count' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-    }
+        if ($existingView) {
+            // If exists, increment view_count
+            DB::table('job_views')
+                ->where('id', $existingView->id)
+                ->increment('view_count');
+        } else {
+            // If not exists, insert and increment update_count
+            DB::table('job_views')->insert([
+                'job_posting_id' => $job->id,
+                'view_date' => $today,
+                'view_count' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
 
         // Save the changes

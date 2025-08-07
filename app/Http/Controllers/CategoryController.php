@@ -18,39 +18,36 @@ public function index(Request $request)
 {
     $startDate = $request->query('start_date');
     $endDate = $request->query('end_date');
-    $today = Carbon::today()->toDateString();
 
-    $categories = Category::with('subcategories')
-        ->withCount([
-            'jobPostings as approved_job_postings_count' => function ($query) {
-                $query->where('status', 'approved');
-            }
-        ])
-        ->withSum([
-            'jobPostings as approved_view_count' => function ($query) {
-                $query->where('status', 'approved');
-            }
-        ], 'view_count')
-        ->get()
-        ->map(function ($category) use ($today, $startDate, $endDate) {
-            $query = DB::table('job_postings')
-                ->where('status', 'approved')
-                ->where('category_id', $category->id);
+    $categories = Category::with('subcategories')->get();
 
-            if ($startDate) {
-                $query->whereDate('updated_at', '>=', $startDate);
-            }
-            if ($endDate) {
-                $query->whereDate('updated_at', '<=', $endDate);
-            }
+    foreach ($categories as $category) {
+        // Base query
+        $query = DB::table('job_postings')
+            ->where('status', 'approved')
+            ->where('category_id', $category->id);
 
-            $category->today_views = $query->sum('update_count');
+        if ($startDate) {
+            $query->whereDate('updated_at', '>=', $startDate);
+        }
 
-            return $category;
-        });
+        if ($endDate) {
+            $query->whereDate('updated_at', '<=', $endDate);
+        }
 
-    return view('Admin.categoryview', compact('categories'));
+        // Total jobs within date range
+        $category->approved_job_postings_count = $query->count();
+
+        // Sum of view_count for approved jobs within date range
+        $category->approved_view_count = $query->sum('view_count');
+
+        // Sum of update_count as "daily views"
+        $category->today_views = $query->sum('update_count');
+    }
+
+    return view('Admin.categoryview', compact('categories', 'startDate', 'endDate'));
 }
+
 
 
     // Show the form for creating a new category
