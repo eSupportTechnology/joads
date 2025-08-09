@@ -23,6 +23,7 @@ class PressReleaseController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'type' => 'required',
             'title' => 'required|string|max:255',
             'description' => 'required',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:10048',
@@ -39,6 +40,7 @@ class PressReleaseController extends Controller
             }
 
             PressRelease::create([
+                'type' => $request->type,
                 'title' => $request->title,
                 'description' => $request->description,
                 'image' => $imagePath,
@@ -66,6 +68,7 @@ class PressReleaseController extends Controller
     public function update(Request $request, PressRelease $pressRelease)
     {
         $request->validate([
+            'type' => 'required',
             'title' => 'required|string|max:255',
             'description' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10048',
@@ -87,6 +90,7 @@ class PressReleaseController extends Controller
             }
 
             $pressRelease->update([
+                'type' => $request->type,
                 'title' => $request->title,
                 'description' => $request->description,
                 'link' => $request->link,
@@ -114,6 +118,8 @@ class PressReleaseController extends Controller
     {
         $request->validate([
             'press_releases' => 'required|array',
+            'press_releases.*.type' => 'required|string',
+            'press_releases' => 'required|array',
             'press_releases.*.title' => 'required|string|max:255',
             'press_releases.*.description' => 'required|string',
             'press_releases.*.image' => 'required|image|mimes:jpeg,png,jpg,gif|max:10048',
@@ -131,6 +137,7 @@ class PressReleaseController extends Controller
                 }
 
                 PressRelease::create([
+                    'type' => $pressReleaseData['type'],
                     'title' => $pressReleaseData['title'],
                     'description' => $pressReleaseData['description'],
                     'image' => $imagePath,
@@ -146,9 +153,10 @@ class PressReleaseController extends Controller
     }
 
 
-    public function frontendIndex()
+    public function frontendIndex(Request $request)
     {
-        $pressReleases = PressRelease::latest()->get(); // Fetch all press releases ordered by latest
-        return view('press-releases.frontend', compact('pressReleases'));
+        $type = $request->query('type', 'press-release');
+        $pressReleases = PressRelease::where('type', $type)->latest()->get();
+        return view('press-releases.frontend', compact('pressReleases', 'type'));
     }
 }

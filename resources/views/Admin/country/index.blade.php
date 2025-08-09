@@ -107,7 +107,22 @@
                             <i class="fa fa-plus icon-fixed-size"></i> Create New
                         </a>
                     </div>
+
                     <div class="card-body">
+                        <form method="GET" action="{{ route('countries.index') }}" class="row mb-4">
+                            <div class="col-md-4">
+                                <label>Start Date</label>
+                                <input type="date" name="start_date" class="form-control" value="{{ $startDate ?? '' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label>End Date</label>
+                                <input type="date" name="end_date" class="form-control" value="{{ $endDate ?? '' }}">
+                            </div>
+                            <div class="col-md-4 mt-4">
+                                <button type="submit" class="btn btn-primary mt-2">Filter</button>
+                                <a href="{{ route('countries.index') }}" class="btn btn-secondary mt-2">Reset</a>
+                            </div>
+                        </form>
                         <div class="dt-ext table-responsive">
                             <table class="display" id="countries-table">
                                 <thead>

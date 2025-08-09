@@ -3,22 +3,59 @@
 namespace App\Http\Controllers;
 
 use App\Models\Country;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CountryController extends Controller
 {
 
-    public function index()
-    {
-        $countries = Country::select('countries.id', 'countries.name')
-            ->leftJoin('job_postings', 'countries.id', '=', 'job_postings.country_id')
-            ->selectRaw('SUM(job_postings.view_count) as total_view_count')
-            ->selectRaw('SUM(job_postings.update_count) as total_update_count')
-            ->groupBy('countries.id', 'countries.name')
-            ->get();
+    public function index(Request $request)
+{
+    $startDate = $request->query('start_date');
+    $endDate = $request->query('end_date');
+    $hasDateRange = $startDate || $endDate;
 
-        return view('Admin.country.index', compact('countries'));
+    $countries = Country::select('countries.id', 'countries.name')->get();
+
+    foreach ($countries as $country) {
+        // Get all job IDs in this country
+        $jobIds = DB::table('job_postings')
+            ->where('country_id', $country->id)
+            ->pluck('id');
+
+        // --- TOTAL VIEWS ---
+        if ($hasDateRange) {
+            $viewQuery = DB::table('job_views')
+                ->whereIn('job_posting_id', $jobIds)
+                ->where('view_count', '>', 0); // exclude zero views
+
+            if ($startDate) {
+                $viewQuery->whereDate('view_date', '>=', $startDate);
+            }
+            if ($endDate) {
+                $viewQuery->whereDate('view_date', '<=', $endDate);
+            }
+
+            $country->total_view_count = $viewQuery->sum('view_count');
+        } else {
+            // No date filter: get from job_postings table
+            $country->total_view_count = DB::table('job_postings')
+                ->whereIn('id', $jobIds)
+                ->sum('view_count');
+        }
+
+        // --- TODAY'S VIEWS ---
+        $country->total_update_count = DB::table('job_views')
+            ->whereIn('job_posting_id', $jobIds)
+            ->whereDate('view_date', Carbon::today())
+            ->where('view_count', '>', 0)
+            ->sum('view_count');
     }
+
+    return view('Admin.country.index', compact('countries', 'startDate', 'endDate'));
+}
+
 
 
     public function create()

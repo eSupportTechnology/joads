@@ -84,7 +84,7 @@
                                             <td>{{ $category->approved_view_count ?? 0 }}</td>
                                             <td>{{ $category->today_views ?? 0 }}</td>
                                             <td>{{ ucfirst($category->status) }}</td>
-                                            <td>
+                                            <td class="d-flex gap-2">
                                                 <a href="{{ route('admin.categories.edit', $category->id) }}"
                                                     class="btn btn-warning btn-sm">Edit</a>
                                                 <form action="{{ route('admin.categories.destroy', $category->id) }}"
@@ -104,11 +104,11 @@
                                                     <td>{{ $category->name }}</td>
                                                     <td>{{ ucfirst($sub->status) }}</td>
                                                     <td colspan="4"></td>
-                                                    <td>
+                                                    <td class="d-flex gap-2">
                                                         <a href="{{ route('admin.categories.edit', $sub->id) }}"
                                                             class="btn btn-warning btn-sm">Edit</a>
                                                         <form action="{{ route('admin.categories.destroy', $sub->id) }}"
-                                                            method="POST" style="display:inline-block;">
+                                                            method="POST">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="btn btn-danger btn-sm"

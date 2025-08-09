@@ -45,6 +45,14 @@
                             @method('PUT')
 
                             <div class="form-group mb-3">
+                                <label for="type">Type</label>
+                                <select name="type" class="form-control" required>
+                                    <option value="press-release" {{ $pressRelease->type === 'press-release' ? 'selected' : '' }}>Press Release</option>
+                                    <option value="career" {{ $pressRelease->type === 'career' ? 'selected' : '' }}>Career Resouces</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
                                 <label for="title">Title</label>
                                 <input type="text" name="title" class="form-control" value="{{ old('title', $pressRelease->title) }}" required>
                             </div>

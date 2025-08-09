@@ -21,7 +21,7 @@ class PressRelease extends Model
      *
      * @var array
      */
-    protected $fillable = ['title', 'description', 'image', 'video', 'link'];
+    protected $fillable = ['type', 'title', 'description', 'image', 'video', 'link'];
 
     /**
      * Automatically handle created_at and updated_at timestamps.

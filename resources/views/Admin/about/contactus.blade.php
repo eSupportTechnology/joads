@@ -18,8 +18,8 @@
         <div class="title-buttons-container">
             <h1 class="tit">Our Services</h1>
             <div class="button-container">
-                <a href="{{ route('press-releases.frontend') }}" class="custom-button">Career Resources</a>
-                <a href="{{ route('press-releases.frontend') }}" class="custom-button">Press Release</a>
+                <a href="{{ route('press-releases.frontend', ['type' => 'career']) }}" class="custom-button">Career Resources</a>
+                <a href="{{ route('press-releases.frontend', ['type' => 'press-release']) }}" class="custom-button">Press Release</a>
             </div>
         </div>
 

@@ -37,6 +37,14 @@
                             @csrf
                             <div id="press-releases-container">
                                 <div class="press-release-item">
+
+                                    <div class="form-group mb-3">
+                                        <label for="type">Type</label>
+                                        <select name="press_releases[0][type]" class="form-control" required>
+                                            <option value="press-release">Press Release</option>
+                                            <option value="career">Career Resouces</option>
+                                        </select>
+                                    </div>
                                     <div class="form-group mb-3">
                                         <label for="title">Title</label>
                                         <input type="text" name="press_releases[0][title]" class="form-control" required>
@@ -78,6 +86,15 @@
                 const container = document.getElementById('press-releases-container');
                 const newPressRelease = `
                     <div class="press-release-item mt-3">
+
+                        <div class="form-group mb-3">
+                            <label for="type">Type</label>
+                            <select name="press_releases[${pressReleaseIndex}][type]" class="form-control" required>
+                                <option value="press-release">Press Release</option>
+                                <option value="career">Career Resouces</option>
+                            </select>
+                        </div>
+                        
                         <div class="form-group mb-3">
                             <label for="title">Title</label>
                             <input type="text" name="press_releases[${pressReleaseIndex}][title]" class="form-control" required>

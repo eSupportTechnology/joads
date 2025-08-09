@@ -22,7 +22,7 @@
 
 
     <div class="container">
-        <h1 class="page-title">Press Releases</h1>
+        <h1 class="page-title">{{ ucfirst(str_replace('-', ' ', $type)) }}</h1>
 
         <!-- Alpine.js for modal functionality -->
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

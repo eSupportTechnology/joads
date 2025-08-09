@@ -374,7 +374,7 @@
             <div class="logo">
                 <div class="logo">
                     <a href="/">
-                        <img src="{{ asset('Jobads.png') }}" alt="Logo" class="unique-logo"
+                        <img src="{{ asset('jobAds-side.png') }}" alt="Logo" class="unique-logo"
                             style="max-height: 60px; margin-left: 20px;">
                     </a>
                 </div>

@@ -96,6 +96,7 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
+                                        <th>Type</th>
                                         <th>Title</th>
                                         <th>Description</th>
                                         <th>Image</th>
@@ -108,6 +109,7 @@
                                     @foreach ($pressReleases as $pressRelease)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $pressRelease->type }}</td>
                                             <td>{{ $pressRelease->title }}</td>
                                             <td>{{ Str::limit($pressRelease->description, 100) }}</td>
                                             <td>
@@ -135,7 +137,7 @@
                                                     N/A
                                                 @endif
                                             </td>
-                                            <td>
+                                            <td class="d-flex gap-2">
                                                 <a href="{{ route('press-releases.edit', $pressRelease->id) }}"
                                                     class="btn custom-btn custom-btn-warning btn-sm">
                                                     <i class="icon-pencil-alt"></i> Edit
