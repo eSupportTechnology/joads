@@ -10,7 +10,7 @@
     <!-- Bootstrap Icons CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-    
+
 
 
 @endsection
@@ -196,13 +196,13 @@
     <div class="col-12">
         <div class="welcome-section p-4 shadow-sm rounded-lg bg-white">
             <div class="row align-items-center">
-                
+
                 <div class="col-md-4 d-none d-md-block">
                     <img src="{{ asset('assets/images/dashboard/welcome-illustration.svg') }}"
                         class="w-50 img-fluid" alt="Welcome">
                 </div>
                 <div class="col-md-8">
-                    <h2 class="mb-3 fw-bold text-primary">Welcome to JoBads.lk</h2>
+                    <h2 class="mb-3 fw-bold text-primary">Welcome to JobAds.lk</h2>
                     <p class="mb-4 opacity-75">Here’s your dashboard overview for today.</p>
                     <!-- <button class="btn btn-gradient px-4 py-2 rounded-pill">What's New?</button> -->
                 </div>
@@ -276,5 +276,5 @@
     <script src="{{ asset('assets/js/animation/wow/wow.min.js') }}"></script>
 
 
-    
+
 @endsection

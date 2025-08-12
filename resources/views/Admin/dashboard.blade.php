@@ -116,7 +116,7 @@
                                 alt="Welcome">
                         </div>
                         <div class="col-md-8">
-                            <h2 class="mb-3 fw-bold text-primary">Welcome to JoBads.lk</h2>
+                            <h2 class="mb-3 fw-bold text-primary">Welcome to JobAds.lk</h2>
                             <p class="mb-4 opacity-75">Here’s your dashboard overview for today.</p>
                             <!-- <button class="btn btn-gradient px-4 py-2 rounded-pill">What's New?</button> -->
                         </div>
