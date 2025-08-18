@@ -40,26 +40,42 @@
                             <table class="table table-bordered" id="performance-table">
                                 <thead>
                                     <tr>
-                                        <th>No.</th>
+                                        <th>No</th>
                                         <th>Company Name</th>
                                         <th>Job Title</th>
-                                        <th>Total Views</th>
+                                        @if ($startDate && $endDate)
+                                            <th>Date</th>
+                                        @endif
+                                        <th>Daily View</th>
+                                        <th>Total View</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($results as $result)
-                                        <tr>
-                                            <td></td>
-                                            <td>{{ $result->company_name ?? 'N/A' }}</td>
-                                            <td>{{ $result->title ?? 'N/A' }}</td>
-                                            <td>{{ $result->total_daily_count ?? 'N/A' }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="text-center">No records found for the selected date
-                                                range.</td>
-                                        </tr>
-                                    @endforelse
+                                    @php $rowNo = 1; @endphp
+                                    @foreach ($results->groupBy('job_id') as $jobId => $jobGroup)
+                                        @foreach ($jobGroup as $index => $result)
+                                            <tr>
+                                                @if ($index == 0)
+                                                    <td rowspan="{{ $jobGroup->count() }}">{{ $rowNo++ }}</td>
+                                                    <td rowspan="{{ $jobGroup->count() }}">{{ $result->company_name }}</td>
+                                                    <td rowspan="{{ $jobGroup->count() }}">{{ $result->title }}</td>
+                                                @endif
+
+                                                @if ($startDate && $endDate)
+                                                    <td>{{ \Carbon\Carbon::parse($result->view_date)->format('Y-m-d') }}
+                                                    </td>
+                                                @endif
+
+                                                <td>{{ $result->daily_view }}</td>
+
+                                                {{-- Only show total on the last row --}}
+                                                @if ($index == 0)
+                                                    <td rowspan="{{ $jobGroup->count() }}">{{ $result->total_view }}</td>
+                                                @endif
+
+                                            </tr>
+                                        @endforeach
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

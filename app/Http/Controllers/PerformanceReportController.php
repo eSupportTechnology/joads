@@ -36,7 +36,7 @@ public function index(Request $request)
     $endDate = $request->input('end_date');
 
     if ($startDate && $endDate) {
-        // ✅ Case 1: Date range selected — filter job_views and sum views
+        // ✅ Case 2: Date range selected — daily breakdown
         $results = DB::table('job_postings')
             ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
             ->join('job_views', 'job_postings.id', '=', 'job_views.job_posting_id')
@@ -45,27 +45,38 @@ public function index(Request $request)
                 Carbon::parse($endDate)->toDateString()
             ])
             ->select(
+                'job_postings.id as job_id',
                 'employers.company_name',
                 'job_postings.title',
-                DB::raw('SUM(job_views.view_count) as total_daily_count')
+                'job_views.view_date',
+                DB::raw('SUM(job_views.view_count) as daily_view'),
+                DB::raw('(SELECT SUM(jv.view_count)
+                          FROM job_views jv
+                          WHERE jv.job_posting_id = job_postings.id
+                          AND jv.view_date BETWEEN "'.Carbon::parse($startDate)->toDateString().'"
+                          AND "'.Carbon::parse($endDate)->toDateString().'") as total_view')
             )
-            ->groupBy('job_postings.id', 'employers.company_name', 'job_postings.title')
-            ->havingRaw('SUM(job_views.view_count) > 0')
+            ->groupBy('job_postings.id', 'employers.company_name', 'job_postings.title', 'job_views.view_date')
+            ->orderBy('job_postings.id')
+            ->orderBy('job_views.view_date')
             ->get();
     } else {
-        // ✅ Case 2: No date range — show all job_postings with their view_count
+        // ✅ Case 1: No date range — from job_postings table
         $results = DB::table('job_postings')
             ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-            // ->where('job_postings.view_count', '>', 0)
             ->select(
+                'job_postings.id as job_id',
                 'employers.company_name',
                 'job_postings.title',
-                'job_postings.view_count as total_daily_count'
+                'job_postings.update_count as daily_view',
+                'job_postings.view_count as total_view'
             )
+            ->orderBy('job_postings.id')
             ->get();
     }
 
     return view('Admin.report.performance', compact('results', 'startDate', 'endDate'));
 }
+
 
 }

@@ -10,6 +10,7 @@
         .export-buttons {
             margin-bottom: 15px;
         }
+
         .export-buttons button {
             margin-right: 8px;
         }
@@ -29,7 +30,8 @@
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Today's Employers</div>
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Today's Employers
+                                </div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $dailyEmployerCount }}</div>
                             </div>
                             <div class="col-auto">
@@ -46,7 +48,8 @@
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">This Week's Employers</div>
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">This Week's Employers
+                                </div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $weeklyEmployerCount }}</div>
                             </div>
                             <div class="col-auto">
@@ -64,7 +67,7 @@
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Views</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $todayUpdateCount}}</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $todayUpdateCount }}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-calendar-week fa-2x text-gray-300"></i>
@@ -81,7 +84,7 @@
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Today Views</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $todayViewCount}}</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $todayViewCount }}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-calendar-week fa-2x text-gray-300"></i>
@@ -97,14 +100,16 @@
                 <label for="start_date" class="col-form-label">Start Date:</label>
             </div>
             <div class="col-auto">
-                <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $startDate ?? '') }}" class="form-control" />
+                <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $startDate ?? '') }}"
+                    class="form-control" />
             </div>
 
             <div class="col-auto">
                 <label for="end_date" class="col-form-label">End Date:</label>
             </div>
             <div class="col-auto">
-                <input type="date" name="end_date" id="end_date" value="{{ old('end_date', $endDate ?? '') }}" class="form-control" />
+                <input type="date" name="end_date" id="end_date" value="{{ old('end_date', $endDate ?? '') }}"
+                    class="form-control" />
             </div>
 
             <div class="col-auto">
@@ -120,76 +125,128 @@
         </div>
 
         <table id="job-postings-table" class="table table-bordered" style="width:100%">
-            <thead>
-                <tr>
-                    <th class="text-center">No.</th>
-                    <th class="text-center" style="padding: 35px">Post Date</th>
-                    <th class="text-center" style="padding: 35px">Approved Date</th>
-                    <th class="text-center">Company</th>
-                    <th class="text-center">Job Post</th>
-                    <th class="text-center">Total Views</th>
-                    <th class="text-center">Today's Views</th>
-                    <th class="text-center">Paid Amount (LKR)</th>
-                    <th class="text-center">Daily Total Earnings (LKR)</th>
-                </tr>
-            </thead>
-            <tbody>
+    <thead>
+        <tr>
+            <th class="text-center">No.</th>
+            <th class="text-center">Post Date</th>
+            <th class="text-center">Approved Date</th>
+            <th class="text-center">Company</th>
+            <th class="text-center">Job Post</th>
+            <th class="text-center">Total Views</th>
+            <th class="text-center">Today's Views</th>
+            <th class="text-center">Paid Amount (LKR)</th>
+            <th class="text-center">Daily Total Earnings (LKR)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @php
+            $totalViews = 0;
+            $totalTodaysViews = 0;
+            $totalPaidAmount = 0;
+            $totalDailyEarnings = 0;
+            $serialNumber = 1;
+        @endphp
+
+        {{-- ✅ Case 1: Date range selected --}}
+        @if ($startDate && $endDate)
+            @foreach ($jobPostings->groupBy('id') as $jobId => $jobGroup)
                 @php
-                    $serialNumber = 1;
-                    $jobsByDate = [];
+                    $job = $jobGroup->first();
+                    $jobTotalViews = $jobGroup->sum('daily_view');
+                    $jobTotalEarnings = $jobGroup->sum('daily_earnings');
 
-                    $totalViewCount = 0;
-                    $totalUpdateCount = 0;
-
-                    // Group jobs by date (Y-m-d)
-                    foreach ($jobPostings as $job) {
-                        $date = \Carbon\Carbon::parse($job->created_at)->format('Y-m-d');
-                        $jobsByDate[$date][] = $job;
-                    }
+                    $totalViews += $jobTotalViews;
+                    $totalTodaysViews += $jobGroup->sum('daily_view');
+                    $totalPaidAmount += $job->package_price;
+                    $totalDailyEarnings += $jobTotalEarnings;
                 @endphp
 
-                @forelse ($jobsByDate as $date => $jobs)
-                    @php $firstJob = true; @endphp
-                    @foreach ($jobs as $job)
-                        @php
-                            // accumulate totals here
-                            $totalViewCount += $job->view_count;
-                            $totalUpdateCount += $job->update_count;
-                        @endphp
-                        <tr>
-                            <td class="text-left">{{ $serialNumber++ }}</td>
-                            <td class="text-left">{{ $date }}</td>
-                            <td class="text-left">{{ $job->approved_date ? \Carbon\Carbon::parse($job->approved_date)->format('Y-m-d') : 'Not Approved' }}</td>
-                            <td class="text-left">{{ $job->company_name ?? 'N/A' }}</td>
-                            <td class="text-left">{{ $job->title }}</td>
-                            <td class="text-left">{{ $job->view_count }}</td>
-                            <td class="text-left">{{ $job->update_count }}</td>
-                            <td class="text-right" style="text-align: right">{{ number_format($job->package_price, 2) }}</td>
-
-                            @if ($firstJob)
-                                <td class="text-right" style="text-align: right; vertical-align: bottom;" rowspan="{{ count($jobs) }}">
-                                    {{ number_format($dailyTotals->get($date, 0), 2) }}
-                                </td>
-                                @php $firstJob = false; @endphp
-                            @endif
-                        </tr>
-                    @endforeach
-                @empty
+                @foreach ($jobGroup as $index => $row)
                     <tr>
-                        <td colspan="9" class="text-center">No job postings available.</td>
-                    </tr>
-                @endforelse
+                        @if ($index == 0)
+                            <td rowspan="{{ $jobGroup->count() }}">{{ $serialNumber++ }}</td>
+                            <td rowspan="{{ $jobGroup->count() }}">{{ \Carbon\Carbon::parse($job->created_at)->format('Y-m-d') }}</td>
+                            <td rowspan="{{ $jobGroup->count() }}">{{ $job->approved_date ? \Carbon\Carbon::parse($job->approved_date)->format('Y-m-d') : 'Not Approved' }}</td>
+                            <td rowspan="{{ $jobGroup->count() }}">{{ $job->company_name }}</td>
+                            <td rowspan="{{ $jobGroup->count() }}">{{ $job->title }}</td>
+                            <td rowspan="{{ $jobGroup->count() }}">{{ $jobTotalViews }}</td>
+                        @endif
 
-                {{-- Totals Row --}}
+                        {{-- Daily views --}}
+                        <td>{{ $row->view_date }} - ({{ $row->daily_view }})</td>
+
+                        @if ($index == 0)
+                            <td rowspan="{{ $jobGroup->count() }}">{{ number_format($job->package_price, 2) }}</td>
+                            <td rowspan="{{ $jobGroup->count() }}">{{ number_format($jobTotalEarnings, 2) }}</td>
+                        @endif
+                    </tr>
+                @endforeach
+            @endforeach
+
+            {{-- Totals Row --}}
+            <tr>
+                <td colspan="5" class="text-right"><strong>Totals:</strong></td>
+                <td><strong>{{ $totalViews }}</strong></td>
+                <td><strong>{{ $totalTodaysViews }}</strong></td>
+                <td><strong>{{ number_format($totalPaidAmount, 2) }}</strong></td>
+                <td><strong>{{ number_format($totalDailyEarnings, 2) }}</strong></td>
+            </tr>
+
+        {{-- ✅ Case 2: No date range --}}
+        @else
+            @php
+                $jobsByDate = [];
+                foreach ($jobPostings as $job) {
+                    $date = \Carbon\Carbon::parse($job->created_at)->format('Y-m-d');
+                    $jobsByDate[$date][] = $job;
+                }
+            @endphp
+
+            @forelse ($jobsByDate as $date => $jobs)
+                @php $firstJob = true; @endphp
+                @foreach ($jobs as $job)
+                    @php
+                        $totalViews += $job->view_count;
+                        $totalTodaysViews += $job->update_count;
+                    @endphp
+                    <tr>
+                        <td>{{ $serialNumber++ }}</td>
+                        <td>{{ $date }}</td>
+                        <td>{{ $job->approved_date ? \Carbon\Carbon::parse($job->approved_date)->format('Y-m-d') : 'Not Approved' }}</td>
+                        <td>{{ $job->company_name ?? 'N/A' }}</td>
+                        <td>{{ $job->title }}</td>
+                        <td>{{ $job->view_count }}</td>
+                        <td>{{ $job->update_count }}</td>
+                        <td class="text-right">{{ number_format($job->package_price, 2) }}</td>
+
+                        @if ($firstJob)
+                            <td class="text-right" rowspan="{{ count($jobs) }}">
+                                {{ number_format($dailyTotals->get($date, 0), 2) }}
+                            </td>
+                            @php $firstJob = false; @endphp
+                        @endif
+                    </tr>
+                @endforeach
+            @empty
                 <tr>
-                    <td colspan="5" class="text-right"><strong>Totals:</strong></td>
-                    <td><strong>{{ $totalViewCount }}</strong></td>
-                    <td><strong>{{ $totalUpdateCount }}</strong></td>
-                    <td colspan="1"></td>
-                    <td><strong>{{ number_format($dailyTotals->sum(), 2) }}</strong></td>
+                    <td colspan="9" class="text-center">No job postings available.</td>
                 </tr>
-            </tbody>
-        </table>
+            @endforelse
+
+            {{-- Totals row --}}
+            <tr>
+                <td colspan="5" class="text-right"><strong>Totals:</strong></td>
+                <td><strong>{{ $totalViews }}</strong></td>
+                <td><strong>{{ $totalTodaysViews }}</strong></td>
+                <td></td>
+                <td><strong>{{ number_format($dailyTotals->sum(), 2) }}</strong></td>
+            </tr>
+        @endif
+    </tbody>
+</table>
+
+
     </div>
 @endsection
 
@@ -201,7 +258,7 @@
 
     <script>
         // Print function
-        document.getElementById('btnPrint').addEventListener('click', function () {
+        document.getElementById('btnPrint').addEventListener('click', function() {
             var divToPrint = document.getElementById('job-postings-table');
             var newWin = window.open('', 'Print-Window');
             newWin.document.open();
@@ -220,11 +277,13 @@
                 </html>
             `);
             newWin.document.close();
-            setTimeout(function () { newWin.close(); }, 10);
+            setTimeout(function() {
+                newWin.close();
+            }, 10);
         });
 
         // Export to Excel function
-        document.getElementById('btnExportExcel').addEventListener('click', function () {
+        document.getElementById('btnExportExcel').addEventListener('click', function() {
             var table = document.getElementById('job-postings-table');
             var wb = XLSX.utils.book_new();
             var ws = XLSX.utils.table_to_sheet(table);
@@ -233,11 +292,16 @@
         });
 
         // Export to PDF function
-        document.getElementById('btnExportPdf').addEventListener('click', function () {
-            const { jsPDF } = window.jspdf;
+        document.getElementById('btnExportPdf').addEventListener('click', function() {
+            const {
+                jsPDF
+            } = window.jspdf;
             var doc = new jsPDF();
 
-            doc.autoTable({ html: '#job-postings-table', startY: 10 });
+            doc.autoTable({
+                html: '#job-postings-table',
+                startY: 10
+            });
 
             doc.save('Employer_Registration_Report.pdf');
         });

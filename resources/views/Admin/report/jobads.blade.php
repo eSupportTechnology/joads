@@ -154,51 +154,65 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th style="width: 120px">Date</th>
                                         <th>Title</th>
                                         <th>Company</th>
                                         <th>Approved By</th>
                                         <th>Total Views</th>
+                                        <th>Daily Views</th>
                                         <th>Total Amount (LKR)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $serialNumber = 1; @endphp
-                                    @foreach ($dailyCount as $daily)
-                                        @if ($daily->jobs->isEmpty())
-                                            <tr>
-                                                <td>{{ $serialNumber++ }}</td>
-                                                <td>{{ $daily->date }}</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td>0</td>
-                                                <td class="amount-col">{{ number_format($daily->earnings, 2) }}</td>
-                                            </tr>
-                                        @else
-                                            @php $firstJob = true; @endphp
-                                            @foreach ($daily->jobs as $job)
-                                                <tr>
-                                                    <td>{{ $serialNumber++ }}</td>
-                                                    @if ($firstJob)
-                                                        <td rowspan="{{ $daily->jobs->count() }}">{{ $daily->date }}</td>
-                                                    @endif
-                                                    <td>{{ $job->title }}</td>
-                                                    <td>{{ $job->company_name }}</td>
-                                                    <td>{{ $job->approved_by }}</td>
-                                                    <td>{{ $job->views_count }}</td>
-                                                    @if ($firstJob)
-                                                        <td class="amount-col" rowspan="{{ $daily->jobs->count() }}">
-                                                            {{ number_format($daily->earnings, 2) }}
-                                                        </td>
-                                                        @php $firstJob = false; @endphp
-                                                    @endif
-                                                </tr>
-                                            @endforeach
-                                        @endif
+                                    @php
+                                        $grandTotalViews = 0;
+                                        $grandDailyViews = 0;
+                                        $grandTotalAmount = 0;
+                                    @endphp
+
+                                    @foreach ($dailyCount as $job)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $job->title }}</td>
+                                            <td>{{ $job->company_name }}</td>
+                                            <td class="text-center">{{ $job->approved_by }}</td>
+                                            <td class="text-center">{{ $job->total_views }}</td>
+                                            <td class="text-center">
+                                                @if ($startDate && $endDate)
+                                                    {{-- Show with dates --}}
+                                                    @foreach ($job->daily_views as $date => $count)
+                                                        {{ $date }} - {{ $count }}<br>
+                                                    @endforeach
+                                                @else
+                                                    {{-- Show only counts --}}
+                                                    {{ array_sum($job->daily_views) }}
+                                                @endif
+                                            </td>
+
+
+                                            <td class="text-right">{{ number_format($job->lkr_price, 2) }}</td>
+                                        </tr>
+                                        @php
+                                            $grandTotalViews = $dailyCount->sum('total_views');
+                                            $grandDailyViews = $dailyCount->sum(
+                                                fn($job) => collect($job->daily_views)->sum(),
+                                            );
+                                            $grandTotalAmount = $dailyCount->sum('lkr_price');
+                                        @endphp
                                     @endforeach
+
+
                                 </tbody>
+                                <tfoot>
+                                    <tr style="font-weight: bold; background: #f2f2f2;">
+                                        <td colspan="4" class="text-left">Grand Totals</td>
+                                        <td class="text-center">{{ $grandTotalViews }}</td>
+                                        <td class="text-center">{{ $grandDailyViews }}</td>
+                                        <td class="text-right">{{ number_format($grandTotalAmount, 2) }}</td>
+                                    </tr>
+                                </tfoot>
                             </table>
+
+
                         </div>
                     </div>
                 </div>

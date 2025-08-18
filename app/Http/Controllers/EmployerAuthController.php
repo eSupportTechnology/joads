@@ -94,120 +94,136 @@ class EmployerAuthController extends Controller
 
 
     public function getFilteredJobPostings(Request $request)
-{
-    $startDate = $request->start_date;
-    $endDate = $request->end_date;
+    {
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
 
-    // ✅ Case 1: Date range is selected — use job_views and filter out 0 views
-    if ($startDate && $endDate) {
-        $results = DB::table('job_postings')
-            ->join('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-            ->join('job_views', 'job_postings.id', '=', 'job_views.job_posting_id')
-            ->where('job_postings.status', 'approved') // ✅ Filter by approved status
-            ->whereBetween('job_views.view_date', [$startDate, $endDate])
-            ->select(
-                'job_postings.id',
-                'job_postings.title',
-                'job_postings.approved_date',
-                'job_postings.created_at',
-                'employers.company_name',
-                'job_postings.update_count',
-                'packages.lkr_price',
-                'job_postings.package_price',
-                DB::raw('SUM(job_views.view_count) as view_count')
-            )
-            ->groupBy(
-                'job_postings.id',
-                'job_postings.title',
-                'job_postings.approved_date',
-                'job_postings.created_at',
-                'employers.company_name',
-                'job_postings.update_count',
-                'packages.lkr_price',
-                'job_postings.package_price'
-            )
-            ->havingRaw('SUM(job_views.view_count) > 0')
-            ->orderBy('job_postings.created_at', 'desc')
-            ->get();
+        // ✅ Case 1: Date range is selected — use job_views and filter out 0 views
+        if ($startDate && $endDate) {
+            $results = DB::table('job_postings')
+                ->join('packages', 'job_postings.package_id', '=', 'packages.id')
+                ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+                ->join('job_views', 'job_postings.id', '=', 'job_views.job_posting_id')
+                ->where('job_postings.status', 'approved')
+                ->whereBetween('job_views.view_date', [
+                    \Carbon\Carbon::parse($startDate)->toDateString(),
+                    \Carbon\Carbon::parse($endDate)->toDateString()
+                ])
+                ->select(
+                    'job_postings.id',
+                    'job_postings.title',
+                    'job_postings.approved_date',
+                    'job_postings.created_at',
+                    'employers.company_name',
+                    'job_postings.update_count',
+                    'packages.lkr_price',
+                    'job_postings.package_price',
+                    'job_views.view_date',
+                    // ✅ daily views for that job on that date
+                    DB::raw('SUM(job_views.view_count) as daily_view'),
+                    //daily earnings
+                    DB::raw("CASE WHEN DATE(job_postings.approved_date) = CURDATE()
+              THEN job_postings.package_price ELSE 0 END as daily_earnings"),
+
+                    // ✅ total views for that job in the range
+                    DB::raw('(SELECT SUM(jv.view_count)
+                  FROM job_views jv
+                  WHERE jv.job_posting_id = job_postings.id
+                  AND jv.view_date BETWEEN "' . \Carbon\Carbon::parse($startDate)->toDateString() . '"
+                  AND "' . \Carbon\Carbon::parse($endDate)->toDateString() . '") as total_view')
+                )
+                ->groupBy(
+                    'job_postings.id',
+                    'job_postings.title',
+                    'job_postings.approved_date',
+                    'job_postings.created_at',
+                    'employers.company_name',
+                    'job_postings.update_count',
+                    'packages.lkr_price',
+                    'job_postings.package_price',
+                    'job_views.view_date'
+                )
+                ->orderBy('job_postings.id')
+                ->orderBy('job_views.view_date')
+                ->get();
+        }
+
+        // ✅ Case 2: No date range — show all approved job postings with job_postings.view_count
+        else {
+            $results = DB::table('job_postings')
+                ->join('packages', 'job_postings.package_id', '=', 'packages.id')
+                ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+                ->where('job_postings.status', 'approved') // ✅ Filter by approved status
+                ->select(
+                    'job_postings.id',
+                    'job_postings.title',
+                    'job_postings.approved_date',
+                    'job_postings.created_at',
+                    'employers.company_name',
+                    'job_postings.update_count',
+                    'packages.lkr_price',
+                    'job_postings.package_price',
+                    'job_postings.view_count'
+                )
+                ->orderBy('job_postings.created_at', 'desc')
+                ->get();
+        }
+
+        // Totals
+        $totalLkr = $results->sum('package_price');
+
+        $dailyTotals = $results->groupBy(function ($item) {
+            return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
+        })->map(fn($group) => $group->sum('package_price'));
+
+        $dailyViews = DB::table('job_views')
+            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
+                return $q->whereBetween('view_date', [$startDate, $endDate]);
+            })
+            ->groupBy('view_date')
+            ->select('view_date', DB::raw('SUM(view_count) as total'))
+            ->pluck('total', 'view_date');
+
+        // Stats
+        $today = Carbon::today();
+        $startOfWeek = $today->copy()->startOfWeek()->toDateString();
+        $endOfWeek = $today->copy()->endOfWeek()->toDateString();
+
+        $dailyEmployerCount = DB::table('job_postings')
+            ->where('status', 'approved') // Only count approved
+            ->select('employer_id')
+            ->groupBy('employer_id')
+            ->havingRaw('DATE(MIN(created_at)) = ?', [$today->toDateString()])
+            ->count();
+
+        $weeklyEmployerCount = DB::table('job_postings')
+            ->where('status', 'approved') // Only count approved
+            ->select('employer_id')
+            ->groupBy('employer_id')
+            ->havingRaw('DATE(MIN(created_at)) BETWEEN ? AND ?', [$startOfWeek, $endOfWeek])
+            ->count();
+
+        $todayViewCount = DB::table('job_views')
+            ->where('view_date', $today->toDateString())
+            ->sum('view_count');
+
+        $todayUpdateCount = DB::table('job_postings')
+            ->where('status', 'approved')
+            ->sum('view_count');
+
+        return view('Admin.report.employer', [
+            'todayViewCount' => $todayViewCount,
+            'todayUpdateCount' => $todayUpdateCount,
+            'jobPostings' => $results,
+            'totalEarningsLkr' => $totalLkr,
+            'dailyTotals' => $dailyTotals,
+            'dailyViews' => $dailyViews,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'dailyEmployerCount' => $dailyEmployerCount,
+            'weeklyEmployerCount' => $weeklyEmployerCount,
+        ]);
     }
-
-    // ✅ Case 2: No date range — show all approved job postings with job_postings.view_count
-    else {
-        $results = DB::table('job_postings')
-            ->join('packages', 'job_postings.package_id', '=', 'packages.id')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-            ->where('job_postings.status', 'approved') // ✅ Filter by approved status
-            ->select(
-                'job_postings.id',
-                'job_postings.title',
-                'job_postings.approved_date',
-                'job_postings.created_at',
-                'employers.company_name',
-                'job_postings.update_count',
-                'packages.lkr_price',
-                'job_postings.package_price',
-                'job_postings.view_count'
-            )
-            ->orderBy('job_postings.created_at', 'desc')
-            ->get();
-    }
-
-    // Totals
-    $totalLkr = $results->sum('package_price');
-
-    $dailyTotals = $results->groupBy(function ($item) {
-        return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
-    })->map(fn($group) => $group->sum('package_price'));
-
-    $dailyViews = DB::table('job_views')
-        ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
-            return $q->whereBetween('view_date', [$startDate, $endDate]);
-        })
-        ->groupBy('view_date')
-        ->select('view_date', DB::raw('SUM(view_count) as total'))
-        ->pluck('total', 'view_date');
-
-    // Stats
-    $today = Carbon::today();
-    $startOfWeek = $today->copy()->startOfWeek()->toDateString();
-    $endOfWeek = $today->copy()->endOfWeek()->toDateString();
-
-    $dailyEmployerCount = DB::table('job_postings')
-        ->where('status', 'approved') // Only count approved
-        ->select('employer_id')
-        ->groupBy('employer_id')
-        ->havingRaw('DATE(MIN(created_at)) = ?', [$today->toDateString()])
-        ->count();
-
-    $weeklyEmployerCount = DB::table('job_postings')
-        ->where('status', 'approved') // Only count approved
-        ->select('employer_id')
-        ->groupBy('employer_id')
-        ->havingRaw('DATE(MIN(created_at)) BETWEEN ? AND ?', [$startOfWeek, $endOfWeek])
-        ->count();
-
-    $todayViewCount = DB::table('job_views')
-        ->where('view_date', $today->toDateString())
-        ->sum('view_count');
-
-    $todayUpdateCount = DB::table('job_postings')
-        ->where('status', 'approved')
-        ->sum('view_count');
-
-    return view('Admin.report.employer', [
-        'todayViewCount' => $todayViewCount,
-        'todayUpdateCount' => $todayUpdateCount,
-        'jobPostings' => $results,
-        'totalEarningsLkr' => $totalLkr,
-        'dailyTotals' => $dailyTotals,
-        'dailyViews' => $dailyViews,
-        'startDate' => $startDate,
-        'endDate' => $endDate,
-        'dailyEmployerCount' => $dailyEmployerCount,
-        'weeklyEmployerCount' => $weeklyEmployerCount,
-    ]);
-}
 
 
 
