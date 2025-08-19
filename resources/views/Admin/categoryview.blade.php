@@ -69,7 +69,14 @@
                                         <th>Parent</th>
                                         <th>No. of Posts</th>
                                         <th>Total Views</th>
-                                        <th>Daily Views</th>
+                                        <th>
+    @if($hasDateRange)
+        Daily Views ({{ $startDate }} - {{ $endDate }})
+    @else
+        Today Views ({{ \Carbon\Carbon::today()->format('Y/m/d') }})
+    @endif
+</th>
+
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -82,7 +89,12 @@
                                             <td>{{ $category->parent ? $category->parent->name : 'Main Category' }}</td>
                                             <td>{{ $category->approved_job_postings_count }}</td>
                                             <td>{{ $category->approved_view_count ?? 0 }}</td>
-                                            <td>{{ $category->today_views ?? 0 }}</td>
+                                            <td>
+    @foreach($category->daily_views as $row)
+        {{ \Carbon\Carbon::parse($row->d)->format('Y/m/d') }} - {{ $row->total }}<br>
+    @endforeach
+</td>
+
                                             <td>{{ ucfirst($category->status) }}</td>
                                             <td class="d-flex gap-2">
                                                 <a href="{{ route('admin.categories.edit', $category->id) }}"

@@ -130,8 +130,14 @@
                                         <th>#</th>
                                         <th>Name</th>
                                         <th>Total Views</th>
-                                        <th>Today Views</th>
-                                        <th class="actions-column">Actions</th>
+                                        <th>
+                                            @if ($hasDateRange)
+                                                Views ({{ $startDate }} - {{ $endDate }})
+                                            @else
+                                                Today Views
+                                            @endif
+                                        </th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -140,7 +146,12 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $country->name }}</td>
                                             <td>{{ $country->total_view_count ?? 0 }}</td>
-                                            <td>{{ $country->total_update_count ?? 0 }}</td>
+                                            <td>
+                                                @foreach ($country->views_by_date as $row)
+                                                    {{ \Carbon\Carbon::parse($row->d)->format('Y/m/d') }} -
+                                                    {{ $row->total }}<br>
+                                                @endforeach
+                                            </td>
                                             <td class="actions-column">
                                                 <a href="{{ route('countries.edit', $country) }}"
                                                     class="btn custom-btn custom-btn-warning" style="height:12px">
@@ -150,7 +161,8 @@
                                                     class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn custom-btn custom-btn-danger" style="height:12px"
+                                                    <button type="submit" class="btn custom-btn custom-btn-danger"
+                                                        style="height:12px"
                                                         onclick="return confirm('Are you sure you want to delete this country?')">
                                                         <i class="icon-trash icon-fixed-size"></i> Delete
                                                     </button>

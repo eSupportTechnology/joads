@@ -30,7 +30,7 @@
         .justify-text {
             text-align: justify;
         }
-        
+
 
         /* Footer styling */
         /* Footer Container */
@@ -114,20 +114,20 @@
 
         <!-- Logo in the top right corner -->
         <div class="logo-container">
-            <img src="{{ asset('Jobads.png') }}" alt="Logo" class="logo">
+            <img src="{{ asset('jobAds-side.png') }}" alt="Logo" class="logo">
         </div>
         <div class="container">
             <div class="privacy-policy-">
 
-        
+
                 <!-- Dynamic Navigation Menu -->
                 <nav>
                     <h2 style="color: #0056b3"> Terms and Conditions</h2>
-                    <p >Welcome to JOBADS.LK. 
+                    <p >Welcome to JOBADS.LK.
                         These Terms and Conditions govern your use of our website and the payment process for services provided through our platform. By accessing and using our website, you agree to comply with these terms. Please read them carefully before proceeding with any transactions.</p>
-    
+
                 </nav>
-        
+
                 <!-- Dynamic Content Sections -->
                 @foreach ($terms as $term)
                     <div id="term-{{ $term['number'] }}" class="section" >
@@ -136,10 +136,10 @@
                     </div>
                 @endforeach
             </div>
-        
-        
+
+
         </div>
-    
+
     </main>
     <!-- Footer with contact information -->
 <footer class="footer-container">

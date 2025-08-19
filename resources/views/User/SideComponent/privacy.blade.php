@@ -30,7 +30,7 @@
         .justify-text {
             text-align: justify;
         }
-        
+
 
         /* Footer styling */
         /* Footer Container */
@@ -114,18 +114,18 @@
 
         <!-- Logo in the top right corner -->
         <div class="logo-container">
-            <img src="{{ asset('Jobads.png') }}" alt="Logo" class="logo">
+            <img src="{{ asset('jobAds-side.png') }}" alt="Logo" class="logo">
         </div>
         <div class="container">
             <div class="privacy-policy-">
-        
+
                 <!-- Dynamic Navigation Menu -->
                 <nav>
                     <h2 style="color: #0056b3"> Introduction</h2>
-                    <p >Welcome to JOBADS.LK. 
-This site is committed to protecting your privacy. This Statement of Privacy applies to the jobads.lk website and governs data collection and usage at this site. Please read the Statement of Privacy below.    
+                    <p >Welcome to JOBADS.LK.
+This site is committed to protecting your privacy. This Statement of Privacy applies to the jobads.lk website and governs data collection and usage at this site. Please read the Statement of Privacy below.
                 </nav>
-        
+
                             <!-- Dynamic Content Sections -->
             @foreach ($policy as $policy)
                 <div id="term-{{ $policy['number'] }}" class="section">
@@ -134,10 +134,10 @@ This site is committed to protecting your privacy. This Statement of Privacy app
                 </div>
             @endforeach
             </div>
-        
-        
+
+
         </div>
-    
+
     </main>
     <!-- Footer with contact information -->
 <footer class="footer-container">
