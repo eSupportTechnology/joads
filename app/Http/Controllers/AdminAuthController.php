@@ -411,17 +411,23 @@ public function updateProfile(Request $request)
 
 
     public function showPermissionForm(Request $request)
-    {
-        $admins = Admin::where('role', '!=', 'super_admin')->get();
-        $permissions = Permission::all();
+{
+    $admins = Admin::where('role', '!=', 'super_admin')->get();
 
-        $selectedAdmin = null;
-        if ($request->has('admin_id')) {
-            $selectedAdmin = Admin::with('permissions')->find($request->admin_id);
-        }
+    // Group permissions by module (prefix before the first '-')
+    $permissions = Permission::all()
+        ->groupBy(function ($permission) {
+            return explode('-', $permission->category)[0]; // e.g. "job" from "job-create"
+        });
 
-        return view('Admin.permissions.index', compact('admins', 'permissions', 'selectedAdmin'));
+    $selectedAdmin = null;
+    if ($request->has('admin_id')) {
+        $selectedAdmin = Admin::with('permissions')->find($request->admin_id);
     }
+
+    return view('Admin.permissions.index', compact('admins', 'permissions', 'selectedAdmin'));
+}
+
 
     public function assignPermissions(Request $request)
     {
