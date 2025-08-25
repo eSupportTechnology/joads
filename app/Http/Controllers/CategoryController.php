@@ -14,79 +14,100 @@ class CategoryController extends Controller
 {
     // Display a listing of categories
 
-public function index(Request $request)
-{
-    $startDate = $request->query('start_date');
-    $endDate   = $request->query('end_date');
+    public function index(Request $request)
+    {
+        $startDate = $request->query('start_date');
+        $endDate   = $request->query('end_date');
 
-    // Treat as a date range only when BOTH are present
-    $hasDateRange = $startDate && $endDate;
+        $hasDateRange = $startDate && $endDate;
 
-    $categories = Category::with(['subcategories', 'jobPostings'])->get();
+        // Get all categories (without undefined relationships)
+        $categories = Category::with(['jobPostings'])->get();
 
-    foreach ($categories as $category) {
-
-        // Base query: approved jobs in this category
-        $jobQuery = DB::table('job_postings')
-            ->where('status', 'approved')
-            ->where('category_id', $category->id);
-
-        // Only apply created_at + active filter when a FULL range is provided
+        // Build date range array if date range is provided
+        $dateRange = [];
         if ($hasDateRange) {
-            $jobQuery->whereDate('created_at', '>=', $startDate)
-                     ->whereDate('created_at', '<=', $endDate)
-                     ->where('closing_date', '>=', \Carbon\Carbon::now());
+            $period = new \DatePeriod(
+                new \DateTime($startDate),
+                new \DateInterval('P1D'),
+                (new \DateTime($endDate))->modify('+1 day') // inclusive
+            );
+
+            foreach ($period as $date) {
+                $dateRange[] = $date->format('Y-m-d');
+            }
         }
 
-        $jobIds = $jobQuery->pluck('id');
-        $category->approved_job_postings_count = $jobIds->count();
-
-        // --- TOTAL VIEWS ---
-        if ($hasDateRange) {
-            // Sum from job_views within the range
-            $category->approved_view_count = DB::table('job_views')
-                ->join('job_postings', 'job_views.job_posting_id', '=', 'job_postings.id')
-                ->where('job_postings.status', 'approved')
-                ->where('job_postings.category_id', $category->id)
-                ->where('job_views.view_count', '>', 0)
-                ->whereBetween(DB::raw('DATE(job_views.view_date)'), [$startDate, $endDate])
-                ->sum('job_views.view_count');
-        } else {
-            // All-time from job_postings
-            $category->approved_view_count = DB::table('job_postings')
+        foreach ($categories as $category) {
+            // Base query: approved jobs in this category
+            $jobQuery = DB::table('job_postings')
                 ->where('status', 'approved')
-                ->where('category_id', $category->id)
-                ->sum('view_count');
+                ->where('category_id', $category->id);
+
+            if ($hasDateRange) {
+                $jobQuery->whereDate('created_at', '>=', $startDate)
+                    ->whereDate('created_at', '<=', $endDate)
+                    ->where('closing_date', '>=', \Carbon\Carbon::now());
+            }
+
+            $jobIds = $jobQuery->pluck('id');
+            $category->approved_job_postings_count = $jobIds->count();
+
+            // --- TOTAL VIEWS ---
+            if ($hasDateRange) {
+                $viewsByDate = DB::table('job_views')
+                    ->whereIn('job_posting_id', $jobIds)
+                    ->where('view_count', '>', 0)
+                    ->whereBetween(DB::raw('DATE(view_date)'), [$startDate, $endDate])
+                    ->selectRaw('DATE(view_date) as d, SUM(view_count) as total')
+                    ->groupBy('d')
+                    ->pluck('total', 'd');
+
+
+                $category->approved_view_count = $viewsByDate->sum();
+
+                // Map daily views to each date, fill 0 if no data
+                $dailyViews = [];
+                foreach ($dateRange as $d) {
+                    $dailyViews[$d] = $viewsByDate[$d] ?? 0;
+                }
+                $category->daily_views = $dailyViews;
+            } else {
+                $today = \Carbon\Carbon::today()->toDateString();
+                $totalCount = DB::table('job_postings')
+                    ->whereIn('id', $jobIds)
+                    ->where('view_count', '>', 0)
+                    ->sum('view_count');
+                $todayCount = DB::table('job_postings')
+                    ->whereIn('id', $jobIds)
+                    // ->whereDate('view_date', $today)
+                    ->where('update_count', '>', 0)
+                    ->sum('view_count');
+
+                $category->approved_view_count = $totalCount;
+                $category->daily_views = [$today => $todayCount];
+                $dateRange = [$today];
+            }
         }
 
-        // --- DAILY VIEWS (breakdown) ---
+        // --- REMOVE ALL-ZERO DATES ---
         if ($hasDateRange) {
-            $category->daily_views = DB::table('job_views')
-                ->join('job_postings', 'job_views.job_posting_id', '=', 'job_postings.id')
-                ->selectRaw('DATE(job_views.view_date) as d, SUM(job_views.view_count) as total')
-                ->where('job_postings.status', 'approved')
-                ->where('job_postings.category_id', $category->id)
-                ->where('job_views.view_count', '>', 0)
-                ->whereBetween(DB::raw('DATE(job_views.view_date)'), [$startDate, $endDate])
-                ->groupBy('d')
-                ->orderBy('d')
-                ->get();
-        } else {
-            $today = \Carbon\Carbon::today()->toDateString();
-            $todayCount = DB::table('job_views')
-                ->join('job_postings', 'job_views.job_posting_id', '=', 'job_postings.id')
-                ->where('job_postings.status', 'approved')
-                ->where('job_postings.category_id', $category->id)
-                ->whereDate('job_views.view_date', $today)
-                ->where('job_views.view_count', '>', 0)
-                ->sum('job_views.view_count');
-
-            $category->daily_views = collect([(object) ['d' => $today, 'total' => $todayCount]]);
+            $filteredDates = [];
+            foreach ($dateRange as $d) {
+                $sumForDate = 0;
+                foreach ($categories as $category) {
+                    $sumForDate += $category->daily_views[$d] ?? 0;
+                }
+                if ($sumForDate > 0) {
+                    $filteredDates[] = $d;
+                }
+            }
+            $dateRange = $filteredDates;
         }
+
+        return view('Admin.categoryview', compact('categories', 'startDate', 'endDate', 'hasDateRange', 'dateRange'));
     }
 
-    return view('Admin.categoryview', compact('categories', 'startDate', 'endDate', 'hasDateRange'));
-}
 
 
 
@@ -140,43 +161,43 @@ public function index(Request $request)
 
     // Update the specified category
     public function update(Request $request, $id)
-{
-    $category = Category::findOrFail($id);
+    {
+        $category = Category::findOrFail($id);
 
-    $request->validate([
-        'name' => 'required|string|max:255|unique:categories,name,' . $id,
-        'status' => 'required|in:active,inactive',
-        'subcategories' => 'nullable|array',
-        'subcategories.*' => 'string|max:255',
-    ]);
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name,' . $id,
+            'status' => 'required|in:active,inactive',
+            'subcategories' => 'nullable|array',
+            'subcategories.*' => 'string|max:255',
+        ]);
 
-    $category->update([
-        'name' => $request->name,
-        'status' => $request->status,
-    ]);
+        $category->update([
+            'name' => $request->name,
+            'status' => $request->status,
+        ]);
 
-    $existingSubcategories = $category->subcategories->pluck('name')->toArray();
+        $existingSubcategories = $category->subcategories->pluck('name')->toArray();
 
-    $submittedSubcategories = $request->subcategories ?? [];
+        $submittedSubcategories = $request->subcategories ?? [];
 
-    foreach ($category->subcategories as $subcategory) {
-        if (!in_array($subcategory->name, $submittedSubcategories)) {
-            $subcategory->delete();
+        foreach ($category->subcategories as $subcategory) {
+            if (!in_array($subcategory->name, $submittedSubcategories)) {
+                $subcategory->delete();
+            }
         }
-    }
-    foreach ($submittedSubcategories as $subcategoryName) {
-        $subcategoryName = trim($subcategoryName);
-        if (!empty($subcategoryName) && !in_array($subcategoryName, $existingSubcategories)) {
-            Subcategory::create([
-                'name' => $subcategoryName,
-                'category_id' => $category->id,
-                'status' => 'active',
-            ]);
+        foreach ($submittedSubcategories as $subcategoryName) {
+            $subcategoryName = trim($subcategoryName);
+            if (!empty($subcategoryName) && !in_array($subcategoryName, $existingSubcategories)) {
+                Subcategory::create([
+                    'name' => $subcategoryName,
+                    'category_id' => $category->id,
+                    'status' => 'active',
+                ]);
+            }
         }
-    }
 
-    return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');
-}
+        return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');
+    }
 
 
 

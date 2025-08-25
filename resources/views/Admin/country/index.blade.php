@@ -124,19 +124,15 @@
                             </div>
                         </form>
                         <div class="dt-ext table-responsive">
-                            <table class="display" id="countries-table">
+                            <table class="display"  id="countries-table" style="overflow-x:auto; width:100%;">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
+                                        <th>NO</th>
                                         <th>Name</th>
                                         <th>Total Views</th>
-                                        <th>
-                                            @if ($hasDateRange)
-                                                Views ({{ $startDate }} - {{ $endDate }})
-                                            @else
-                                                Today Views
-                                            @endif
-                                        </th>
+                                        @foreach ($dateRange as $d)
+                                            <th>{{ \Carbon\Carbon::parse($d)->format('Y/m/d') }}</th>
+                                        @endforeach
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -146,13 +142,10 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $country->name }}</td>
                                             <td>{{ $country->total_view_count ?? 0 }}</td>
+                                            @foreach ($dateRange as $d)
+                                                <td>{{ $country->views_by_date[$d] ?? 0 }}</td>
+                                            @endforeach
                                             <td>
-                                                @foreach ($country->views_by_date as $row)
-                                                    {{ \Carbon\Carbon::parse($row->d)->format('Y/m/d') }} -
-                                                    {{ $row->total }}<br>
-                                                @endforeach
-                                            </td>
-                                            <td class="actions-column">
                                                 <a href="{{ route('countries.edit', $country) }}"
                                                     class="btn custom-btn custom-btn-warning" style="height:12px">
                                                     <i class="icon-pencil-alt icon-fixed-size"></i> Edit
@@ -172,6 +165,7 @@
                                     @endforeach
                                 </tbody>
                             </table>
+
                         </div>
                     </div>
                 </div>
@@ -192,8 +186,14 @@
     <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.responsive.min.js') }}"></script>
     <script>
         $(document).ready(function() {
+            if ($.fn.DataTable.isDataTable('#countries-table')) {
+                $('#countries-table').DataTable().destroy(); // Destroy if already exists
+            }
+
             $('#countries-table').DataTable({
-                responsive: true,
+                // scrollX: true,
+                scrollCollapse: true,
+                paging: true,
                 pageLength: 25,
                 dom: 'Bfrtip',
                 buttons: [
@@ -204,7 +204,7 @@
                     {
                         extend: 'print',
                         exportOptions: {
-                            columns: ':not(.actions-column)' // Exclude actions column during export
+                            columns: ':not(.actions-column)' // Exclude actions column from export
                         }
                     }
                 ],

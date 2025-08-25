@@ -125,126 +125,101 @@
         </div>
 
         <table id="job-postings-table" class="table table-bordered" style="width:100%">
-    <thead>
-        <tr>
-            <th class="text-center">No.</th>
-            <th class="text-center">Post Date</th>
-            <th class="text-center">Approved Date</th>
-            <th class="text-center">Company</th>
-            <th class="text-center">Job Post</th>
-            <th class="text-center">Total Views</th>
-            <th class="text-center">Today's Views</th>
-            <th class="text-center">Paid Amount (LKR)</th>
-            <th class="text-center">Daily Total Earnings (LKR)</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @php
-            $totalViews = 0;
-            $totalTodaysViews = 0;
-            $totalPaidAmount = 0;
-            $totalDailyEarnings = 0;
-            $serialNumber = 1;
-        @endphp
-
-        {{-- ✅ Case 1: Date range selected --}}
-        @if ($startDate && $endDate)
-            @foreach ($jobPostings->groupBy('id') as $jobId => $jobGroup)
-                @php
-                    $job = $jobGroup->first();
-                    $jobTotalViews = $jobGroup->sum('daily_view');
-                    $jobTotalEarnings = $jobGroup->sum('daily_earnings');
-
-                    $totalViews += $jobTotalViews;
-                    $totalTodaysViews += $jobGroup->sum('daily_view');
-                    $totalPaidAmount += $job->package_price;
-                    $totalDailyEarnings += $jobTotalEarnings;
-                @endphp
-
-                @foreach ($jobGroup as $index => $row)
-                    <tr>
-                        @if ($index == 0)
-                            <td rowspan="{{ $jobGroup->count() }}">{{ $serialNumber++ }}</td>
-                            <td rowspan="{{ $jobGroup->count() }}">{{ \Carbon\Carbon::parse($job->created_at)->format('Y-m-d') }}</td>
-                            <td rowspan="{{ $jobGroup->count() }}">{{ $job->approved_date ? \Carbon\Carbon::parse($job->approved_date)->format('Y-m-d') : 'Not Approved' }}</td>
-                            <td rowspan="{{ $jobGroup->count() }}">{{ $job->company_name }}</td>
-                            <td rowspan="{{ $jobGroup->count() }}">{{ $job->title }}</td>
-                            <td rowspan="{{ $jobGroup->count() }}">{{ $jobTotalViews }}</td>
-                        @endif
-
-                        {{-- Daily views --}}
-                        <td>{{ $row->view_date }} - ({{ $row->daily_view }})</td>
-
-                        @if ($index == 0)
-                            <td rowspan="{{ $jobGroup->count() }}">{{ number_format($job->package_price, 2) }}</td>
-                            <td rowspan="{{ $jobGroup->count() }}">{{ number_format($jobTotalEarnings, 2) }}</td>
-                        @endif
-                    </tr>
-                @endforeach
-            @endforeach
-
-            {{-- Totals Row --}}
-            <tr>
-                <td colspan="5" class="text-right"><strong>Totals:</strong></td>
-                <td><strong>{{ $totalViews }}</strong></td>
-                <td><strong>{{ $totalTodaysViews }}</strong></td>
-                <td><strong>{{ number_format($totalPaidAmount, 2) }}</strong></td>
-                <td><strong>{{ number_format($totalDailyEarnings, 2) }}</strong></td>
-            </tr>
-
-        {{-- ✅ Case 2: No date range --}}
-        @else
             @php
-                $jobsByDate = [];
-                foreach ($jobPostings as $job) {
-                    $date = \Carbon\Carbon::parse($job->created_at)->format('Y-m-d');
-                    $jobsByDate[$date][] = $job;
-                }
+                // collect all distinct dates in range
+                $datesInRange = $jobPostings
+                    ->pluck('view_date')
+                    // ->filter()
+                    ->unique()
+                    ->sort()
+                    ->map(fn($d) => \Carbon\Carbon::parse($d)->format('Y-m-d'))
+                    ->values();
             @endphp
 
-            @forelse ($jobsByDate as $date => $jobs)
-                @php $firstJob = true; @endphp
-                @foreach ($jobs as $job)
+            <thead>
+                <tr>
+                    <th class="text-center">No.</th>
+                    <th class="text-center">Post Date</th>
+                    <th class="text-center">Approved Date</th>
+                    <th class="text-center">Company</th>
+                    <th class="text-center">Job Post</th>
+                    <th class="text-center">Total Views</th>
+
+                    {{-- ✅ dynamic date headers --}}
+                    @foreach ($datesInRange as $date)
+                        <th class="text-center">{{ $date }}</th>
+                    @endforeach
+
+                    <th class="text-center">Paid Amount (LKR)</th>
+                    <th class="text-center">Daily Total Earnings (LKR)</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @php
+                    $totalViews = 0;
+                    $totalPaidAmount = 0;
+                    $totalDailyEarnings = 0;
+                    $dateTotals = array_fill_keys($datesInRange->toArray(), 0);
+                    $serialNumber = 1;
+                @endphp
+
+                @foreach ($jobPostings->groupBy('id') as $jobId => $jobGroup)
                     @php
-                        $totalViews += $job->view_count;
-                        $totalTodaysViews += $job->update_count;
+                        $job = $jobGroup->first();
+                        $jobTotalViews = $jobGroup->sum('daily_view');
+                        $jobTotalEarnings = $jobGroup->sum('daily_earnings');
+
+                        $totalViews += $jobTotalViews;
+                        $totalPaidAmount += $job->package_price;
+                        $totalDailyEarnings += $jobTotalEarnings;
+
+                        // map daily views keyed by date
+                        $dailyViewsByDate = $jobGroup
+                            ->pluck('daily_view', 'view_date')
+                            ->mapWithKeys(fn($v, $d) => [\Carbon\Carbon::parse($d)->format('Y-m-d') => $v])
+                            ->toArray();
+
+                        // accumulate totals per date
+                        foreach ($datesInRange as $date) {
+                            $dateTotals[$date] += $dailyViewsByDate[$date] ?? 0;
+                        }
                     @endphp
+
                     <tr>
                         <td>{{ $serialNumber++ }}</td>
-                        <td>{{ $date }}</td>
-                        <td>{{ $job->approved_date ? \Carbon\Carbon::parse($job->approved_date)->format('Y-m-d') : 'Not Approved' }}</td>
-                        <td>{{ $job->company_name ?? 'N/A' }}</td>
+                        <td>{{ \Carbon\Carbon::parse($job->created_at)->format('Y-m-d') }}</td>
+                        <td>{{ $job->approved_date ? \Carbon\Carbon::parse($job->approved_date)->format('Y-m-d') : 'Not Approved' }}
+                        </td>
+                        <td>{{ $job->company_name }}</td>
                         <td>{{ $job->title }}</td>
-                        <td>{{ $job->view_count }}</td>
-                        <td>{{ $job->update_count }}</td>
-                        <td class="text-right">{{ number_format($job->package_price, 2) }}</td>
+                        <td>{{ $jobTotalViews }}</td>
 
-                        @if ($firstJob)
-                            <td class="text-right" rowspan="{{ count($jobs) }}">
-                                {{ number_format($dailyTotals->get($date, 0), 2) }}
-                            </td>
-                            @php $firstJob = false; @endphp
-                        @endif
+                        {{-- ✅ loop each date column --}}
+                        @foreach ($datesInRange as $date)
+                            <td>{{ $dailyViewsByDate[$date] ?? 0 }}</td>
+                        @endforeach
+
+                        <td>{{ number_format($job->package_price, 2) }}</td>
+                        <td>{{ number_format($jobTotalEarnings, 2) }}</td>
                     </tr>
                 @endforeach
-            @empty
-                <tr>
-                    <td colspan="9" class="text-center">No job postings available.</td>
-                </tr>
-            @endforelse
 
-            {{-- Totals row --}}
-            <tr>
-                <td colspan="5" class="text-right"><strong>Totals:</strong></td>
-                <td><strong>{{ $totalViews }}</strong></td>
-                <td><strong>{{ $totalTodaysViews }}</strong></td>
-                <td></td>
-                <td><strong>{{ number_format($dailyTotals->sum(), 2) }}</strong></td>
-            </tr>
-        @endif
-    </tbody>
-</table>
+                {{-- ✅ Totals Row --}}
+                <tr>
+                    <td colspan="5" class="text-right"><strong>Totals:</strong></td>
+                    <td><strong>{{ $totalViews }}</strong></td>
+
+                    @foreach ($datesInRange as $date)
+                        <td><strong>{{ $dateTotals[$date] }}</strong></td>
+                    @endforeach
+
+                    <td><strong>{{ number_format($totalPaidAmount, 2) }}</strong></td>
+                    <td><strong>{{ number_format($totalDailyEarnings, 2) }}</strong></td>
+                </tr>
+            </tbody>
+
+        </table>
 
 
     </div>

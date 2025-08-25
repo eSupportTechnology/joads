@@ -62,77 +62,45 @@
 
                         <div class="dt-ext table-responsive">
                             <table class="display" id="keytable">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>S.No</th>
-                                        <th>Name</th>
-                                        <th>Parent</th>
-                                        <th>No. of Posts</th>
-                                        <th>Total Views</th>
-                                        <th>
-    @if($hasDateRange)
-        Daily Views ({{ $startDate }} - {{ $endDate }})
-    @else
-        Today Views ({{ \Carbon\Carbon::today()->format('Y/m/d') }})
-    @endif
-</th>
+    <thead class="table-light">
+        <tr>
+            <th>S.No</th>
+            <th>Name</th>
+            <th>Parent</th>
+            <th>No. of Posts</th>
+            <th>Total Views</th>
+            @foreach($dateRange as $d)
+                <th>{{ \Carbon\Carbon::parse($d)->format('Y/m/d') }}</th>
+            @endforeach
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($categories as $category)
+        <tr>
+            <td>{{ $category->id }}</td>
+            <td>{{ $category->name }}</td>
+            <td>{{ $category->parent ? $category->parent->name : 'Main Category' }}</td>
+            <td>{{ $category->approved_job_postings_count }}</td>
+            <td>{{ $category->approved_view_count ?? 0 }}</td>
+            @foreach($dateRange as $d)
+                <td>{{ $category->daily_views[$d] ?? 0 }}</td>
+            @endforeach
+            <td>{{ ucfirst($category->status) }}</td>
+            <td class="d-flex gap-2">
+                <a href="{{ route('admin.categories.edit', $category->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" style="display:inline-block;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
 
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($categories as $category)
-                                        <tr>
-                                            <td>{{ $category->id }}</td>
-                                            <td>{{ $category->name }}</td>
-                                            <td>{{ $category->parent ? $category->parent->name : 'Main Category' }}</td>
-                                            <td>{{ $category->approved_job_postings_count }}</td>
-                                            <td>{{ $category->approved_view_count ?? 0 }}</td>
-                                            <td>
-    @foreach($category->daily_views as $row)
-        {{ \Carbon\Carbon::parse($row->d)->format('Y/m/d') }} - {{ $row->total }}<br>
-    @endforeach
-</td>
-
-                                            <td>{{ ucfirst($category->status) }}</td>
-                                            <td class="d-flex gap-2">
-                                                <a href="{{ route('admin.categories.edit', $category->id) }}"
-                                                    class="btn btn-warning btn-sm">Edit</a>
-                                                <form action="{{ route('admin.categories.destroy', $category->id) }}"
-                                                    method="POST" style="display:inline-block;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('Are you sure?')">Delete</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                        @if ($category->children && count($category->children) > 0)
-                                            @foreach ($category->children as $sub)
-                                                <tr>
-                                                    <td>{{ $sub->id }}</td>
-                                                    <td>-- {{ $sub->name }}</td>
-                                                    <td>{{ $category->name }}</td>
-                                                    <td>{{ ucfirst($sub->status) }}</td>
-                                                    <td colspan="4"></td>
-                                                    <td class="d-flex gap-2">
-                                                        <a href="{{ route('admin.categories.edit', $sub->id) }}"
-                                                            class="btn btn-warning btn-sm">Edit</a>
-                                                        <form action="{{ route('admin.categories.destroy', $sub->id) }}"
-                                                            method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                                onclick="return confirm('Are you sure?')">Delete</button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        @endif
-                                    @endforeach
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </div>

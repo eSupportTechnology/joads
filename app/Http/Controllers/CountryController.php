@@ -11,60 +11,83 @@ class CountryController extends Controller
 {
 
     public function index(Request $request)
-    {
-        $startDate = $request->query('start_date');
-        $endDate   = $request->query('end_date');
+{
+    $startDate = $request->query('start_date');
+    $endDate   = $request->query('end_date');
+    $hasDateRange = $startDate && $endDate;
 
-        // Consider a range ONLY when BOTH dates are provided
-        $hasDateRange = $startDate && $endDate;
+    $countries = Country::select('countries.id', 'countries.name')->get();
 
-        $countries = Country::select('countries.id', 'countries.name')->get();
+    $dateRange = [];
+    if ($hasDateRange) {
+        $period = new \DatePeriod(
+            new \DateTime($startDate),
+            new \DateInterval('P1D'),
+            (new \DateTime($endDate))->modify('+1 day') // inclusive
+        );
 
-        foreach ($countries as $country) {
-            // All job IDs in this country
-            $jobIds = DB::table('job_postings')
-                ->where('country_id', $country->id)
-                ->pluck('id');
+        foreach ($period as $date) {
+            $dateRange[] = $date->format('Y-m-d');
+        }
+    }
 
-            if ($hasDateRange) {
-                // --- TOTAL VIEWS within range (from job_views) ---
-                $country->total_view_count = DB::table('job_views')
-                    ->whereIn('job_posting_id', $jobIds)
-                    ->where('view_count', '>', 0)
-                    ->whereBetween(DB::raw('DATE(view_date)'), [$startDate, $endDate])
-                    ->sum('view_count');
+    foreach ($countries as $country) {
+        $jobIds = DB::table('job_postings')
+            ->where('country_id', $country->id)
+            ->pluck('id');
 
-                // --- BREAKDOWN by date within range ---
-                $country->views_by_date = DB::table('job_views')
-                    ->selectRaw('DATE(view_date) as d, SUM(view_count) as total')
-                    ->whereIn('job_posting_id', $jobIds)
-                    ->where('view_count', '>', 0)
-                    ->whereBetween(DB::raw('DATE(view_date)'), [$startDate, $endDate])
-                    ->groupBy('d')
-                    ->orderBy('d')
-                    ->get();
-            } else {
-                // --- TOTAL VIEWS all-time (from job_postings) ---
-                $country->total_view_count = DB::table('job_postings')
-                    ->whereIn('id', $jobIds)
-                    ->sum('view_count');
+        if ($hasDateRange) {
+            $viewsByDate = DB::table('job_views')
+                ->selectRaw('DATE(view_date) as d, SUM(view_count) as total')
+                ->whereIn('job_posting_id', $jobIds)
+                ->where('view_count', '>', 0)
+                ->whereBetween(DB::raw('DATE(view_date)'), [$startDate, $endDate])
+                ->groupBy('d')
+                ->pluck('total', 'd');
 
-                // --- TODAY'S VIEWS (single line breakdown) ---
-                $today = \Carbon\Carbon::today()->toDateString();
-                $todayCount = DB::table('job_views')
-                    ->whereIn('job_posting_id', $jobIds)
-                    ->whereDate('view_date', $today)
-                    ->where('view_count', '>', 0)
-                    ->sum('view_count');
+            $country->total_view_count = $viewsByDate->sum();
 
-                $country->views_by_date = collect([
-                    (object)['d' => $today, 'total' => $todayCount],
-                ]);
+            $tempViews = [];
+            foreach ($dateRange as $d) {
+                $tempViews[$d] = $viewsByDate[$d] ?? 0;
+            }
+            $country->views_by_date = $tempViews;
+        } else {
+            $country->total_view_count = DB::table('job_postings')
+                ->whereIn('id', $jobIds)
+                ->sum('view_count');
+
+            $today = \Carbon\Carbon::today()->toDateString();
+            $todayCount = DB::table('job_views')
+                ->whereIn('job_posting_id', $jobIds)
+                ->whereDate('view_date', $today)
+                ->where('view_count', '>', 0)
+                ->sum('view_count');
+
+            $country->views_by_date = [$today => $todayCount];
+            $dateRange = [$today];
+        }
+    }
+
+    // ✅ FILTER OUT all-zero dates
+    if ($hasDateRange) {
+        $filteredDates = [];
+        foreach ($dateRange as $d) {
+            $sumForDate = 0;
+            foreach ($countries as $country) {
+                $sumForDate += $country->views_by_date[$d] ?? 0;
+            }
+            if ($sumForDate > 0) {
+                $filteredDates[] = $d;
             }
         }
-
-        return view('Admin.country.index', compact('countries', 'startDate', 'endDate', 'hasDateRange'));
+        $dateRange = $filteredDates;
     }
+
+    return view('Admin.country.index', compact('countries', 'startDate', 'endDate', 'hasDateRange', 'dateRange'));
+}
+
+
 
 
 

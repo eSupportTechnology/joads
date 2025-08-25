@@ -30,53 +30,88 @@ class PerformanceReportController extends Controller
     }
 
 
-public function index(Request $request)
-{
-    $startDate = $request->input('start_date');
-    $endDate = $request->input('end_date');
+    public function index(Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate   = $request->input('end_date');
 
-    if ($startDate && $endDate) {
-        // ✅ Case 2: Date range selected — daily breakdown
-        $results = DB::table('job_postings')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-            ->join('job_views', 'job_postings.id', '=', 'job_views.job_posting_id')
-            ->whereBetween('job_views.view_date', [
-                Carbon::parse($startDate)->toDateString(),
-                Carbon::parse($endDate)->toDateString()
-            ])
-            ->select(
-                'job_postings.id as job_id',
-                'employers.company_name',
-                'job_postings.title',
-                'job_views.view_date',
-                DB::raw('SUM(job_views.view_count) as daily_view'),
-                DB::raw('(SELECT SUM(jv.view_count)
-                          FROM job_views jv
-                          WHERE jv.job_posting_id = job_postings.id
-                          AND jv.view_date BETWEEN "'.Carbon::parse($startDate)->toDateString().'"
-                          AND "'.Carbon::parse($endDate)->toDateString().'") as total_view')
-            )
-            ->groupBy('job_postings.id', 'employers.company_name', 'job_postings.title', 'job_views.view_date')
-            ->orderBy('job_postings.id')
-            ->orderBy('job_views.view_date')
-            ->get();
-    } else {
-        // ✅ Case 1: No date range — from job_postings table
-        $results = DB::table('job_postings')
-            ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
-            ->select(
-                'job_postings.id as job_id',
-                'employers.company_name',
-                'job_postings.title',
-                'job_postings.update_count as daily_view',
-                'job_postings.view_count as total_view'
-            )
-            ->orderBy('job_postings.id')
-            ->get();
+        if ($startDate && $endDate) {
+            // ✅ Case 2: Date range selected — pivoted daily breakdown
+            $rawResults = DB::table('job_postings')
+                ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+                ->join('job_views', 'job_postings.id', '=', 'job_views.job_posting_id')
+                ->whereBetween('job_views.view_date', [
+                    Carbon::parse($startDate)->toDateString(),
+                    Carbon::parse($endDate)->toDateString()
+                ])
+                ->select(
+                    'job_postings.id as job_id',
+                    'employers.company_name',
+                    'job_postings.title',
+                    'job_views.view_date',
+                    DB::raw('SUM(job_views.view_count) as daily_view')
+                )
+                ->groupBy('job_postings.id', 'employers.company_name', 'job_postings.title', 'job_views.view_date')
+                ->orderBy('job_postings.id')
+                ->orderBy('job_views.view_date')
+                ->get();
+
+            // ✅ Collect unique dates
+            $dates = $rawResults->pluck('view_date')->unique()->sort()->values();
+
+            // ✅ Pivot results by job
+            $results = $rawResults->groupBy('job_id')->map(function ($group) use ($dates) {
+                $job = [
+                    'company_name' => $group->first()->company_name,
+                    'title'        => $group->first()->title,
+                    'views'        => [],
+                    'total'        => 0,
+                ];
+
+                foreach ($dates as $date) {
+                    $view = $group->firstWhere('view_date', $date);
+                    $count = $view ? $view->daily_view : 0;
+                    $job['views'][$date] = $count;
+                    $job['total'] += $count;
+                }
+
+                return $job;
+            });
+
+            return view('Admin.report.performance', [
+                'results'   => $results,
+                'dates'     => $dates,
+                'startDate' => $startDate,
+                'endDate'   => $endDate,
+            ]);
+        } else {
+            // ✅ Case 1: No date range — convert to array as well
+            $results = DB::table('job_postings')
+                ->join('employers', 'job_postings.employer_id', '=', 'employers.id')
+                ->select(
+                    'job_postings.id as job_id',
+                    'employers.company_name',
+                    'job_postings.title',
+                    'job_postings.update_count as daily_view',
+                    'job_postings.view_count as total_view'
+                )
+                ->orderBy('job_postings.id')
+                ->get()
+                ->map(function ($row) {
+                    return [
+                        'company_name' => $row->company_name,
+                        'title'        => $row->title,
+                        'daily_view'   => $row->daily_view,
+                        'total'        => $row->total_view,
+                    ];
+                });
+
+            return view('Admin.report.performance', [
+                'results'   => $results,
+                'dates'     => [],
+                'startDate' => $startDate,
+                'endDate'   => $endDate,
+            ]);
+        }
     }
-
-    return view('Admin.report.performance', compact('results', 'startDate', 'endDate'));
-}
-
-
 }
