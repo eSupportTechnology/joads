@@ -58,7 +58,7 @@ class PackageContactController extends Controller
         $packageDetails = PackageContact::first();
         $contacts = ContactUs::all();
         $contactsList = Contact::all();
-        $packages = Package::where('package_type', 'Standard')->get();
+        $packages = Package::where('package_type', 'standard')->get();
         $localBanks = BankAccount::where('localorforeign', 'local')->get();
         $foreignBanks = BankAccount::where('localorforeign', 'foreign')->get();
 

@@ -48,10 +48,12 @@ class PerformanceReportController extends Controller
                     'job_postings.id as job_id',
                     'employers.company_name',
                     'job_postings.title',
+                    'job_postings.approved_date',
+                    'job_postings.job_id',
                     'job_views.view_date',
                     DB::raw('SUM(job_views.view_count) as daily_view')
                 )
-                ->groupBy('job_postings.id', 'employers.company_name', 'job_postings.title', 'job_views.view_date')
+                ->groupBy('job_postings.id', 'employers.company_name', 'job_postings.title', 'job_postings.approved_date', 'job_postings.job_id', 'job_views.view_date')
                 ->orderBy('job_postings.id')
                 ->orderBy('job_views.view_date')
                 ->get();
@@ -62,6 +64,10 @@ class PerformanceReportController extends Controller
             // ✅ Pivot results by job
             $results = $rawResults->groupBy('job_id')->map(function ($group) use ($dates) {
                 $job = [
+                    'approved_date' => $group->first()->approved_date
+                        ? Carbon::parse($group->first()->approved_date)->format('Y-m-d')
+                        : 'Not Approved',
+                    'job_id'       => $group->first()->job_id,
                     'company_name' => $group->first()->company_name,
                     'title'        => $group->first()->title,
                     'views'        => [],
@@ -93,12 +99,18 @@ class PerformanceReportController extends Controller
                     'employers.company_name',
                     'job_postings.title',
                     'job_postings.update_count as daily_view',
-                    'job_postings.view_count as total_view'
+                    'job_postings.view_count as total_view',
+                    'job_postings.approved_date',
+                    'job_postings.job_id'
                 )
                 ->orderBy('job_postings.id')
                 ->get()
                 ->map(function ($row) {
                     return [
+                        'approved_date' => $row->approved_date
+                            ? Carbon::parse($row->approved_date)->format('Y-m-d')
+                            : 'Not Approved',
+                        'job_id'       => $row->job_id,
                         'company_name' => $row->company_name,
                         'title'        => $row->title,
                         'daily_view'   => $row->daily_view,

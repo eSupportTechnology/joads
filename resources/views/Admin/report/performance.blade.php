@@ -7,7 +7,6 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datepicker.css') }}">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
 @endsection
-
 @section('breadcrumb-title')
     <h3>Performance Report</h3>
 @endsection
@@ -41,6 +40,8 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
+                                        <th>App.Date</th>
+                                        <th>Job ID</th>
                                         <th>Company</th>
                                         <th>Job Title</th>
                                         @if (!empty($dates))
@@ -60,6 +61,8 @@
                                         @foreach ($results as $job)
                                             <tr>
                                                 <td>{{ $rowNo++ }}</td>
+                                                <td>{{ $job['approved_date'] }}</td>
+                                                <td>{{ $job['job_id'] }}</td>
                                                 <td>{{ $job['company_name'] }}</td>
                                                 <td>{{ $job['title'] }}</td>
                                                 @foreach ($dates as $date)
@@ -73,6 +76,8 @@
                                         @foreach ($results as $job)
                                             <tr>
                                                 <td>{{ $rowNo++ }}</td>
+                                                <td>{{ $job['approved_date'] }}</td>
+                                                <td>{{ $job['job_id'] }}</td>
                                                 <td>{{ $job['company_name'] }}</td>
                                                 <td>{{ $job['title'] }}</td>
                                                 <td>{{ $job['daily_view'] }}</td>
@@ -103,23 +108,38 @@
 
     <script>
         $('#performance-table').DataTable({
-    dom: 'Bfrtip',
-    pageLength: 100,
-    order: [],
-    buttons: [
-        { extend: 'copy', className: 'btn btn-primary' },
-        { extend: 'csv', className: 'btn btn-success' },
-        { extend: 'excel', className: 'btn btn-info' },
-        { extend: 'pdf', className: 'btn btn-danger' },
-        { extend: 'print', className: 'btn btn-warning' }
-    ],
-    drawCallback: function(settings) {
-        var api = this.api();
-        api.column(0, { page: 'current' }).nodes().each(function(cell, i) {
-            cell.innerHTML = i + 1 + api.page.info().start;
+            dom: 'Bfrtip',
+            pageLength: 100,
+            order: [],
+            buttons: [{
+                    extend: 'copy',
+                    className: 'btn btn-primary'
+                },
+                {
+                    extend: 'csv',
+                    className: 'btn btn-success'
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn btn-info'
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-danger'
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-warning'
+                }
+            ],
+            drawCallback: function(settings) {
+                var api = this.api();
+                api.column(0, {
+                    page: 'current'
+                }).nodes().each(function(cell, i) {
+                    cell.innerHTML = i + 1 + api.page.info().start;
+                });
+            }
         });
-    }
-});
-
     </script>
 @endsection

@@ -524,10 +524,17 @@ class JobPostingController extends Controller
         $dailyApplications = $applicationsQuery->count();
 
         $usersQuery = User::query();
+
         if ($startDate && $endDate) {
-            $usersQuery->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+            // Count users only in selected date range
+            $dailyUsers = $usersQuery
+                ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                ->count();
+        } else {
+            // Count all users (no filter)
+            $dailyUsers = $usersQuery->count();
         }
-        $dailyUsers = $usersQuery->count();
+
 
         // Applications grouped by date
         $dailyApplicationsData = $applicationsQuery->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
@@ -539,7 +546,7 @@ class JobPostingController extends Controller
                 $apps = Application::with('job')
                     ->whereDate('created_at', $day->date)
                     ->select('name', 'email', 'job_posting_id', 'created_at')
-                    ->limit(5)
+                    // ->limit(5)
                     ->get()
                     ->map(function ($app) {
                         return [
@@ -573,7 +580,7 @@ class JobPostingController extends Controller
         $categories = Category::all();
         $subcategories = Subcategory::all();
         $employerId = auth('employer')->user()->id;
-        $packages = Package::where('package_type', 'Standard')->get();
+        $packages = Package::where('package_type', 'standard')->get();
         $jobPostings = [
             [
                 'title' => '',
@@ -867,9 +874,9 @@ class JobPostingController extends Controller
     public function edit(JobPosting $jobPosting)
     {
         $categories = Category::all();
-        $subcategories = Subcategory::all(); // ✅ Load all subcategories
+        $subcategories = Subcategory::all();
         $countries = Country::all();
-        $packages = Package::where('package_type', 'Standard')->get();
+        $packages = Package::where('package_type', 'standard')->get();
 
         // Convert comma-separated strings to arrays
         $categoryIds = array_filter(explode(',', $jobPosting->category_id));

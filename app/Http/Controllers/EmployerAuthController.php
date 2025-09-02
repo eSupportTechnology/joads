@@ -16,11 +16,23 @@ use Illuminate\Support\Facades\DB;
 
 class EmployerAuthController extends Controller
 {
-    public function list()
-    {
-        $employers = Employer::all(); // Fetch all employers
-        return view('Admin.employerlist', compact('employers')); // Pass to view
+    public function list(Request $request)
+{
+    $query = Employer::query();
+
+    // Date range filter
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $query->whereBetween('created_at', [
+            $request->start_date . ' 00:00:00',
+            $request->end_date . ' 23:59:59'
+        ]);
     }
+
+    $employers = $query->get();
+
+    return view('Admin.employerlist', compact('employers'));
+}
+
     public function listedit($id)
     {
         $employer = Employer::findOrFail($id); // Find employer by ID
