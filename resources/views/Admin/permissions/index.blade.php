@@ -71,14 +71,14 @@
 
                                     @foreach ($permissions as $category => $perms)
                                         <div class="card mb-3" >
-                                            <div class="bg-primary text-white fw-bold" style="padding: 1rem">
+                                            <div class="bg-primary text-white fw-bold" style="padding: 0.5rem">
                                                 {{ ucfirst($category) }} Permissions
                                             </div>
-                                            <div class="card-body" style="margin-bottom: -3rem;">
+                                            <div class="card-body" style="margin-bottom: -3.5rem;">
                                                 <div class="row">
                                                     @foreach ($perms as $permission)
-                                                        <div class="card-body col-md-3 col-sm-6" style="margin-bottom:0rem; margin-top:-2rem; height: auto;">
-                                                            <div class="form-check flex-gap">
+                                                        <div class="card-body col-md-3 col-sm-6" style="margin-bottom:0rem; margin-top:-3rem; height: auto;">
+                                                            <div class="form-check">
                                                                 <input type="checkbox" name="permissions[]"
                                                                     value="{{ $permission->id }}"
                                                                     class="form-check-input permission-checkbox"

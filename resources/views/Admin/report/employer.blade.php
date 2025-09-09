@@ -158,6 +158,7 @@
 
                         <th class="text-center">Paid Amount (LKR)</th>
                         <th class="text-center">Daily Total Earnings (LKR)</th>
+                        <th>Currency Type</th>
                     </tr>
                 </thead>
 
@@ -208,6 +209,7 @@
 
                             <td>{{ number_format($job->package_price, 2) }}</td>
                             <td>{{ number_format($jobTotalEarnings, 2) }}</td>
+                            <td>{{ $job->currency_type }}</td>
                         </tr>
                     @endforeach
 
@@ -236,6 +238,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
 
     <script>
         // Print function

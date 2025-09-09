@@ -10,7 +10,7 @@
     <style>
         /* Style the table headers */
         #daily-table thead th {
-            background-color: #c6d9ee9f;
+            background-color: #fcfcfc9f;
             color: #000000;
             text-align: center;
             font-weight: bold;
@@ -150,10 +150,12 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="display" id="daily-table" style="width:100%">
+                            <table class="table table-bordered" id="daily-table" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>No</th>
+                                        <th>App. Date</th>
+                                        <th>Job ID</th>
                                         <th>Title</th>
                                         <th>Company</th>
                                         <th>Approved By</th>
@@ -173,6 +175,8 @@
                                     @foreach ($dailyCount as $job)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $job->approved_date }}</td>
+                                            <td>{{ $job->job_id }}</td>
                                             <td>{{ $job->title }}</td>
                                             <td>{{ $job->company_name }}</td>
                                             <td class="text-center">{{ $job->approved_by }}</td>
@@ -230,19 +234,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
+    <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
     <script>
-        $(document).ready(function() {
-            $('#daily-table').DataTable({
-                responsive: true,
-                paging: true,
-                searching: true,
-                ordering: true,
-                info: true,
-                order: [
-                    [1, 'desc']
-                ] // Order by date descending by default
-            });
+        $('#daily-table').DataTable({
+            responsive: true,
+            pageLength: -1,
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            order: [
+                [1, 'desc']
+            ],
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'excel', 'pdf', 'print'
+            ],
+            lengthMenu: [
+                [10, 25, 50, 100, -1],
+                [10, 25, 50, 100, "All"] // -1 maps to "All"
+            ]
         });
+
+
 
         function printTable() {
             const table = document.getElementById('daily-table');

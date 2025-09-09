@@ -130,6 +130,7 @@ class EmployerAuthController extends Controller
                     'job_postings.update_count',
                     'packages.lkr_price',
                     'job_postings.package_price',
+                    'job_postings.currency_type',
                     'job_views.view_date',
                     // ✅ daily views for that job on that date
                     DB::raw('SUM(job_views.view_count) as daily_view'),
@@ -153,6 +154,7 @@ class EmployerAuthController extends Controller
                     'job_postings.update_count',
                     'packages.lkr_price',
                     'job_postings.package_price',
+                    'job_postings.currency_type',
                     'job_views.view_date'
                 )
                 ->orderBy('job_postings.id')
@@ -185,6 +187,7 @@ class EmployerAuthController extends Controller
                     'job_postings.update_count',
                     'packages.lkr_price',
                     'job_postings.package_price',
+                    'job_postings.currency_type',
                     DB::raw('NULL as view_date'),
         DB::raw('job_postings.view_count as daily_view'),
         DB::raw('0 as daily_earnings'),

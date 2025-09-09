@@ -148,6 +148,8 @@ class JobPostingController extends Controller
                 ->select(
                     'job_postings.id',
                     'job_postings.title',
+                    'job_postings.approved_date',
+                    'job_postings.job_id',
                     'job_postings.package_price',
                     'employers.company_name',
                     DB::raw('COALESCE(admins.name, "N/A") as approved_by'),
@@ -157,6 +159,8 @@ class JobPostingController extends Controller
                 ->groupBy(
                     'job_postings.id',
                     'job_postings.title',
+                    'job_postings.approved_date',
+                    'job_postings.job_id',
                     'job_postings.package_price',
                     'employers.company_name',
                     'admins.name',
@@ -179,6 +183,8 @@ class JobPostingController extends Controller
                 return (object)[
                     'id'           => $jobId,
                     'title'        => $firstJob->title,
+                    'approved_date'=> $firstJob->approved_date,
+                    'job_id'       => $firstJob->job_id,
                     'company_name' => $firstJob->company_name,
                     'approved_by'  => $firstJob->approved_by,
                     'total_views'  => array_sum($dailyViews),
@@ -198,6 +204,8 @@ class JobPostingController extends Controller
                 ->select(
                     'job_postings.id',
                     'job_postings.title',
+                    'job_postings.approved_date',
+                    'job_postings.job_id',
                     'employers.company_name',
                     DB::raw('COALESCE(admins.name, "N/A") as approved_by'),
                     DB::raw('COALESCE(job_postings.view_count, 0) as total_views'),
@@ -211,6 +219,8 @@ class JobPostingController extends Controller
                 return (object)[
                     'id'           => $job->id,
                     'title'        => $job->title,
+                    'approved_date'=> $job->approved_date,
+                    'job_id'       => $job->job_id,
                     'company_name' => $job->company_name,
                     'approved_by'  => $job->approved_by,
                     'total_views'  => (int) $job->total_views,        // total all-time views
