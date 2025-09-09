@@ -10,7 +10,7 @@
     <style>
         /* Style the table headers */
         #daily-table thead th {
-            background-color: #c6d9ee9f;
+            background-color: #fcfcfc9f;
             color: #000000;
             text-align: center;
             font-weight: bold;
@@ -150,68 +150,69 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="display" id="daily-table" style="width:100%">
+                            <table class="table table-bordered" id="daily-table" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>No</th>
+                                        <th>App. Date</th>
+                                        <th>Job ID</th>
                                         <th>Title</th>
                                         <th>Company</th>
                                         <th>Approved By</th>
                                         <th>Total Views</th>
-                                        <th>Daily Views</th>
+
+                                        {{-- Only show daily columns if dates exist --}}
+                                        @if (count($datesInRange) > 0)
+                                            @foreach ($datesInRange as $date)
+                                                <th>{{ $date }}</th>
+                                            @endforeach
+                                        @endif
+
                                         <th>Total Amount (LKR)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php
-                                        $grandTotalViews = 0;
-                                        $grandDailyViews = 0;
-                                        $grandTotalAmount = 0;
-                                    @endphp
-
                                     @foreach ($dailyCount as $job)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $job->approved_date }}</td>
+                                            <td>{{ $job->job_id }}</td>
                                             <td>{{ $job->title }}</td>
                                             <td>{{ $job->company_name }}</td>
                                             <td class="text-center">{{ $job->approved_by }}</td>
                                             <td class="text-center">{{ $job->total_views }}</td>
-                                            <td class="text-center">
-                                                @if ($startDate && $endDate)
-                                                    {{-- Show with dates --}}
-                                                    @foreach ($job->daily_views as $date => $count)
-                                                        {{ $date }} - {{ $count }}<br>
-                                                    @endforeach
-                                                @else
-                                                    {{-- Show only counts --}}
-                                                    {{ array_sum($job->daily_views) }}
-                                                @endif
+
+                                            {{-- Daily views per column --}}
+                                            @if (count($datesInRange) > 0)
+                                                @foreach ($datesInRange as $date)
+                                                    <td class="text-center">{{ $job->daily_views[$date] ?? 0 }}</td>
+                                                @endforeach
+                                            @endif
+
+                                            <td class="text-left amount-col">
+                                                {{ number_format($job->lkr_price, 2) }}
                                             </td>
 
-
-                                            <td class="text-right">{{ number_format($job->lkr_price, 2) }}</td>
                                         </tr>
-                                        @php
-                                            $grandTotalViews = $dailyCount->sum('total_views');
-                                            $grandDailyViews = $dailyCount->sum(
-                                                fn($job) => collect($job->daily_views)->sum(),
-                                            );
-                                            $grandTotalAmount = $dailyCount->sum('lkr_price');
-                                        @endphp
                                     @endforeach
-
-
                                 </tbody>
                                 <tfoot>
                                     <tr style="font-weight: bold; background: #f2f2f2;">
                                         <td colspan="4" class="text-left">Grand Totals</td>
-                                        <td class="text-center">{{ $grandTotalViews }}</td>
-                                        <td class="text-center">{{ $grandDailyViews }}</td>
-                                        <td class="text-right">{{ number_format($grandTotalAmount, 2) }}</td>
+                                        <td class="text-center">{{ $dailyCount->sum('total_views') }}</td>
+
+                                        @if (count($datesInRange) > 0)
+                                            @foreach ($datesInRange as $date)
+                                                <td class="text-center">
+                                                    {{ $dailyCount->sum(fn($job) => $job->daily_views[$date] ?? 0) }}
+                                                </td>
+                                            @endforeach
+                                        @endif
+
+                                        <td class="text-right">{{ number_format($dailyCount->sum('lkr_price'), 2) }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
-
 
                         </div>
                     </div>
@@ -233,19 +234,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
+    <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
     <script>
-        $(document).ready(function() {
-            $('#daily-table').DataTable({
-                responsive: true,
-                paging: true,
-                searching: true,
-                ordering: true,
-                info: true,
-                order: [
-                    [1, 'desc']
-                ] // Order by date descending by default
-            });
+        $('#daily-table').DataTable({
+            responsive: true,
+            pageLength: -1,
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            order: [
+                [1, 'desc']
+            ],
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'excel', 'pdf', 'print'
+            ],
+            lengthMenu: [
+                [10, 25, 50, 100, -1],
+                [10, 25, 50, 100, "All"] // -1 maps to "All"
+            ]
         });
+
+
 
         function printTable() {
             const table = document.getElementById('daily-table');

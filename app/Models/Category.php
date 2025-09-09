@@ -20,5 +20,5 @@ class Category extends Model
     {
         return $this->hasMany(JobPosting::class);
     }
-    
+
 }

@@ -30,9 +30,25 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
-                    <div class="card-header pb-0 card-no-border">
-                        <h3>Customer List</h3>
+                    <div class="card-header">
+                        <h5>Employer List</h5>
+                        <form action="{{ route('employer.list') }}" method="GET" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date"
+                                    value="{{ request('start_date') }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date"
+                                    value="{{ request('end_date') }}">
+                            </div>
+                            <div class="col-md-4 align-self-end">
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                            </div>
+                        </form>
                     </div>
+
                     <div class="card-body">
                         <div class="dt-ext table-responsive">
                             <table class="display" id="keytable">
@@ -117,13 +133,30 @@
 
 
         <script>
-        $(document).ready(function() {
-            if ($.fn.DataTable.isDataTable('#keytable')) {
-                $('#keytable').DataTable().destroy();
-            }
-            $('#keytable').DataTable({
-                pageLength: 250
+        $(document).ready(function () {
+    if ($.fn.DataTable.isDataTable('#keytable')) {
+        $('#keytable').DataTable().destroy();
+    }
+
+    $('#keytable').DataTable({
+        dom: 'Bfrtip',
+        pageLength: 100,
+        scrollX: true,   // 👈 enables horizontal scroll
+        order: [],
+        buttons: [
+            { extend: 'copy', className: 'btn btn-primary' },
+            { extend: 'csv', className: 'btn btn-success' },
+            { extend: 'excel', className: 'btn btn-info' },
+            { extend: 'pdf', className: 'btn btn-danger' },
+            { extend: 'print', className: 'btn btn-warning' }
+        ],
+        drawCallback: function(settings) {
+            var api = this.api();
+            api.column(0, { page: 'current' }).nodes().each(function(cell, i) {
+                cell.innerHTML = i + 1 + api.page.info().start;
             });
-        });
+        }
+    });
+});
     </script>
 @endsection

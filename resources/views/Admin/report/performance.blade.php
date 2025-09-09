@@ -7,7 +7,6 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datepicker.css') }}">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
 @endsection
-
 @section('breadcrumb-title')
     <h3>Performance Report</h3>
 @endsection
@@ -41,43 +40,55 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Company Name</th>
+                                        <th>App.Date</th>
+                                        <th>Job ID</th>
+                                        <th>Company</th>
                                         <th>Job Title</th>
-                                        @if ($startDate && $endDate)
-                                            <th>Date</th>
+                                        @if (!empty($dates))
+                                            @foreach ($dates as $date)
+                                                <th>{{ \Carbon\Carbon::parse($date)->format('Y-m-d') }}</th>
+                                            @endforeach
+                                        @else
+                                            <th>Daily Views</th>
                                         @endif
-                                        <th>Daily View</th>
-                                        <th>Total View</th>
+                                        <th>Total Views</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @php $rowNo = 1; @endphp
-                                    @foreach ($results->groupBy('job_id') as $jobId => $jobGroup)
-                                        @foreach ($jobGroup as $index => $result)
+                                    @if (!empty($dates))
+                                        {{-- ✅ Case 2: Pivoted results --}}
+                                        @foreach ($results as $job)
                                             <tr>
-                                                @if ($index == 0)
-                                                    <td rowspan="{{ $jobGroup->count() }}">{{ $rowNo++ }}</td>
-                                                    <td rowspan="{{ $jobGroup->count() }}">{{ $result->company_name }}</td>
-                                                    <td rowspan="{{ $jobGroup->count() }}">{{ $result->title }}</td>
-                                                @endif
-
-                                                @if ($startDate && $endDate)
-                                                    <td>{{ \Carbon\Carbon::parse($result->view_date)->format('Y-m-d') }}
-                                                    </td>
-                                                @endif
-
-                                                <td>{{ $result->daily_view }}</td>
-
-                                                {{-- Only show total on the last row --}}
-                                                @if ($index == 0)
-                                                    <td rowspan="{{ $jobGroup->count() }}">{{ $result->total_view }}</td>
-                                                @endif
-
+                                                <td>{{ $rowNo++ }}</td>
+                                                <td>{{ $job['approved_date'] }}</td>
+                                                <td>{{ $job['job_id'] }}</td>
+                                                <td>{{ $job['company_name'] }}</td>
+                                                <td>{{ $job['title'] }}</td>
+                                                @foreach ($dates as $date)
+                                                    <td>{{ $job['views'][$date] ?? 0 }}</td>
+                                                @endforeach
+                                                <td>{{ $job['total'] }}</td>
                                             </tr>
                                         @endforeach
-                                    @endforeach
+                                    @else
+                                        {{-- ✅ Case 1: No date range --}}
+                                        @foreach ($results as $job)
+                                            <tr>
+                                                <td>{{ $rowNo++ }}</td>
+                                                <td>{{ $job['approved_date'] }}</td>
+                                                <td>{{ $job['job_id'] }}</td>
+                                                <td>{{ $job['company_name'] }}</td>
+                                                <td>{{ $job['title'] }}</td>
+                                                <td>{{ $job['daily_view'] }}</td>
+                                                <td>{{ $job['total'] }}</td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
                                 </tbody>
                             </table>
+
+
                         </div>
                     </div>
                 </div>
@@ -96,105 +107,39 @@
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-            $('#performance-table').DataTable({
-                dom: 'Bfrtip',
-                pageLength: 100,
-                columns: [{
-                        searchable: false,
-                        orderable: false
-                    }, // Serial number column
-                    null,
-                    null,
-                    null
-                ],
-                order: [],
-                buttons: [{
-                        extend: 'copy',
-                        className: 'btn btn-primary',
-                        exportOptions: {
-                            columns: ':visible',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    // For first column (serial number), return row index + 1 + page offset
-                                    if (column === 0) {
-                                        return row + 1;
-                                    }
-                                    return data;
-                                }
-                            }
-                        }
-                    },
-                    {
-                        extend: 'csv',
-                        className: 'btn btn-success',
-                        exportOptions: {
-                            columns: ':visible',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 0) {
-                                        return row + 1;
-                                    }
-                                    return data;
-                                }
-                            }
-                        }
-                    },
-                    {
-                        extend: 'excel',
-                        className: 'btn btn-info',
-                        exportOptions: {
-                            columns: ':visible',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 0) {
-                                        return row + 1;
-                                    }
-                                    return data;
-                                }
-                            }
-                        }
-                    },
-                    {
-                        extend: 'pdf',
-                        className: 'btn btn-danger',
-                        exportOptions: {
-                            columns: ':visible',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 0) {
-                                        return row + 1;
-                                    }
-                                    return data;
-                                }
-                            }
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        className: 'btn btn-warning',
-                        exportOptions: {
-                            columns: ':visible',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 0) {
-                                        return row + 1;
-                                    }
-                                    return data;
-                                }
-                            }
-                        }
-                    }
-                ],
-                drawCallback: function(settings) {
-                    var api = this.api();
-                    api.column(0, {
-                        page: 'current'
-                    }).nodes().each(function(cell, i) {
-                        cell.innerHTML = i + 1 + api.page.info().start;
-                    });
+        $('#performance-table').DataTable({
+            dom: 'Bfrtip',
+            pageLength: 100,
+            order: [],
+            buttons: [{
+                    extend: 'copy',
+                    className: 'btn btn-primary'
+                },
+                {
+                    extend: 'csv',
+                    className: 'btn btn-success'
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn btn-info'
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-danger'
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-warning'
                 }
-            });
+            ],
+            drawCallback: function(settings) {
+                var api = this.api();
+                api.column(0, {
+                    page: 'current'
+                }).nodes().each(function(cell, i) {
+                    cell.innerHTML = i + 1 + api.page.info().start;
+                });
+            }
         });
     </script>
 @endsection

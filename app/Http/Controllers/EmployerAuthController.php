@@ -16,11 +16,23 @@ use Illuminate\Support\Facades\DB;
 
 class EmployerAuthController extends Controller
 {
-    public function list()
-    {
-        $employers = Employer::all(); // Fetch all employers
-        return view('Admin.employerlist', compact('employers')); // Pass to view
+    public function list(Request $request)
+{
+    $query = Employer::query();
+
+    // Date range filter
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $query->whereBetween('created_at', [
+            $request->start_date . ' 00:00:00',
+            $request->end_date . ' 23:59:59'
+        ]);
     }
+
+    $employers = $query->get();
+
+    return view('Admin.employerlist', compact('employers'));
+}
+
     public function listedit($id)
     {
         $employer = Employer::findOrFail($id); // Find employer by ID
@@ -118,6 +130,7 @@ class EmployerAuthController extends Controller
                     'job_postings.update_count',
                     'packages.lkr_price',
                     'job_postings.package_price',
+                    'job_postings.currency_type',
                     'job_views.view_date',
                     // ✅ daily views for that job on that date
                     DB::raw('SUM(job_views.view_count) as daily_view'),
@@ -141,11 +154,22 @@ class EmployerAuthController extends Controller
                     'job_postings.update_count',
                     'packages.lkr_price',
                     'job_postings.package_price',
+                    'job_postings.currency_type',
                     'job_views.view_date'
                 )
                 ->orderBy('job_postings.id')
                 ->orderBy('job_views.view_date')
                 ->get();
+
+            $datesInRange = DB::table('job_views')
+                ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
+                    return $q->whereBetween('view_date', [$startDate, $endDate]);
+                })
+                ->distinct()
+                ->orderBy('view_date')
+                ->pluck('view_date')
+                ->map(fn($d) => \Carbon\Carbon::parse($d)->format('Y-m-d'))
+                ->toArray();
         }
 
         // ✅ Case 2: No date range — show all approved job postings with job_postings.view_count
@@ -163,10 +187,16 @@ class EmployerAuthController extends Controller
                     'job_postings.update_count',
                     'packages.lkr_price',
                     'job_postings.package_price',
-                    'job_postings.view_count'
+                    'job_postings.currency_type',
+                    DB::raw('NULL as view_date'),
+        DB::raw('job_postings.view_count as daily_view'),
+        DB::raw('0 as daily_earnings'),
+        DB::raw('job_postings.view_count as total_view')
                 )
                 ->orderBy('job_postings.created_at', 'desc')
                 ->get();
+
+                $datesInRange = [];
         }
 
         // Totals
@@ -222,6 +252,7 @@ class EmployerAuthController extends Controller
             'endDate' => $endDate,
             'dailyEmployerCount' => $dailyEmployerCount,
             'weeklyEmployerCount' => $weeklyEmployerCount,
+            'datesInRange' => $datesInRange ?? [],
         ]);
     }
 
